@@ -1,0 +1,236 @@
+% ===========================================================================
+% APPENDIX (included from main.tex after \appendix\onecolumn)
+% ===========================================================================
+
+\section{Mathematical Preliminaries}
+\label{app:prelim}
+
+This appendix collects the mathematics needed to read both models. Standard references are
+\citet{absil2008} for optimization on manifolds, \citet{kuramoto1984,strogatz2000} for coupled
+oscillators, and \citet{lohe2009} for Kuramoto models on higher-dimensional spheres.
+
+\subsection{Spheres, Tangent Spaces and Products of Spheres}
+
+Differentiating $\ip{z(t)}{z(t)}=1$ along a curve on $\Sph^{n-1}$ gives $\ip{\dot z}{z}=0$, so the
+tangent space at $z$ is the hyperplane $\tang_z\Sph^{n-1}=\{v:\ip{v}{z}=0\}$. The projector
+$\Proj_z=\Id-zz^\top$ of \eqref{eq:proj} is symmetric and idempotent, satisfies $\Proj_zz=0$, and leaves
+tangent vectors unchanged. The radial part of a vector changes only its length and is invisible after
+normalization; only the tangential part moves a point along the sphere. This decomposition underlies
+every identity in the paper.
+
+A state of $M$ unit vectors $z=(z_1,\dots,z_M)$, $z_m\in\Sph^{N-1}$, lives on the product manifold
+$(\Sph^{N-1})^M$ of dimension $M(N-1)$, whose tangent space is the product of the factors' tangent
+spaces; the projector acts block by block. AKOrN uses $M=C/N$ small factors per position; SFPRM uses one
+factor per token ($N=d$), so its state space is $\mathcal S=(\Sph^{d-1})^T$. Rescaling by $1/\sqrt M$
+embeds $(\Sph^{N-1})^M$ into $\Sph^{MN-1}$ as the subset on which all blocks have equal norm. On a
+sphere a state can neither grow nor vanish, so iterating a map on it is bounded by construction and
+only directions carry information; FPRM enforces boundedness by coupling residual coefficients
+\citep{movahedi2026fprm}, whereas SFPRM obtains it from the geometry \citep{sfprm}.
+
+The geodesic distance is the angle $\theta=\angle(u,v)$. SFPRM's halting test uses the chordal
+quantity $1-\ip{u}{v}=1-\cos\theta=\tfrac12\norm{u-v}^2$. Geodesics are great circles; the one leaving
+$u$ in unit tangent direction $e$ is $t\mapsto\cos(t)u+\sin(t)e$, which gives $\Exp_u$. Its inverse
+$\Log_u$ follows from $\norm{\Proj_uv}^2=1-\cos^2\theta=\sin^2\theta$. $\Slerp$ is undefined at
+antipodal pairs, where the shortest arc is not unique.
+
+\subsection{Retractions and Riemannian Gradients}
+
+A retraction is a smooth map $R_z:\tang_z\Sph^{n-1}\to\Sph^{n-1}$ with $R_z(0)=z$ and identity
+derivative at $0$, so it agrees with $\Exp_z$ to first order. Normalization, $R_z(v)=\Ret(z+v)$, is
+the retraction used by AKOrN and nGPT. For tangent $v$, $\norm{z+v}^2=1+\norm{v}^2$, hence
+\begin{equation}
+  \Ret(z+v) = \cos\varphi\,z+\sin\varphi\,\tfrac{v}{\norm{v}},\qquad \tan\varphi=\norm{v}:
+\end{equation}
+normalization moves along the same great circle as $\Exp_z(v)$ but by the angle $\arctan\norm{v}<\pi/2$
+instead of $\norm{v}$. Retraction, exponential map and Slerp therefore differ only in how a step
+length is converted into an angle, which is why step sizes can be traded between them exactly.
+
+For a smooth $f$ on $\R^n$, the Riemannian gradient of its restriction to the sphere is
+$\grad f(z)=\Proj_z\nabla f(z)$, and Riemannian gradient descent is
+$z\leftarrow R_z(-\gamma\grad f(z))$. For the linear potential $f(z)=-\ip{c}{z}$,
+$\grad f=-\Proj_zc$ (AKOrN's stimulus); for the geodesic potential $f(z)=\tfrac12\angle(z,x)^2$,
+$\grad f=-\Log_zx$ (SFPRM's injection, \cref{prop:injection-gradient}).
+
+\subsection{Antisymmetric Matrices and Rotations}
+
+If $\Omega^\top=-\Omega$ then $\ip{\Omega z}{z}=0$, so $\Omega z$ is tangent and the flow
+$\dot z=\Omega z$ preserves the norm; its solution $e^{t\Omega}z(0)$ is a rotation. In a suitable
+orthonormal basis $\Omega$ is block diagonal with $2\times2$ blocks $\omega_kR$,
+$R=\begin{psmallmatrix}0&-1\\1&0\end{psmallmatrix}$, $R^2=-\Id$, plus a zero row and column when $N$
+is odd; each block rotates one plane at the natural frequency $\omega_k$. For odd $N$ a rotation fixes
+an axis, and by the hairy-ball theorem every tangent field on $\Sph^{N-1}$ vanishes somewhere. For even
+$N$, $\Omega$ can have no zero eigenvalue and $\dot z=\Omega z$ moves every point. This is why AKOrN uses
+even $N$, and it is the obstruction to fixed-point existence that SFPRM's injection repairs.
+
+\subsection{The Kuramoto Model in Vector Form}
+\label{app:kuramoto}
+
+In $\dot\theta_i=\omega_i+\sum_jK_{ij}\sin(\theta_j-\theta_i)$ \citep{kuramoto1984,strogatz2000},
+positive couplings synchronize phases and negative couplings repel them; the order parameter
+$re^{i\psi}=\tfrac1n\sum_je^{i\theta_j}$ measures synchrony. A phase-locked state rotates at a common
+frequency with constant phase differences and is a fixed point in the co-rotating frame. With
+$x_i=(\cos\theta_i,\sin\theta_i)$ we have $\dot x_i=\dot\theta_iRx_i$, where
+$Rx_i=(-\sin\theta_i,\cos\theta_i)$ is the unit tangent at $x_i$, and
+$\ip{x_j}{Rx_i}=\sin(\theta_j-\theta_i)$. Hence $\Proj_{x_i}x_j=\sin(\theta_j-\theta_i)Rx_i$, which
+gives \eqref{eq:kuramoto-vector}. Replacing $\omega_iR$ by an antisymmetric $\Omega_i$, scalar
+couplings by matrices $J_{ij}$, and adding an external field $c_i$ that pins oscillators as an injected
+signal locks a physical oscillator \citep{adler1946locking} yields \eqref{eq:akorn-ode}
+\citep{lohe2009,miyato2025akorn}. The AKOrN implementation rotates with the opposite sign, which only
+flips the sign convention of $\omega$.
+
+\subsection{Gradient Flows and Lyapunov Functions}
+
+If $c+Jx=-\nabla E(x)$ and $\Omega=0$, then \eqref{eq:akorn-ode} is the Riemannian gradient flow
+$\dot x=-\grad E(x)$, along which
+\begin{equation}
+  \tfrac{d}{dt}E(x(t))=\ip{\nabla E}{\dot x}=-\norm{\grad E(x)}^2\le0,
+\end{equation}
+because $\dot x$ is tangent. $E$ is a Lyapunov function, and on a compact state space the flow
+settles into the set of stationary points (LaSalle's invariance principle). For
+$E(x)=-\tfrac12x^\top Jx-c^\top x$, the condition $c+Jx=-\nabla E$ holds exactly when $J$ is symmetric,
+which is the origin of \eqref{eq:akorn-energy}. A rotation $\Omega x$ is not a gradient, and neither is
+a non-symmetric coupling such as softmax attention; in those cases no energy is guaranteed.
+
+\subsection{Fixed-Point Iterations and Damping}
+
+A looped model iterates $z_{i+1}=F(z_i)$ and reads its answer at a fixed point $z^\star=F(z^\star)$. If
+$F$ is a contraction with constant $q<1$, Banach's theorem gives a unique fixed point and
+$\norm{z_i-z^\star}\le q^i\norm{z_0-z^\star}$; this is the form of FPRM's global result
+\citep{movahedi2026fprm}. Near a fixed point the error evolves as $e_{i+1}\approx Je_i$ with
+$J=\mathrm dF(z^\star)$. The damped (Krasnosel'skii--Mann) iteration
+$z_{i+1}=(1-\eta)z_i+\eta F(z_i)$ \citep{mann1953} has the same fixed points for every $\eta\in(0,1]$ and
+linearizes to $(1-\eta)\Id+\eta J$, mapping each eigenvalue $\zeta$ to $1+\eta(\zeta-1)$. Since
+$|1+\eta(\zeta-1)|^2=1-2\eta(1-\operatorname{Re}\zeta)+\eta^2|\zeta-1|^2$, the mode decays exactly when
+$\operatorname{Re}\zeta<1$ and $\eta<2(1-\operatorname{Re}\zeta)/|\zeta-1|^2$. Damping tames rotating
+or overshooting modes but no step size helps a mode with $\operatorname{Re}\zeta\ge1$. On the sphere,
+$\Slerp_\eta(z_i,F(z_i))$ replaces linear interpolation with the same fixed points and linearization
+\citep{sfprm}.
+
+By the implicit function theorem, the parameter gradient at $z^\star$ involves $(\Id-J)^{-1}$. FPRM
+and SFPRM avoid forming it: they backpropagate through windows of $K$ iterations, detach the state, and
+apply a loss after every window (deep supervision with truncated backpropagation through time). Under
+contraction this corresponds to truncating the Neumann series $\sum_{k<K}J^k$ for $(\Id-J)^{-1}$
+\citep{movahedi2026fprm}.
+
+\subsection{Transformers on the Sphere}
+
+nGPT \citep{loshchilov2025ngpt} folds a sub-layer output $G(h)$ into the state by
+$h\leftarrow\Norm(h+\alpha\odot(\Norm(G(h))-h))$ with per-coordinate eigen learning rates $\alpha$; for
+scalar $\alpha$ this is normalized linear interpolation toward $\Norm(G(h))$. Softmax attention,
+\begin{equation}
+  \Attn(h)_t=\sum_sa_{ts}(h)\,W_OW_Vh_s,\qquad
+  a_{ts}(h)=\operatorname{softmax}_s\big(s_{qk}\ip{\Norm(W_Qh_t)}{\Norm(W_Kh_s)}\big),
+\end{equation}
+is a linear map of the token vectors with state-dependent weights, i.e.\ a coupling
+$J_{ts}(h)=a_{ts}(h)W_OW_V$ of the kind AKOrN uses as attention connectivity.
+
+\subsection{Operator Splitting}
+
+For smooth vector fields $A,B$ with flows $\phi^A_\varepsilon,\phi^B_\varepsilon$,
+$\phi^B_\varepsilon\circ\phi^A_\varepsilon=\phi^{A+B}_\varepsilon+O(\varepsilon^2)$, with leading
+error proportional to the Lie bracket $[A,B]$ \citep{trotter1959}. The same holds for single
+retraction steps $z\mapsto R_z(\varepsilon A(z))$, which agree with their flows to first order. A model
+that applies stimulus, coupling and nonlinearity as separate small steps is therefore, to first order,
+a single step with the summed drive (\cref{thm:trotter}).
+
+% ===========================================================================
+\section{Proofs and Additional Statements}
+\label{app:proofs}
+
+\paragraph{Attention sub-layer with per-coordinate eigen learning rates.}
+The following restates \cref{prop:attention} and adds the per-coordinate case.
+
+\begin{proposition}[Attention sub-layer, full statement]
+\label{prop:attention-full}
+Let $A_t:=\Attn(h)_t\neq0$, $\hat A_t:=A_t/\norm{A_t}$ and $J_{ts}(h)$ as in \eqref{eq:attn-as-coupling}.
+\begin{enumerate}
+  \item[(a)] If $\alpha_A=a\mathbf1$ and $1+a(\ip{\hat A_t}{h_t}-1)>0$ (automatic for $a<1/2$), then
+  \eqref{eq:ngpt-attn} equals
+  $h_t\leftarrow\Ret\big(h_t+\gamma^A_t\Proj_{h_t}\sum_sJ_{ts}(h)h_s\big)$ with
+  $\gamma^A_t=a/\big(\norm{A_t}(1+a(\ip{\hat A_t}{h_t}-1))\big)$.
+  \item[(b)] If $\alpha_A\in\R^d$, $w_t:=\alpha_A\odot(\hat A_t-h_t)$ and $1+\ip{w_t}{h_t}>0$, then
+  \eqref{eq:ngpt-attn} equals
+  \begin{equation}
+    h_t\leftarrow\Ret\Big(h_t+\tfrac{1}{1+\ip{w_t}{h_t}}\,\Proj_{h_t}\Big[\tfrac{1}{\norm{A_t}}\diag(\alpha_A)\sum_sJ_{ts}(h)h_s-\diag(\alpha_A)h_t\Big]\Big):
+  \end{equation}
+  the coupling is diagonally preconditioned and a self-drive $-\diag(\alpha_A)h_t$ appears, whose
+  tangent part is $-\grad\tfrac12h^\top\diag(\alpha_A)h$ and vanishes when $\alpha_A$ is constant.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+Apply \cref{lem:renorm} with $z=h_t$ and $w=w_t$. For (a),
+$\Proj_{h_t}w_t=a\Proj_{h_t}\hat A_t=\tfrac{a}{\norm{A_t}}\Proj_{h_t}\sum_sJ_{ts}h_s$ because
+$\Proj_{h_t}h_t=0$, and $1+\ip{w_t}{h_t}=1+a(\ip{\hat A_t}{h_t}-1)$. For (b), $\Proj_{h_t}$ no longer
+annihilates $\diag(\alpha_A)h_t$, which produces the self-drive.
+\end{proof}
+
+\begin{proposition}[nGPT MLP sub-layer]
+\label{prop:mlp}
+With $M_t:=\MLP(h)_t\neq0$ and $\hat M_t:=M_t/\norm{M_t}$, \eqref{eq:ngpt-mlp} is the step of
+\cref{prop:attention-full} with $\sum_sJ_{ts}h_s$ replaced by the token-wise nonlinear drive $M_t$.
+\end{proposition}
+\begin{proof}
+Identical to \cref{prop:attention-full} with $A_t$ replaced by $M_t$.
+\end{proof}
+
+\paragraph{Proof of \cref{thm:trotter} (sketch).}
+For a smooth tangent field $v$, $\Ret(y+\varepsilon v(y))=y+\varepsilon v(y)+O(\varepsilon^2)$. By
+\cref{lem:slerp},
+$\Slerp_{\varepsilon\kappa_0}(z,x)=\Exp_z(\varepsilon\kappa_0\Log_zx)=z+\varepsilon\kappa_0\tfrac{\theta^x}{\sin\theta^x}\Proj_zx+O(\varepsilon^2)$.
+Each nGPT sub-layer gives $h\mapsto h+\varepsilon\kappa\Proj_h\hat A+O(\varepsilon^2)$ (or $\hat M$).
+Since every intermediate state equals $z+O(\varepsilon)$, evaluating all drives at $z$ costs
+$O(\varepsilon^2)$ (Lie--Trotter). Hence $\tilde z=z+\varepsilon\Proj_zV(z)+O(\varepsilon^2)$ and
+$\theta_i=O(\varepsilon)$. Then \cref{lem:slerp} gives $\gamma_\eta(\theta_i)=\eta+O(\varepsilon^2)$ and
+$z_{i+1}=\Ret(z+\eta\Proj_z\tilde z)+O(\varepsilon^2)=\Ret(z+\eta\varepsilon\Proj_zV(z))+O(\varepsilon^2)$.
+\hfill$\square$
+
+\paragraph{Proof of \cref{prop:linearization}.}
+Write $v(z):=\Omega z+\Proj_zD(z)$, so $v(z^\star)=0$. Terms involving the derivative of $\gamma$
+multiply $v(z^\star)$ and vanish. For a tangent perturbation $u$,
+$\mathrm d(\Proj_zD)[u]=\Proj_zJ_Du-\ip{D}{u}z-\ip{D}{z}u$. The middle term is normal and is removed by
+the derivative of $\Ret$ at $z^\star$, which equals $\Proj$ because $z^\star+\gamma v(z^\star)=z^\star$
+has unit norm. Collecting terms gives the claim. \hfill$\square$
+
+\paragraph{Proof of \cref{cor:window}.}
+At a fixed point of SFPRM, $F_\theta(z^\star;x)=z^\star$, so $\mu_t=\ip{z^\star_t}{z^\star_t}=1$ and
+$\Proj J_F\Proj-\Id$ restricted to the tangent space equals $J-\Id$. With $\Omega=0$ and
+$\gamma\to\eta$, \cref{prop:linearization} gives $\Id+\eta(J-\Id)=(1-\eta)\Id+\eta J$, the
+linearization of the $\Slerp$ step reported by \citet{sfprm}. \hfill$\square$
+
+\paragraph{Proof of \cref{prop:adler}.}
+Fixed points satisfy $\Omega x+h-\mu x=0$ with $\mu:=\ip{h}{x}$. In plane $k$, $\Omega_k=\omega_kR'$
+with $R'=\begin{psmallmatrix}0&1\\-1&0\end{psmallmatrix}$, $R'^2=-\Id$, and
+$(\omega_kR'-\mu\Id)^{-1}=-(\omega_kR'+\mu\Id)/(\omega_k^2+\mu^2)$. Hence
+$x_k=(\omega_kR'+\mu\Id)h_k/(\omega_k^2+\mu^2)$, and since $R'h_k\perp h_k$ and $\norm{R'h_k}=\norm{h_k}$,
+\begin{equation}
+  \norm{x}^2=g(\mu):=\sum_k\frac{\norm{h_k}^2}{\omega_k^2+\mu^2}.
+\end{equation}
+Consistency holds automatically: $\ip{h}{x}=\sum_k\mu\norm{h_k}^2/(\omega_k^2+\mu^2)=\mu\,g(\mu)$, which
+equals $\mu$ whenever $g(\mu)=1$. Fixed points therefore correspond to solutions of $g(\mu)=1$. The
+function $g$ is even, strictly decreasing in $|\mu|$, tends to $0$ as $|\mu|\to\infty$, and satisfies
+$g(0)=\sum_k\norm{h_k}^2/\omega_k^2$, so a solution exists if and only if $g(0)\ge1$. \hfill$\square$
+
+% ===========================================================================
+\section{Numerical Verification Setup}
+\label{app:numerics}
+
+All checks used NumPy in double precision. % TODO: release the verification scripts as supplementary material.
+\begin{itemize}
+  \item \textbf{\Cref{lem:renorm,lem:slerp}.} $5{,}000$ random draws in $d=64$: unit $z$ and $v$, damping
+  $\eta\sim\mathcal U(0.02,1)$, and nGPT-style updates $w=\alpha\odot(A-z)$ with unit $A$ and
+  $\alpha_i\sim\mathcal U(0,0.5)$; only draws satisfying the positivity conditions enter the maxima.
+  \item \textbf{\Cref{prop:attention}.} $T=6$ tokens, $d=16$, $H=2$ heads with QK-normalization
+  (logit scale $4$), scalar eigen learning rate $a=0.3$. The identity
+  $\Attn(h)_t=\sum_sJ_{ts}(h)h_s$ holds to $2.2\times10^{-16}$.
+  \item \textbf{\Cref{thm:trotter}.} The same tokens with one nGPT-style layer (attention and an MLP
+  $h\mapsto\tanh(W_1h)$), $\eta=1$, all $\kappa=1$; the error between the split iteration and the single
+  step is reported at $\varepsilon\in\{10^{-1},10^{-2},10^{-3}\}$.
+  \item \textbf{\Cref{prop:linearization}.} One token in $d=6$ with
+  $F(z)=\Ret(\tanh(Wz+b)+1.2z)$, $\gamma=0.5$, and either $\Omega=0$ or three rotation planes with
+  frequencies $(0.3,0.2,0.1)$. Fixed points were found by iterating $50{,}000$ steps (residual
+  $<10^{-16}$); Jacobians were compared with central differences of step $10^{-6}$ on the tangent space.
+  \item \textbf{\Cref{prop:adler}.} $N=4$ with plane frequencies $(1.0,0.6)$, random drives rescaled so
+  that $\sum_k\norm{h_k}^2/\omega_k^2\in\{0.6,0.9,0.99,1.01,1.1,2\}$, step $\gamma=0.05$, $40{,}000$ steps
+  from three random initializations. For values $\ge1.01$ the final tangent speed was below
+  $10^{-15}$; for values $\le0.99$ it stayed above $7\times10^{-2}$.
+\end{itemize}

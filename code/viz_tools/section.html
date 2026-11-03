@@ -1,0 +1,159 @@
+<section id="energy">
+  <h2>New method: an energy-based SFPRM with a codebook memory</h2>
+  <p class="prose">The dictionary has one row where the two models disagree: AKOrN can have an energy, SFPRM never does. The new method closes that gap from the SFPRM side. Each iteration takes one Riemannian gradient step on an explicit energy, so every step is an AKOrN step whose drive is <span class="m">−grad E</span>, and the halting residual becomes the size of that gradient.</p>
+  <div class="pair">
+    <div class="eq"><span class="tag">Energy (visible tokens z, hidden tokens u)</span>
+      E(w;x) = κ₀ Σ<sub>t</sub> ½∠(z<sub>t</sub>, x<sub>t</sub>)² + E<sub>attn</sub>(u, z) + E<sub>mem</sub>(u) + E<sub>ans</sub>(z)
+    </div>
+    <div class="eq"><span class="tag">Update and halting</span>
+      w ← Exp<sub>w</sub>( −η grad E(w;x) ),&nbsp;&nbsp; halt when max<sub>t</sub> ‖grad<sub>t</sub> E‖ &lt; τ
+    </div>
+  </div>
+  <div class="pipeline" aria-label="The terms of the energy and their roles">
+    <div class="stage c1"><b>Evidence</b><span class="m">½∠(z<sub>t</sub>, x<sub>t</sub>)²</span><div class="akorn">SFPRM's geodesic injection, unchanged. Keeps each token near its input.</div></div>
+    <div class="stage c2"><b>Constraints</b><span class="m">−(σ<sub>k</sub>/β) Σ<sub>t</sub> log Σ<sub>s</sub> e<sup>β⟨W<sub>Q</sub>u<sub>t</sub>, W<sub>K</sub>z<sub>s</sub>⟩</sup></span><div class="akorn">Energy attention. Heads with σ &gt; 0 attract, heads with σ &lt; 0 repel. The coupling is symmetric.</div></div>
+    <div class="stage c3"><b>Values</b><span class="m">−(1/β) Σ<sub>t</sub> log Σ<sub>k</sub> e<sup>β⟨ξ<sub>k</sub>, z<sub>t</sub>⟩</sup></span><div class="akorn">Hopfield memory with one prototype per answer. Its minima are the possible answers.</div></div>
+    <div class="stage c4"><b>Readout</b><span class="m">logits<sub>t</sub> = s Ξ z<sub>t</sub></span><div class="akorn">Tied to the same prototypes: the prediction is the prototype the token sits in.</div></div>
+  </div>
+  <p class="prose">The figures below build the intuition in four steps: what an energy does to the dynamics near a fixed point, what the memory term does to a single cell, a small Sudoku solved by descending an energy, and what the trained models show.</p>
+
+  <h3>1 · An energy removes rotation, but not stiffness</h3>
+  <p class="prose">Near a halted state the error <span class="m">e</span> evolves as <span class="m">e ← (I − ηM)e</span>. For a gradient step, <span class="m">M</span> is the Hessian of <span class="m">E</span>: symmetric, so its eigenvalues are real and the error shrinks without turning. A learned map like SFPRM's adds an antisymmetric part <span class="m">ωR</span>, which rotates the error. Rotation pushes the eigenvalues off the real axis and lets the energy rise along the way. The stiffness slider makes one mode steeper than the other, which is what the trained energy models turned out to be.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="rotPlane" viewBox="-160 -130 320 260" role="img" aria-label="Error trajectory near a fixed point over energy contours"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="rOm">Rotation ω <output id="rOmv"></output></label><input id="rOm" type="range" min="0" max="150" value="0"></div>
+        <div class="ctl"><label for="rKap">Stiffness h<sub>max</sub>/h<sub>min</sub> <output id="rKapv"></output></label><input id="rKap" type="range" min="1" max="40" value="4"></div>
+        <div class="ctl"><label for="rEta">Step η <output id="rEtav"></output></label><input id="rEta" type="range" min="2" max="200" value="80"></div>
+        <dl class="readout" id="rotRead"></dl>
+        <svg id="rotEig" viewBox="-115 -78 230 156" role="img" aria-label="Eigenvalues of the damped map in the complex plane"></svg>
+        <svg id="rotErr" viewBox="0 0 300 130" role="img" aria-label="Energy along the path, log scale"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s3)"></span>contours of ½eᵀHe</span>
+      <span><span class="sw" style="background:var(--s2)"></span>error path from e₀</span>
+      <span><span class="sw" style="background:var(--bad)"></span>step where ½eᵀHe rose</span>
+      <span><span class="sw" style="background:var(--s1)"></span>damped eigenvalue 1 − ηλ</span>
+    </div>
+    <figcaption>With ω = 0 the update is a gradient step: the path cuts across the contours and the energy falls at every step, as long as η stays below 2/h<sub>max</sub>. Raise ω and the path spirals, the eigenvalues become a complex pair and the energy can rise. Raise the stiffness instead: the eigenvalues stay real, but the step must shrink with h<sub>max</sub> and the slow mode then takes many steps. The “best η” readout shows the fastest any fixed step can do. The trained energy models are stiff (largest Hessian eigenvalue about 13), so they halt in 40–100 iterations against about 20 for SFPRM.</figcaption>
+  </figure>
+
+  <h3>2 · One cell: the memory term and its β knob</h3>
+  <p class="prose">With prototypes of equal norm, <span class="m">e<sup>β⟨ξ<sub>k</sub>, z⟩</sup></span> is a von Mises–Fisher density on the sphere, so the memory energy is minus the log of a mixture centred on the prototypes (green ring). Here a single cell lives on a circle with four digit prototypes. The blue arrow is the pull from the rest of the puzzle, standing in for injection and attention. At small β the mixture is almost flat and the pull decides where the cell goes. At large β each prototype digs its own well and the cell commits to the nearest one. Annealing β from small to large lets the constraints act first and commits late.</p>
+  <figure>
+    <div class="fig-grid">
+      <div>
+        <svg id="cellDial" viewBox="-150 -140 300 280" role="img" aria-label="A cell on a circle with four digit prototypes"></svg>
+        <svg id="cellCurve" viewBox="0 0 460 200" role="img" aria-label="Energy along the circle at the current beta"></svg>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label for="cB">Final concentration β <output id="cBv"></output></label><input id="cB" type="range" min="0" max="100" value="91"></div>
+        <div class="ctl"><label for="cPhi">Digit favoured by the constraints <output id="cPhiv"></output></label><input id="cPhi" type="range" min="0" max="359" value="200"></div>
+        <div class="ctl"><label for="cS">Pull from the constraints <output id="cSv"></output></label><input id="cS" type="range" min="0" max="100" value="35"></div>
+        <div class="ctl"><label for="cStart">Start angle <output id="cStartv"></output></label><input id="cStart" type="range" min="0" max="359" value="60"></div>
+        <div class="btns"><button id="cFix" type="button" class="ghost">Descend, fixed β</button><button id="cAnn" type="button">Descend, annealed β</button></div>
+        <svg id="cellBars" viewBox="0 0 220 74" role="img" aria-label="Soft assignment of the cell to the four digits"></svg>
+        <dl class="readout" id="cRead"></dl>
+        <p class="note" id="cMsg"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s3)"></span>memory density (vMF mixture)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>pull from the constraints</span>
+      <span><span class="sw" style="background:var(--s2)"></span>cell and its path</span>
+    </div>
+    <figcaption>In the default setting the constraints favour digit 3, but the cell starts closest to digit 2. With β fixed at its final value, the cell drops into the digit-2 well at once. With β annealed (×1/30 at the start, full after 70 steps), it first follows the pull toward 3 and commits only when the wells appear; watch the energy curve change during the run. In the trained model, fixing β from the start left training stuck at the clue-only plateau. The bars show the soft assignment softmax(β⟨ξ<sub>k</sub>, z⟩); a cell counts as committed when its largest bar exceeds 0.9, a certificate that needs no labels.</figcaption>
+  </figure>
+
+  <h3>3 · A 4×4 Sudoku solved by descending one energy</h3>
+  <p class="prose">The same energy at puzzle scale, with weights set by hand rather than trained. Each of the 16 cells is a unit vector in four dimensions, with digit prototypes <span class="m">e₁…e₄</span>. The evidence term pins the clues. One repulsive attention head over each cell's row, column and box pushes peers apart. The memory pulls every cell toward a digit, with β annealed. The update is the plain gradient step <span class="m">z ← Exp<sub>z</sub>(−η grad E)</span>. The bars in each cell show its soft assignment at the current β, and a digit turns solid once the cell commits.</p>
+  <figure>
+    <div class="fig-grid">
+      <div>
+        <svg id="sud" viewBox="0 0 330 330" role="img" aria-label="A 4 by 4 Sudoku grid whose cells evolve under gradient descent"></svg>
+        <svg id="sudPlot" viewBox="0 0 330 120" role="img" aria-label="Energy over iterations"></svg>
+      </div>
+      <div class="controls">
+        <div class="radio" role="radiogroup" aria-label="Concentration schedule">
+          <label><input type="radio" name="sched" id="schA" checked> annealed β</label>
+          <label><input type="radio" name="sched" id="schF"> fixed β</label>
+        </div>
+        <div class="btns"><button id="sudRun" type="button">Solve from a random start</button><button id="sudNew" type="button" class="ghost">Next puzzle</button></div>
+        <dl class="readout" id="sudRead"></dl>
+        <p class="note" id="sudMsg"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--rule)"></span>clue cell</span>
+      <span><span class="sw" style="background:var(--s2)"></span>leading digit in a cell's soft assignment</span>
+      <span><span class="sw" style="background:var(--good)"></span>correct after halting</span>
+      <span><span class="sw" style="background:var(--bad)"></span>wrong after halting</span>
+    </div>
+    <figcaption>A single start often ends in a stable but wrong board: a local minimum of the energy. The grey band on the energy plot is the annealing window. The energy (measured at the final β) can rise there, which is why descent is only guaranteed once the schedule ends. Weights: repulsion 1.5 with logit scale 4, memory 1 with final β = 12, β annealed from 12/20 over 60 iterations, step 0.2, 260 iterations.</figcaption>
+  </figure>
+
+  <h3>4 · Restarts, and why the energy can choose between them</h3>
+  <p class="prose">Restarting from new random states finds the solution more often. The hard part is choosing which halted state to trust. In SFPRM every halted state has a residual near zero, so the residual cannot rank them, and the anchor angle turned out to rank them badly. With an energy the choice is natural: a wrong board violates a constraint or sits off the prototypes, so it ends higher. Picking the lowest-energy restart then works whenever any restart found the answer.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="sudE" viewBox="0 0 460 170" role="img" aria-label="Final energies of the restarts on the current puzzle"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="sB">Restarts B <output id="sBv"></output></label><input id="sB" type="range" min="1" max="32" value="16"></div>
+        <div class="btns"><button id="sudRestart" type="button">Run B restarts on this puzzle</button></div>
+        <dl class="readout" id="sudERead"></dl>
+      </div>
+    </div>
+    <figcaption>Each dot is one restart of the puzzle shown above, placed at its final energy. The ring marks the lowest-energy restart, the one energy selection returns. The schedule is the one chosen above.</figcaption>
+  </figure>
+  <figure>
+    <div class="fig-grid">
+      <svg id="sudBatch" viewBox="0 0 460 260" role="img" aria-label="Fraction of puzzles solved against the number of restarts"></svg>
+      <div class="controls">
+        <p class="note" style="margin:0">24 puzzles × 16 restarts per schedule, computed in your browser. A puzzle counts as solved when the chosen restart decodes to the solution.</p>
+        <button id="sudBatchBtn" type="button">Recompute with new random starts</button>
+        <dl class="readout" id="sudBatchRead"></dl>
+        <p class="note" style="margin:0">In this toy the lowest-energy curve lies on the oracle curve: the energy never prefers a wrong board over a right one. That holds because the answers are the deepest minima. Weight the repulsion several times more than the memory and it stops holding. In the trained model, tying the readout to the prototypes in the energy is what made the energy rank answers; before that change, energy selection lowered accuracy.</p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s2)"></span>annealed β, lowest energy</span>
+      <span><span class="sw dash" style="color:var(--s2)"></span>annealed β, majority vote</span>
+      <span><span class="sw" style="background:var(--ink-2)"></span>annealed β, oracle (any restart correct)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>fixed β, lowest energy</span>
+    </div>
+  </figure>
+
+  <h3>5 · What the trained models show</h3>
+  <p class="prose">The same picture appears in the trained models: SFPRM against the energy model with the codebook readout on Sudoku, 500 out-of-distribution test puzzles with fewer clues than in training. First, the spectrum of the Jacobian at halted states, damped by a step <span class="m">η</span> of your choice. Every eigenvalue of the energy model is real, as the theory requires, while 96% of SFPRM's form complex pairs. The energy model's eigenvalues spread far along the real axis, so it needs a small step, which is the stiffness from figure 1.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="realEig" viewBox="-170 -150 340 300" role="img" aria-label="Measured eigenvalues of the two trained models in the complex plane"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="rE">Step η <output id="rEv"></output></label><input id="rE" type="range" min="1" max="100" value="15"></div>
+        <dl class="readout" id="realEigRead"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>SFPRM, 1,008 eigenvalues</span>
+      <span><span class="sw" style="background:var(--s2)"></span>energy model (codebook), 2,016 eigenvalues</span>
+    </div>
+    <figcaption>One halted 4×4 out-of-distribution state per model, Jacobian computed exactly on the tangent space, each eigenvalue ζ shown as 1 + η(ζ − 1). A mode decays when its point is inside the unit circle. At η = 1, SFPRM's operating point, every SFPRM mode decays, but most rotate. The energy model needs η below about 0.16, where all its modes are real and inside the circle but the slowest ones shrink slowly.</figcaption>
+  </figure>
+  <p class="prose">Second, accuracy against the number of restarts. For SFPRM only rules without an energy are available. For the energy model with the codebook readout, the lowest-energy restart reaches the oracle: 75% to 99% out of distribution on 4×4 and 10% to 88% on 6×6, with 64 restarts. The first energy model, without the codebook readout, shows what happens when the energy does not rank answers: selection makes things worse.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="realB" viewBox="0 0 460 270" role="img" aria-label="Measured accuracy against the number of restarts"></svg>
+      <div class="controls">
+        <div class="radio" role="radiogroup" aria-label="Board size">
+          <label><input type="radio" name="rsize" id="r4" checked> 4×4</label>
+          <label><input type="radio" name="rsize" id="r6"> 6×6</label>
+        </div>
+        <dl class="readout" id="realBRead"></dl>
+        <div class="legend" id="realBLegend" style="display:grid;gap:4px"></div>
+      </div>
+    </div>
+    <figcaption>Out-of-distribution board accuracy over 500 test puzzles, 64 restarts per puzzle, rules applied to the first B. The oracle counts a puzzle as solved if any of the B restarts is correct, so it is the ceiling for every selection rule. The 6×6 energy model shown is the variant trained with the extra ranking loss; on 4×4 that loss did not improve selection and cost single-restart accuracy. A single run, single seed per model.</figcaption>
+  </figure>
+</section>

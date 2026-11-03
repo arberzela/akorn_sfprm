@@ -1,0 +1,371 @@
+% ===========================================================================
+\section{Proofs for the Energy-Based SFPRM}
+\label{app:energy-proofs}
+
+\paragraph{Proof of \cref{prop:energy-gradient}.}
+Write $q^k_t=W_Q^ku_t$, $k^k_s=W_K^kz_s$ and $\ell^k_{ts}=\beta_k\ip{q^k_t}{k^k_s}$. For the Euclidean
+gradient of $E_A$ with respect to $u_t$ only the terms of head $k$ in which $t$ is the query index
+contribute, and $\partial_{u_t}\big[-\tfrac{\sigma_k}{\beta_k}\log\sum_{s\neq t}e^{\ell^k_{ts}}\big]
+=-\sigma_k\sum_{s\neq t}a^k_{ts}(W_Q^k)^\top k^k_s=-\sigma_k\sum_{s\neq t}a^k_{ts}M_kz_s$. For $z_s$
+only terms in which $s$ is the key index contribute, one for every query $t\neq s$, giving
+$-\sigma_k\sum_{t\neq s}a^k_{ts}(W_K^k)^\top q^k_t=-\sigma_k\sum_{t\neq s}a^k_{ts}M_k^\top u_t$;
+renaming indices yields the key-path sum in \eqref{eq:grad-z}. The bilinear term gives
+$-\kappa_CC^\top u_t$ and $-\kappa_CCz_t$, the memory term gives
+$-\kappa_M\sum_\mu\operatorname{softmax}_\mu(\beta_M\Xi u_t)\,\xi_\mu$, and the injection term gives
+$-\kappa_0\Log_{z_t}x_t$ after projection (\cref{prop:injection-gradient}). The Riemannian gradient
+on a product of spheres is the token-wise projection $\Proj_{w_t}$ of the Euclidean gradient
+(\cref{app:prelim}), which proves \eqref{eq:grad-z}--\eqref{eq:grad-u}. In the flat variant
+$u_t=z_t$ and the two attention contributions to token $t$ add to
+$\sum_{s\neq t}\big(a^k_{ts}M_k+a^k_{st}M_k^\top\big)z_s$, so $J_{ts}=\sum_k\sigma_k(a^k_{ts}M_k+a^k_{st}M_k^\top)$
+and $J_{st}^\top=\sum_k\sigma_k(a^k_{st}M_k^\top+a^k_{ts}M_k)=J_{ts}$. \hfill$\square$
+
+\paragraph{Proof of \cref{thm:lyapunov}.}
+\emph{Existence of $L$.} $E_A$, $E_C$ and $E_M$ are real-analytic on $\R^{2Td}$, so their
+restrictions to the compact manifold $(\Sph^{d-1})^{2T}$ have bounded Riemannian Hessians, and for the
+exponential retraction $t\mapsto E(\Exp_w(tv))$ has second derivative
+$\operatorname{Hess}E(\gamma(t))[\dot\gamma,\dot\gamma]\le\lambda_{\max}(\operatorname{Hess}E)\norm v^2$,
+which gives the inequality with $L=\sup\lambda_{\max}(\operatorname{Hess}E)$ by Taylor's theorem
+\citep[Ch.~10]{boumal2023}. For the injection term, on $\Sph^{d-1}$ the Hessian of
+$\tfrac12\angle(\cdot,x)^2$ at angle $\theta\in(0,\pi)$ has eigenvalue $1$ along the geodesic to $x$
+and $\theta\cot\theta\le1$ on its orthogonal complement; at the antipode the function has a concave
+corner, so its second derivative along any geodesic is bounded above by $1$ in the distributional
+sense and the inequality holds with the contribution $\kappa_0$ at every $w$ with no token antipodal
+to its input, which is the exceptional set of the theorem; for the chordal injection
+$\sum_t(1-\ip{z_t}{x_t})$, AKOrN's stimulus potential, the Hessian is bounded by $1$ everywhere and
+no exception is needed.
+\emph{(i)} Take $v=-\eta\grad E(w_i)$:
+$E(w_{i+1})\le E(w_i)-\eta\norm{\grad E(w_i)}^2+\tfrac L2\eta^2\norm{\grad E(w_i)}^2=E(w_i)-c_\eta\norm{\grad E(w_i)}^2$.
+\emph{(ii)} Summing (i) over $i<N$ and using that $E$ is continuous on a compact set, hence bounded
+below by $\min E$, gives $c_\eta\sum_{i<N}\norm{\grad E(w_i)}^2\le E(w_0)-\min E$ for every $N$. Hence
+$\grad E(w_i)\to0$, and by continuity of $\grad E$ every accumulation point is stationary. If the
+halting test has not fired before iteration $N$ then $\norm{\grad E(w_i)}\ge\max_t\norm{\grad_{w_t}E(w_i)}\ge\tau_g$
+for all $i<N$, so $Nc_\eta\tau_g^2\le E(w_0)-\min E$. \emph{(iii)} By (i) and $v=-\eta\grad E$, the
+iteration is a descent method with exact gradient direction and sufficient decrease, so the
+Łojasiewicz argument of \citet{absil2005analytic}, applied in a chart around an accumulation point
+where $E$ is real-analytic, shows that the sequence has finite length and converges. For decaying
+step sizes $\eta_i\in[\eta_{\min},\eta]$, (i) holds with $c_{\eta_i}\ge\min(c_{\eta_{\min}},c_\eta)$
+because $c$ is concave in $\eta$ on $(0,2/L)$. \hfill$\square$
+
+\paragraph{Proof of \cref{prop:real-spectrum}.}
+$F_E$ is the generalized AKOrN step of \cref{def:gen-akorn} with $\Omega=0$, $\gamma=1$, drive
+$D=-\nabla E$ and the exponential retraction in place of normalization; at a fixed point the two
+retractions have the same derivative because both equal the identity on the tangent space to first
+order and the step vanishes. \Cref{prop:linearization} with $J_D=-\nabla^2E$ and
+$\mu_t=\ip{D_t}{w^\star_t}=-\ip{\nabla_{w_t}E}{w^\star_t}$ gives
+$\mathrm dF_E=\Id-\big(\Proj\nabla^2E\,\Proj-\operatorname{M}_{\mu'}\big)$ with
+$\mu'_t=\ip{\nabla_{w_t}E}{w^\star_t}$, and the bracket is the Riemannian Hessian of $E$ on the
+product of spheres \citep[Sec.~5.4]{absil2008}. It is self-adjoint on the tangent space because
+$\Proj\nabla^2E\,\Proj$ is symmetric and $\operatorname{M}_{\mu'}$ is a token-wise multiple of the
+identity. By \cref{cor:window} the $\Slerp$ step linearizes to $(1-\eta)\Id+\eta\,\mathrm dF_E=\Id-\eta\operatorname{Hess}E$.
+The spectral theorem gives real eigenvalues $h$ of the Hessian and $\zeta=1-h$ of $\mathrm dF_E$. The
+mode decays iff $|1-\eta h|<1$ iff $0<h<2/\eta$; all modes decay iff $\operatorname{Hess}E\succ0$ and
+$\eta<2/\lambda_{\max}$, and for real $\zeta$ the window $2(1-\operatorname{Re}\zeta)/|\zeta-1|^2$
+of \cref{cor:window} equals $2/h$. If some $h<0$ then $|1-\eta h|>1$ for every $\eta>0$. \hfill$\square$
+
+\paragraph{Eigen learning rates as a preconditioner.}
+Let $D=\diag(\alpha)\succ0$ be fixed and replace the step by $w\leftarrow\Exp_w(-\eta\,\Proj D\,\grad E(w))$.
+Then $\ip{\grad E}{\Proj D\grad E}=\ip{\grad E}{D\grad E}\ge\alpha_{\min}\norm{\grad E}^2$, so the
+direction is a descent direction and \cref{thm:lyapunov} holds with $c_\eta$ replaced by
+$\eta(\alpha_{\min}-\eta L\alpha_{\max}^2/2)$. At a stationary point the Jacobian is
+$\Id-\eta(\Proj D\Proj)\operatorname{Hess}E$, and $(\Proj D\Proj)\operatorname{Hess}E$ restricted to
+the tangent space is similar to $S^{1/2}\operatorname{Hess}E\,S^{1/2}$ with $S=\Proj D\Proj\succ0$ on
+the tangent space, which is symmetric, so the spectrum stays real.
+
+\paragraph{Proof of \cref{prop:voting}.}
+The residual bound is \cref{def:esfprm}. Energy selection with $\sigma_k=\kappa_C=\kappa_M=0$ is
+anchor-angle selection. Let $w^\sharp$ be the global minimizer with basin $\mathcal B$ of measure
+$p>0$. A restart in $\mathcal B$ halts at a $\tau_g$-stationary point $w^{(b)}$ in the basin, with
+$E(w^{(b)})\le\min E+\delta(\tau_g)$, where the halting slack $\delta$ vanishes with $\tau_g$. Any other
+halted state is within the same slack of a stationary value, which by assumption exceeds $\min E+2\delta$
+(the gap condition of the proposition),
+so $w^{(b)}$ has the smallest energy among the halted states and decodes correctly. The probability
+that none of $B$ starts falls in $\mathcal B$ is $(1-p)^B\to0$. \hfill$\square$
+
+\paragraph{Implicit gradient and equilibrium propagation.}
+At an attracting halted state, $\grad E(w^\star;\theta)=0$ with $\operatorname{Hess}E(w^\star)\succ0$,
+so by the implicit function theorem (in a chart) $w^\star(\theta)$ is smooth and differentiating the
+stationarity condition gives $\operatorname{Hess}E\,\frac{\mathrm dw^\star}{\mathrm d\theta}+\frac{\partial\grad E}{\partial\theta}=0$.
+Hence $\frac{\mathrm d\ell}{\mathrm d\theta}=\ip{\grad\ell}{\frac{\mathrm dw^\star}{\mathrm d\theta}}=-\ip{\operatorname{Hess}E^{-1}\grad\ell}{\partial_\theta\grad E}$,
+which is \eqref{eq:implicit}. With $J=\mathrm dF_E=\Id-\operatorname{Hess}E$ the matrix
+$(\Id-J)^{-1}$ of \cref{app:prelim} is $\operatorname{Hess}E^{-1}$, and the truncated Neumann series
+of truncated BPTT becomes $\eta\sum_{k<K}(\Id-\eta\operatorname{Hess}E)^k$, whose error after $K$
+terms is $(1-\eta\lambda_{\min})^K$, i.e.\ $K=O(\kappa\log(1/\epsilon))$ for $\eta=1/\lambda_{\max}$,
+against $O(\sqrt\kappa\log(1/\epsilon))$ for conjugate gradient \citep[Thm.~5.5]{nocedal2006}. For
+\eqref{eq:ep}, let $G(\theta,\beta):=\min_wE(w;\theta)+\beta\ell(w)=E(w^\star_\beta;\theta)+\beta\ell(w^\star_\beta)$.
+By the envelope theorem $\partial_\theta G=\partial_\theta E(w^\star_\beta;\theta)$ and
+$\partial_\beta G=\ell(w^\star_\beta)$; equality of mixed partial derivatives gives
+$\frac{\mathrm d}{\mathrm d\theta}\ell(w^\star_\beta)=\frac{\mathrm d}{\mathrm d\beta}\partial_\theta E(w^\star_\beta;\theta)$,
+and $\beta=0$ yields \eqref{eq:ep} \citep{scellier2017ep}; the argument uses only stationarity on the
+manifold.
+
+% ===========================================================================
+\section{Pilot Experiment: Energy-Based versus Standard SFPRM}
+\label{app:pilot}
+
+\paragraph{Tasks.}
+Sudoku of size $4\times4$ ($2\times2$ boxes, $T=16$) and $6\times6$ ($2\times3$ boxes, $T=36$).
+Puzzles are generated by filling a random grid with a randomized backtracking solver and removing
+cells in random order while the puzzle keeps a unique solution, until a target number of clues is
+reached. For $6\times6$, training uses $12{,}000$ puzzles with $14$--$22$ clues (mean $18.0$); the
+in-distribution (ID) test set has puzzles from the same range and the out-of-distribution (OOD) test
+set puzzles with $8$--$13$ clues (mean $11.1$), mirroring the easy/hard split used for AKOrN. For
+$4\times4$, training uses $400$ puzzles with $7$--$10$ clues and the OOD test set has $4$--$6$
+clues; since only $288$ distinct $4\times4$ grids exist, test grids can coincide with training grids,
+and the $4\times4$ task measures constraint propagation rather than generalization across grids.
+Evaluation uses $500$ puzzles per test set. Each cell is a token; the input embedding is
+$x_t=\Norm(e_{\mathrm{digit}(t)}+Wp_t)$ with a learned digit table (blank included) and a learned
+linear map $W$ of the row/column/box one-hot features $p_t$, shared by both models. The readout is
+linear, $s\,W_{\mathrm{out}}z_t+b$, and the loss is the cross-entropy over all cells.
+
+\paragraph{Models.}
+\emph{SFPRM}: $d=64$, $D=2$ nGPT layers with $H=4$ heads, QK-normalized attention with a learned
+logit scale per head, a GELU MLP of width $4d$, per-coordinate eigen learning rates initialized at
+$0.25$, injection $\lambda=0.5$, $\Slerp$ damping; PSF parameters. \emph{Energy SFPRM}
+(\cref{def:esfprm}, hidden variant): $d=64$, $H=8$ heads of dimension $8$ with signed weights
+initialized at $\pm0.2$ (alternating), $W_Q,W_K$ with entries of standard deviation $1/\sqrt d$,
+logit scales $\beta_k=d/\sqrt{d_h}$, $K=1024$ memories with $\beta_M=\sqrt d$, $\kappa_0=0.5$,
+$\kappa_C=0.5$, $\kappa_M=0.1$, geodesic injection; PEN parameters. All positive scales are
+softplus-parametrized and learned.
+
+\paragraph{Training.}
+Both models are trained identically: AdamW (learning rate $2\times10^{-3}$, weight decay $0.01$ on
+matrices, cosine decay, $200$ warm-up steps, gradient clipping at $1$), batch $128$,
+$4{,}000$ steps on $6\times6$ ($400$ for SFPRM and $2{,}000$ for the energy model on $4\times4$,
+each run until its training accuracy had saturated), random unit-norm initial states, deep supervision with two windows of $K=8$ iterations at $\eta=1$
+and the state detached between windows, exactly the recipe described for FPRM and SFPRM. For the
+energy model each training iteration uses Armijo backtracking on $E$ (acceptance constant
+$10^{-4}$, at most four halvings, step size treated as a constant), which keeps the training
+dynamics inside the descent regime of \cref{thm:lyapunov}; without it, energy increases in up to
+half of the iterations once the attention sharpens, and the model does not learn.
+
+\paragraph{Evaluation.}
+At test time both models run the damped loop from random unit-norm states for at most $128$
+iterations with the chordal halting test at $\tau_c=10^{-4}$, $\eta$ starting at $1$ and halved
+after $3$ iterations without residual improvement (patience rule, minimum $1/64$); for the energy
+model we report Armijo backtracking in place of the patience rule, and use it for the spectrum and
+restart measurements as well; the patience rule, which starts at $\eta=1$, far outside the energy
+model's window, halts only about half of the puzzles within $128$ iterations. \emph{Iterations to halt}
+are counted over puzzles that halt. \emph{Spectrum}: for $20$ ID and $20$ OOD puzzles the halted
+state is polished in double precision (continuing the damped iteration until the residual is below
+$10^{-12}$ or for $2{,}000$ steps), and the Jacobian of the proposal map $F$ on the tangent space
+is computed by automatic differentiation in an orthonormal tangent basis; we report the fraction of
+eigenvalues with $|\operatorname{Im}\zeta|>10^{-8}$, $\max|\operatorname{Im}\zeta|$, the relative
+asymmetry $\norm{J-J^\top}_{\max}/\norm{J}_{\max}$, and the damping window of \cref{cor:window}.
+\emph{Restarts}: for $B\in\{1,2,4,\dots,64\}$ independent random starts per puzzle we select one
+halted state by (a) the final energy $E(w^\star;x)$, (b) the energy summed over the first $32$
+iterations, as AKOrN does, (c) the anchor-angle potential $\Phi_x(z^\star)$, which is available in
+plain SFPRM, (d) majority vote over decoded boards, and report board accuracy; the oracle is the
+fraction of puzzles for which any of the $B$ restarts is correct.
+
+\paragraph{Results of the first energy model.}
+\Cref{tab:pilot} and \cref{fig:pilot} summarize the comparison of \cref{sec:energy-pilot}. Four
+observations. \emph{Accuracy and training cost.} The energy model learns both tasks, but needs several times more
+optimization steps than SFPRM to leave the ``clues only'' plateau (\cref{fig:training}), and at an
+equal budget it is behind: on $4\times4$ it reaches 82.4\% ID and 17.2\% OOD against 97.8\% and
+65.6\% for SFPRM, and on $6\times6$ it does not leave the plateau within the $4{,}000$-step budget in which SFPRM reaches $99.8\%$ ID and $89.2\%$ OOD (cell accuracy $72\%$, no board solved). Without the three design choices of
+\cref{sec:energy-design} and Armijo backtracking in training it does not leave the plateau at all.
+\emph{Spectrum.} At every polished halted state the energy model's Jacobian is symmetric to
+machine precision and all eigenvalues are real, whereas 96.4\% of SFPRM's eigenvalues are complex
+with imaginary parts up to 0.61 (\cref{fig:pilot}, left). The learned energy is stiff, however:
+$\lambda_{\max}(\operatorname{Hess}E)\approx 12.2$, so the admissible step is
+$\eta<2/\lambda_{\max}\approx 0.16$ rather than SFPRM's $\approx 1.40$, and the slow modes of a
+stiff Hessian make halting \emph{slower}, not faster: 68 / 114 iterations (median / p90, OOD) against
+19 / 45 for SFPRM. Real eigenvalues remove the rotational obstruction of \cref{cor:window}, but the
+condition number of the learned Hessian decides the halting time, and nothing in the training
+objective controls it. \emph{Halting rule.} With Armijo backtracking the energy model halts
+81.8\% of the OOD puzzles within $128$ iterations and the energy never increases; the patience rule,
+which starts at $\eta=1$, halts about half as many (\cref{tab:pilot-full}).
+\emph{Energy selection.} Energy voting does not help here: selecting the lowest-energy halted
+state among $B=64$ restarts gives 12.4\% OOD on $4\times4$, below the single-restart accuracy, while
+majority voting gives 20.6\% and the oracle 36.0\%. The premise of \cref{prop:voting} fails, as the
+lowest minima of the learned energy are not the correct boards; deep supervision never asks them
+to be. Anchor-angle selection fails in the same way for both models.
+
+\begin{table}[h]
+  \caption{Pilot comparison on $4\times4$ and $6\times6$ Sudoku ($500$ test puzzles each; board
+  accuracy in \%; one restart unless stated; iterations to halt at $\tau_c=10^{-4}$ over halted
+  puzzles, median / 90th percentile; spectrum of $\mathrm dF$ at polished halted OOD states). The
+  energy model uses Armijo backtracking at test time, SFPRM the patience rule.}
+  \label{tab:pilot}
+  \vskip 0.1in
+  \begin{center}
+  \begin{footnotesize}
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+     & \multicolumn{2}{c}{$4\times4$} & \multicolumn{2}{c}{$6\times6$} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+     & SFPRM & Energy & SFPRM & Energy \\
+    \midrule
+    Parameters ($\times10^3$) & 101 & 79 & 101 & 80 \\
+    Steps to $90\%$ train acc.\ & 200 & 1250 & 400 & $>4000$ \\
+    Board acc.\ ID & 97.8 & 82.4 & 99.8 & 0.0 \\
+    Board acc.\ OOD & 65.6 & 17.2 & 89.2 & 0.0 \\
+    Halted, OOD ($\le128$ it.) & 73.4 & 81.8 & 90.6 & 30.4 \\
+    Iterations to halt, OOD & 19 / 45 & 68 / 114 & 19 / 37 & 102 / 122 \\
+    Complex $\zeta$ & 96.4 & 0.0 & 96.4 & 0.0 \\
+    $\max|\operatorname{Im}\zeta|$ & 0.61 & $0$ & 0.65 & 0.02 \\
+    $\lambda_{\max}(\operatorname{Hess}E)$ & -- & 12.2 & -- & 17.9 \\
+    Window (\cref{cor:window}) & 1.40 & 0.16 & 1.33 & 0.12 \\
+    OOD, $B{=}64$: energy & -- & 12.4 & -- & 0.0 \\
+    OOD, $B{=}64$: anchor & 48.8 & 20.4 & 92.8 & 0.0 \\
+    OOD, $B{=}64$: majority & 67.0 & 20.6 & 90.6 & 0.0 \\
+    OOD, $B{=}64$: oracle & 81.8 & 36.0 & 93.8 & 0.0 \\
+    \bottomrule
+  \end{tabular}
+  \end{footnotesize}
+  \end{center}
+  \vskip -0.1in
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.48\textwidth]{figures/spectrum_4x4.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/restarts_4x4.pdf}
+  \caption{First energy model against SFPRM on $4\times4$ Sudoku. Left: eigenvalues of the tangent Jacobian at polished halted OOD states
+  (three puzzles pooled); SFPRM at $\eta=1$, the energy model for the damped map at
+  $\eta=1/\lambda_{\max}(\operatorname{Hess}E)$, half its window. Right: OOD board accuracy against
+  the number of restarts $B$ under the selection rules of \cref{prop:voting}.}
+  \label{fig:pilot}
+\end{figure}
+
+\paragraph{Full results.}
+\Cref{tab:pilot-full} lists the ID and OOD numbers for both tasks and both halting rules, and
+\cref{fig:training} shows the training curves and the distribution of iterations to halt.
+On $4\times4$ the energy model solves $82.4\%$ of ID and $17.2\%$ of OOD boards after $2{,}000$
+steps (SFPRM: $97.8\%$ and $65.6\%$ after $400$), halting $93.6\%$ and $81.8\%$ of the puzzles within
+$128$ iterations under Armijo backtracking against $47\%$ and $28\%$ under the patience rule. On
+$6\times6$ its training cell accuracy rises from $58\%$ to $73\%$ over $4{,}000$ steps but no board
+is solved, so the restart curves of \cref{fig:pilot6} are flat at zero; the spectrum and halting
+measurements at its halted states remain valid and show the same picture as on $4\times4$: real
+eigenvalues (the ID Jacobians have relative asymmetry $\le4\times10^{-2}$ and no complex pair; on OOD
+the polishing step did not reach the $10^{-12}$ residual within $2{,}000$ iterations at the small
+admissible step for all puzzles, leaving imaginary parts up to $0.09$ in one of six cases), a stiff
+Hessian with $\lambda_{\max}\approx14$--$18$, a window of $0.12$--$0.16$, and halting after $88$
+(ID) and $102$ (OOD) iterations at the median, against $11$ and $19$ for SFPRM. The $4\times4$
+restart curves show the selection rules in detail: energy selection decreases monotonically with
+$B$ ($84.8\%$ at $B=1$ to $78.8\%$ at $B=64$ ID; $17.4\%$ to $12.4\%$ OOD), the summed energy and
+the anchor angle are flat, majority voting gains little, and the oracle rises to $95.2\%$ ID and
+$36.0\%$ OOD, so the restarts do contain correct boards that no available score identifies.
+
+\begin{table}[h]
+  \caption{Full pilot results (board accuracy in \%, $500$ puzzles per set; iterations to halt
+  over halted puzzles). Pat.: patience rule; Arm.: Armijo backtracking on $E$.}
+  \label{tab:pilot-full}
+  \vskip 0.1in
+  \begin{center}
+  \begin{small}
+  \begin{tabular}{@{}llcccccc@{}}
+    \toprule
+    Task & Model (rule) & Acc.\ ID & Acc.\ OOD & Halted ID & Halted OOD & It.\ ID (med/p90) & It.\ OOD (med/p90) \\
+    \midrule
+    $4\times4$ & SFPRM (Pat.) & 97.8 & 65.6 & 98.2 & 73.4 & 13 / 18 & 19 / 45 \\
+    $4\times4$ & Energy (Pat.) & 80.2 & 21.4 & 47.0 & 28.0 & 49 / 67 & 50 / 67 \\
+    $4\times4$ & Energy (Arm.) & 82.4 & 17.2 & 93.6 & 81.8 & 61 / 100 & 68 / 114 \\
+    $6\times6$ & SFPRM (Pat.) & 99.8 & 89.2 & 99.8 & 90.6 & 11 / 13 & 19 / 37 \\
+    $6\times6$ & Energy (Pat.) & 0.0 & 0.0 & 2.4 & 1.0 & 54 / 97 & 67 / 118 \\
+    $6\times6$ & Energy (Arm.) & 0.0 & 0.0 & 62.0 & 30.4 & 88 / 117 & 102 / 122 \\
+    \bottomrule
+  \end{tabular}
+  \end{small}
+  \end{center}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.48\textwidth]{figures/training_4x4.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/halting_4x4.pdf}\\[4pt]
+  \includegraphics[width=0.48\textwidth]{figures/training_6x6.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/halting_6x6.pdf}
+  \caption{Training curves (left; train board accuracy, logged every $50$ steps) and cumulative
+  distribution of iterations to halt (right; SFPRM with the patience rule, the energy model with
+  Armijo backtracking) on $4\times4$ (top) and $6\times6$ (bottom) Sudoku.}
+  \label{fig:training}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.48\textwidth]{figures/spectrum_6x6.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/restarts_6x6.pdf}
+  \caption{$6\times6$ pilot: Jacobian spectra at polished halted OOD states (left) and OOD board
+  accuracy against the number of restarts (right), as in \cref{fig:pilot}, for the first energy model.}
+  \label{fig:pilot6}
+\end{figure}
+
+\paragraph{Codebook variant.}
+The codebook runs of \cref{tab:results} use the hidden-token energy model of \cref{app:pilot} with the answer
+codebook on the visible tokens ($\kappa_{\mathrm{ans}}=0.5$, $\beta_{\mathrm{ans}}=\sqrt d$ at the
+end of the schedule, prototypes initialized as orthonormal directions and kept at unit norm), the
+tied readout with a learned scale, the digit embedding tied to the prototypes, the $\beta$ schedule
+$\rho=8$ over the first $K=8$ iterations applied to both memory terms (so the energy is only
+non-increasing after iteration $8$, and the energy-increase counter of \cref{app:pilot} is not
+meaningful during the schedule), the ranking loss with weight $0.1$, margin $1$ and $R=2$ restarts
+per puzzle (batch $64\times2$) when enabled, and otherwise the training recipe of
+\cref{app:pilot}; $2{,}000$ steps on $4\times4$ and $4{,}000$ on $6\times6$. On $6\times6$ only the
+variant with the ranking loss was trained, at learning rate $10^{-3}$; a first run at
+$2\times10^{-3}$ diverged after $500$ steps (loss rising from $0.93$ to $1.34$) and was stopped. A
+further $4\times4$ ablation fixes $\beta$ at its final value from the first iteration (with the
+ranking loss): it stays on the clue-only plateau for all $2{,}000$ steps, with $65\%$ ID and $49\%$
+OOD cell accuracy, no board solved and no puzzle halted within $128$ iterations. The memory-MLP ablation of SFPRM uses $256$ tied
+memories with a learned $\beta$ in place of the GELU MLP in both nGPT layers. Evaluation adds a third
+halting rule, Armijo backtracking with the commitment requirement, and reports the commitment
+statistics at the Armijo-halted state. With the commitment requirement, board accuracy is
+$97.6\%$ ID and $71.4\%$ OOD for the codebook model ($98.0\%$ and $74.4\%$ without it) and $93.6\%$
+and $61.6\%$ with the ranking loss ($94.6\%$ and $62.8\%$). \Cref{fig:v2} shows the training curves and halting distributions of the
+codebook variant against SFPRM, and its $6\times6$ spectrum and restart curves.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.48\textwidth]{figures/training_4x4v2.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/halting_4x4v2.pdf}\\[4pt]
+  \includegraphics[width=0.48\textwidth]{figures/training_6x6v2.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/halting_6x6v2.pdf}\\[4pt]
+  \includegraphics[width=0.48\textwidth]{figures/spectrum_6x6v2.pdf}\hfill
+  \includegraphics[width=0.48\textwidth]{figures/restarts_6x6v2.pdf}
+  \caption{Codebook variant (``Energy SFPRM'') against SFPRM. Top: $4\times4$ training curves and
+  iterations to halt (``Codebook'' column of \cref{tab:results}). Middle and bottom: $6\times6$
+  training curves, iterations to halt, spectra at halted OOD states and OOD accuracy against
+  restarts (``$+$rank'' column).}
+  \label{fig:v2}
+\end{figure}
+
+% ===========================================================================
+\section{Numerical Verification of the Energy Statements}
+\label{app:energy-numerics}
+
+All checks use the model of \cref{def:esfprm} with random weights in double precision: $T=6$ tokens,
+$d=16$, $H=2$ heads of dimension $8$, $K=24$ memories, $\kappa_0=1$, signed head weights
+$\sigma=(0.3,-0.3)$, $\beta_k=2$, $\kappa_M=0.5$, $\beta_M=3$, and the geodesic injection; inputs
+$x$ are normalized embeddings of random clues. Scripts are included with the submission.
+\begin{itemize}
+  \item \textbf{\Cref{prop:energy-gradient}.} The closed-form drive \eqref{eq:grad-z}--\eqref{eq:grad-u}
+  is compared with $-\Proj_w\nabla E$ from automatic differentiation on $200$ random states for the
+  flat model and $100$ for the hidden model. The coupling matrices $J_{ts}$ of the flat model are
+  assembled explicitly and compared with $J_{st}^\top$, and $\Proj_z\sum_sJ_{ts}z_s$ with the attention
+  part of the drive.
+  \item \textbf{\Cref{prop:real-spectrum}.} A stationary point is found by iterating
+  \eqref{eq:esfprm-step} with $\eta=0.2$ until $\norm{\grad E}<10^{-14}$ ($765$ iterations). The
+  tangent Jacobian of $F_E$ (automatic differentiation in an orthonormal basis of the tangent space)
+  is compared with $\Id-\operatorname{Hess}E$, where the Riemannian Hessian is
+  $\Proj\nabla^2E\,\Proj-\operatorname{M}_\mu$, and with central finite differences of step $10^{-6}$
+  along tangent directions. The Hessian eigenvalues lie in $[0.21,1.90]$. For comparison, a random
+  one-layer SFPRM map (scalar eigen learning rates $0.3$, $\lambda=0.5$) is iterated to a fixed point
+  (residual $<10^{-30}$) and its tangent Jacobian is analysed in the same way.
+  \item \textbf{\Cref{thm:lyapunov}.} $\hat L$ is the largest Riemannian Hessian eigenvalue over $50$
+  random states ($2.23$) and over the states and midpoints visited by $20$ descent trajectories of
+  $20$ steps ($3.05$). $200$ trajectories of $20$ steps are then run at
+  $\eta\in\{0.5,1,1.9,3\}/\hat L$; at the three step sizes inside the window the energy never
+  increased and the inequality of (i) held at every step (worst slack $-5.9\times10^{-8}$ at
+  $1.9/\hat L$), while at $3/\hat L$ the energy increased in $54\%$ of the steps.
+  \item \textbf{\Cref{eq:implicit}.} At a stationary point with Hessian condition number $6.5$ and a
+  linear loss $\ell(w)=\ip{\omega}{w}$ with random $\omega$, the adjoint system is solved exactly, by
+  conjugate gradient, and by the truncated Neumann series $\eta\sum_{k<K}(\Id-\eta\operatorname{Hess}E)^k$
+  with $\eta=1/\lambda_{\max}$; the iteration counts to relative error $10^{-3}$ are $7$ and $40$ and
+  to $10^{-6}$ they are $11$ and $81$. The resulting derivative of $\ell(w^\star)$ with respect to
+  $\kappa_0$ is compared with central finite differences of step $10^{-5}$ through the re-solved
+  stationary point.
+  \item \textbf{\Cref{eq:ep}.} The nudged minimizer of $E+\beta\ell$ is found by the same iteration
+  and \eqref{eq:ep} is evaluated one-sided and centered for $\beta\in\{10^{-1},10^{-2},10^{-3}\}$;
+  the relative errors are $2.5$, $0.34$, $0.034$ (one-sided, $O(\beta)$) and $0.050$, $0.0010$,
+  $1.1\times10^{-5}$ (centered, $O(\beta^2)$).
+\end{itemize}

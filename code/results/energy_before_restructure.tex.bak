@@ -1,0 +1,390 @@
+% ===========================================================================
+\section{An Energy-Based SFPRM}
+\label{sec:energy}
+
+\Cref{sec:differences} identified the energy as the main structural difference between the two
+models: AKOrN's drive is a gradient field when $J$ is symmetric, whereas SFPRM's $F_\theta$ never is.
+We now close this gap from the SFPRM side. The recurrent map is replaced by a Riemannian gradient
+step on an explicit energy $E(w;x)$, so that every iteration is an AKOrN step whose drive is
+$-\nabla E$. The injection is already a gradient (\cref{prop:injection-gradient}); for attention
+and the MLP we take the two energies of the Energy Transformer \citep{hoover2023et} to the sphere,
+with modifications that reasoning tasks turn out to require (\cref{sec:energy-design}).
+
+\subsection{Energy, Update and Gradient}
+\label{sec:energy-def}
+
+\begin{definition}[Energy SFPRM]
+\label{def:esfprm}
+The state is $w=(z,u)\in(\Sph^{d-1})^{2T}$ with visible tokens $z$ and hidden tokens $u$, one per
+visible token; the \emph{flat} variant identifies $u\equiv z$. With heads $k=1,\dots,H$, signed head
+weights $\sigma_k\in\R$, logit scales $\beta_k>0$, memories $\xi_1,\dots,\xi_K\in\R^d$ (rows of
+$\Xi$) and $\kappa_0,\kappa_C,\kappa_M,\beta_M>0$,
+\begin{equation}
+\begin{aligned}
+  E(w;x) &= \kappa_0\,\Phi_x(z) + E_A(u,z) + E_C(u,z) + E_M(u),\\
+  E_A &= -\textstyle\sum_{k=1}^H\frac{\sigma_k}{\beta_k}\sum_{t}\log\sum_{s\neq t}e^{\ell^k_{ts}},\\
+  E_C &= -\kappa_C\textstyle\sum_t\ip{u_t}{Cz_t},\\
+  E_M &= -\frac{\kappa_M}{\beta_M}\textstyle\sum_t\log\sum_{\mu=1}^Ke^{\beta_M\ip{\xi_\mu}{u_t}},
+\end{aligned}
+\label{eq:energy}
+\end{equation}
+where $\ell^k_{ts}:=\beta_k\ip{W_Q^ku_t}{W_K^kz_s}$ are the attention logits and
+$\Phi_x(z)=\tfrac12\sum_t\angle(z_t,x_t)^2$ is the injection potential of
+\cref{prop:injection-gradient}. The recurrent map is the unit gradient step
+$F_E(w;x):=\Exp_w\big(-\grad E(w;x)\big)$, with $\grad$ the Riemannian gradient on
+$(\Sph^{d-1})^{2T}$, and the iteration is SFPRM's damped loop \eqref{eq:sfprm-damp} with $F_E$ in
+place of $F_\theta$:
+\begin{equation}
+\begin{aligned}
+  w_{i+1}&=\Slerp_{\eta_i}\big(w_i,F_E(w_i;x)\big)\\&=\Exp_{w_i}\big(-\eta_i\grad E(w_i;x)\big),
+\end{aligned}
+  \label{eq:esfprm-step}
+\end{equation}
+the equality by \cref{lem:slerp} whenever $\norm{\grad_{w_t}E}<\pi$. The prediction is read from
+$z$. SFPRM's chordal halting residual of $F_E$ is $1-\cos\norm{\grad_{w_t}E}$, so the halting test
+is $\max_t\norm{\grad_{w_t}E}<\tau_g$: the iteration halts at $\tau_g$-stationary points of $E$.
+\end{definition}
+
+\begin{proposition}[The gradient is injection, symmetric coupling and memory]
+\label{prop:energy-gradient}
+Let $a^k_{ts}=\operatorname{softmax}_{s\neq t}\big(\beta_k\ip{W_Q^ku_t}{W_K^kz_s}\big)$ and
+$M_k:=(W_Q^k)^\top W_K^k$. Token-wise,
+\begin{align}
+  -\grad_{z_t}E &= \kappa_0\Log_{z_t}x_t+\kappa_C\Proj_{z_t}C^\top u_t\nonumber\\
+  &\quad+\Proj_{z_t}\textstyle\sum_k\sigma_k\sum_{s\neq t}a^k_{st}M_k^\top u_s,\label{eq:grad-z}\\
+  -\grad_{u_t}E &= \Proj_{u_t}\Big[\textstyle\sum_k\sigma_k\sum_{s\neq t}a^k_{ts}M_kz_s\nonumber\\
+  &\quad+\kappa_CCz_t+\kappa_M\Xi^\top\!\operatorname{softmax}(\beta_M\Xi u_t)\Big].\label{eq:grad-u}
+\end{align}
+In the flat variant the two attention sums add, and the drive is an AKOrN coupling $\sum_sJ_{ts}(z)z_s$
+with $J_{ts}=\sum_k\sigma_k\big(a^k_{ts}M_k+a^k_{st}M_k^\top\big)$, which satisfies AKOrN's
+symmetry condition $J_{ts}=J_{st}^\top$ at every state.
+\end{proposition}
+
+Every term has a counterpart in \cref{thm:trotter}: $\kappa_0\Log_zx$ is the stimulus $c$, the
+attention sums are the coupling $Jz$, and the memory is the self-drive $m$. The energy model is
+therefore the collapsed single-step form of SFPRM in which the coupling is a gradient field and the
+MLP is a Hopfield memory: the query-path term $\sum_sa_{ts}M_kz_s$ is standard attention with value
+matrix $M_k$ (rank at most $d_h$), the key-path term $\sum_sa_{st}M_k^\top u_s$ is the
+contribution that makes the field conservative \citep{hoover2023et}, the matrix $C$ plays the role
+of the output projection, and $\Xi^\top\operatorname{softmax}(\beta_M\Xi u)$ is the tied-weight MLP
+$W_2\,r(W_1u)$ with $W_2=W_1^\top$ and $r=\operatorname{softmax}$, the retrieval rule of modern
+Hopfield networks \citep{krotov2016dam,ramsauer2021hopfield}; $r=\operatorname{relu}$ with
+$G(a)=\tfrac12\operatorname{relu}(a)^2$ in place of the log-sum-exp gives the classical memory.
+In the terms of \cref{tab:differences}, the energy row now reads ``yes'' for both models.
+
+\subsection{Three Design Choices}
+\label{sec:energy-design}
+
+The Energy Transformer was designed for image completion and graph tasks. Three modifications,
+each forced by a failure we observed in the pilot of \cref{sec:energy-pilot}, make
+\eqref{eq:energy} suitable for reasoning while keeping it an energy.
+\emph{Signed heads.} With $\sigma_k>0$ the log-sum-exp is minimized by aligning queries with keys:
+attention is attractive. A head with $\sigma_k<0$ is repulsive, and its drive pushes a token away
+from the tokens it attends to most. Constraints of the form ``cells in the same unit hold different
+digits'' are repulsive couplings, the negative couplings of the Kuramoto model
+\citep{kuramoto1984}, and cannot be expressed with attractive heads alone.
+\emph{Hidden tokens.} In the flat variant the message $M_kz_s$ delivered to a token is tied to the
+score $\ip{W_Q^kz_t}{W_K^kz_s}$ that selects it, since both use $M_k$; a model cannot match on
+position and message on content. Hidden tokens receive the query-path message, the visible token
+receives $C^\top u_t$ through the free bilinear coupling $E_C$, and matching and messaging decouple.
+The energy becomes a two-layer associative memory \citep{krotov2021hierarchical}; the state doubles,
+the theory below is unchanged.
+\emph{Sharpness versus message size.} In \eqref{eq:energy} the softmax sharpness is
+$\beta_k\norm{W_Q^ku_t}\norm{W_K^kz_s}$ while the message size is $|\sigma_k|\norm{M_kz_s}$, so a
+small $W$ with a large $\beta_k$ gives sharp attention and unit-scale messages at the same time, the
+separation that QK-normalization and the logit scale achieve in nGPT. Sizing $W$ for unit logits
+instead makes $\norm{M_k}$ large, the Hessian of $E_A$ grows with $\beta_k\norm{M_k}^2$, and the
+iteration leaves the stability window of \cref{prop:real-spectrum}.
+
+\subsection{What the Energy Buys}
+\label{sec:energy-theory}
+
+\begin{theorem}[Energy descent, global convergence and a halting bound]
+\label{thm:lyapunov}
+Let $L>0$ be such that $E(\Exp_w(v))\le E(w)+\ip{\grad E(w)}{v}+\tfrac L2\norm v^2$ for all $w$ and
+tangent $v$. Such an $L$ exists; $L=\sup_w\lambda_{\max}(\operatorname{Hess}E(w))$ suffices, and the
+injection contributes at most $\kappa_0$ to it because the Hessian of $\tfrac12\angle(\cdot,x)^2$ has
+eigenvalues $1$ and $\theta\cot\theta\le1$. Fix $\eta\in(0,2/L)$ and let $c_\eta:=\eta(1-\eta L/2)>0$.
+Then along every trajectory on which no token is antipodal to its input (an exceptional set of
+measure zero, empty for the chordal injection $\sum_t(1-\ip{z_t}{x_t})$):
+\begin{enumerate}
+  \item[(i)] $E(w_{i+1})\le E(w_i)-c_\eta\norm{\grad E(w_i)}^2$: $E$ is a Lyapunov function;
+  \item[(ii)] $\sum_{i\ge0}\norm{\grad E(w_i)}^2\le\big(E(w_0)-\min E\big)/c_\eta$, so
+        $\grad E(w_i)\to0$, every accumulation point is stationary, and the halting test
+        $\max_t\norm{\grad_{w_t}E}<\tau_g$ fires within
+        $\big\lceil(E(w_0)-\min E)/(c_\eta\tau_g^2)\big\rceil$ iterations;
+  \item[(iii)] if $E$ is real-analytic on a neighbourhood of the accumulation set, the whole
+        sequence converges to a single stationary point.
+\end{enumerate}
+The same holds for decaying $\eta_i\in[\eta_{\min},\eta]$ with $c_\eta$ replaced by
+$\min(c_{\eta_{\min}},c_\eta)$, so SFPRM's patience rule is admissible.
+\end{theorem}
+
+SFPRM has existence of a fixed point and convergence from starts near one \citep{sfprm}. With an
+energy every start settles, and the number of iterations before the halting test fires is bounded
+a priori. The energy also replaces the patience heuristic: accept $\eta_i$ if
+$E(w_{i+1})\le E(w_i)-c\,\eta_i\norm{\grad E(w_i)}^2$ and halve it otherwise (Armijo backtracking),
+which guarantees (i) at every iteration without knowledge of $L$. Analyticity in (iii) holds for the
+log-sum-exp terms, the bilinear term and, away from the antipode, the squared angle; the antipode is
+the point at which $\Slerp$, and hence SFPRM's own update, is undefined (\cref{cor:fixed}).
+
+\begin{proposition}[Real spectrum and the window at a halted state]
+\label{prop:real-spectrum}
+Let $w^\star$ be a stationary point of $E$ at which $E$ is twice differentiable. On
+$\tang_{w^\star}(\Sph^{d-1})^{2T}$,
+\begin{equation}
+\begin{aligned}
+  \mathrm dF_E(w^\star)&=\Id-\operatorname{Hess}E(w^\star),\\
+  \operatorname{Hess}E(w^\star)&=\Proj\nabla^2E\,\Proj-\operatorname{M}_\mu,
+\end{aligned}
+\end{equation}
+with $\mu_t=\ip{\nabla_{w_t}E(w^\star)}{w^\star_t}$ as in \cref{prop:linearization}, and the damped
+step \eqref{eq:esfprm-step} linearizes to $\Id-\eta\operatorname{Hess}E(w^\star)$. The Hessian is
+self-adjoint, so every eigenvalue $\zeta=1-h$ of $\mathrm dF_E(w^\star)$ is real; the window of
+\cref{cor:window} is $\eta<2/\lambda_{\max}(\operatorname{Hess}E(w^\star))$; $w^\star$ is
+attracting if and only if $\operatorname{Hess}E(w^\star)\succ0$; and a strict saddle has an
+expanding mode $|\zeta|>1$ for every $\eta>0$.
+\end{proposition}
+
+For SFPRM, $\mathrm dF_\theta$ has no such structure, and \citet{sfprm} observe that modes with
+$\zeta-1$ close to the imaginary axis narrow the window and slow down halting. The energy removes
+them: with real $\zeta$ the per-mode decay factor $|1-\eta h|$ is minimized by $\eta=1/h$ and the
+window $2/h$ is the widest that \cref{cor:window} allows. Since the retracted gradient step avoids
+strict saddles from almost every start \citep{lee2019saddle}, halted states are local minima of $E$.
+nGPT's eigen learning rates survive as a fixed diagonal preconditioner $D\succ0$ applied to the
+gradient: descent and real spectrum are preserved because $(\Proj D\Proj)\operatorname{Hess}E$ is
+similar to a symmetric matrix (\cref{app:energy-proofs}).
+
+\begin{proposition}[Energy selection over restarts]
+\label{prop:voting}
+Let $w^{(1)},\dots,w^{(B)}$ be halted states from $B$ independent random starts. Every halted
+state has chordal residual below $1-\cos\tau_g$, so the residual cannot rank them, whereas
+$E(w^{(b)};x)$ can. Energy selection, $\hat b=\arg\min_bE(w^{(b)};x)$, contains anchor-angle
+selection $\arg\min_b\Phi_x(z^{(b)})$ as the special case in which only the first term of
+\eqref{eq:energy} is kept. If the global minimizer of $E(\cdot;x)$ decodes to the correct answer, its
+basin of attraction has positive measure, and its energy is separated from every other stationary
+value by more than twice the halting slack, then the selected answer is correct with probability
+tending to one as $B\to\infty$.
+\end{proposition}
+
+Energy-based voting is AKOrN's best test-time result: on the harder Sudoku test set, board accuracy
+rises from $51.7\%$ without voting to $81.6\%$ with $100$ restarts and $89.5\%$ in the configuration
+of their main table \citep{miyato2025akorn}, where majority voting does not help. SFPRM cannot do
+this today: every halted state has residual zero, and \cref{prop:voting} says what it would need.
+
+\subsection{Training}
+\label{sec:energy-training}
+
+\paragraph{Implicit gradients by conjugate gradient.}
+At an attracting halted state the Hessian is positive definite, and the implicit function theorem
+gives, for a loss $\ell(w^\star)$,
+\begin{equation}
+\begin{aligned}
+  \frac{\mathrm d\ell}{\mathrm d\theta}&=-\big\langle v,\ \partial_\theta\grad E(w^\star;\theta)\big\rangle,\\
+  \operatorname{Hess}E(w^\star)\,v&=\grad\ell(w^\star).
+\end{aligned}
+  \label{eq:implicit}
+\end{equation}
+The system is symmetric positive definite, so conjugate gradient \citep{hestenes1952cg} reaches
+relative error $\epsilon$ in $O(\sqrt\kappa\log(1/\epsilon))$ Hessian-vector products, each one
+backward pass, where $\kappa$ is the condition number of $\operatorname{Hess}E(w^\star)$
+\citep{nocedal2006}. Truncated BPTT with window $K$, the training scheme of FPRM and SFPRM, sums the
+first $K$ terms of the Neumann series $\eta\sum_k(\Id-\eta\operatorname{Hess}E)^k$ for the same
+inverse (\cref{app:prelim}), a Richardson iteration that needs $O(\kappa\log(1/\epsilon))$ terms. For
+SFPRM the matrix $\Id-J$ is not symmetric and conjugate gradient does not apply.
+
+\paragraph{Equilibrium propagation.}
+Because \eqref{eq:esfprm-step} is gradient descent on $E$, the nudged energy $E+\beta\ell$ has a
+minimizer $w^\star_\beta$ near $w^\star$ and
+\begin{equation}
+  \frac{\mathrm d\ell}{\mathrm d\theta}=\lim_{\beta\to0}\beta^{-1}\big[\partial_\theta E(w^\star_\beta)-\partial_\theta E(w^\star)\big]
+  \label{eq:ep}
+\end{equation}
+\citep{scellier2017ep}, with error $O(\beta)$, or $O(\beta^2)$ for a centered difference. The rule
+needs only the forward dynamics, run twice, and is the route by which natural frequencies of
+Kuramoto networks are learned in hardware \citep{ahmadi2026phase}. SFPRM has no energy to nudge.
+
+\subsection{Expressivity and a Pilot Study}
+\label{sec:energy-pilot}
+
+The restriction is real: each head's value matrix is $M_k=(W_Q^k)^\top W_K^k$, every head carries a
+key-path term, the memory is a tied-weight MLP, and depth is replaced by hidden tokens. We ran a
+small controlled comparison on $6\times6$ Sudoku (\cref{app:pilot}): SFPRM with two nGPT layers
+against the energy model of \cref{def:esfprm}, same embedding, readout, training recipe (deep
+supervision with truncated BPTT) and halting rule, trained on puzzles with $14$--$22$ clues and
+tested in distribution and out of distribution on $8$--$13$ clues. \Cref{tab:pilot} reports the four
+quantities the theory speaks to.
+\Cref{tab:pilot} and \cref{fig:pilot} summarize the comparison; \cref{app:pilot} has the full
+protocol, the ID numbers and the training curves. Four observations.
+\emph{Accuracy and training cost.} The energy model learns both tasks, but needs several times more
+optimization steps than SFPRM to leave the ``clues only'' plateau (\cref{fig:training}), and at an
+equal budget it is behind: on $4\times4$ it reaches 82.4\% ID and 17.2\% OOD against 97.8\% and
+65.6\% for SFPRM, and on $6\times6$ it does not leave the plateau within the $4{,}000$-step budget in which SFPRM reaches $99.8\%$ ID and $89.2\%$ OOD (cell accuracy $72\%$, no board solved). Without the three design choices of
+\cref{sec:energy-design} and Armijo backtracking in training it does not leave the plateau at all.
+\emph{Spectrum.} At every polished halted state the energy model's Jacobian is symmetric to
+machine precision and all eigenvalues are real, whereas 96.4\% of SFPRM's eigenvalues are complex
+with imaginary parts up to 0.61 (\cref{fig:pilot}, top). The learned energy is stiff, however:
+$\lambda_{\max}(\operatorname{Hess}E)\approx 12.2$, so the admissible step is
+$\eta<2/\lambda_{\max}\approx 0.16$ rather than SFPRM's $\approx 1.40$, and the slow modes of a
+stiff Hessian make halting \emph{slower}, not faster: 68 / 114 iterations (median / p90, OOD) against
+19 / 45 for SFPRM. Real eigenvalues remove the rotational obstruction of \cref{cor:window}, but the
+condition number of the learned Hessian decides the halting time, and nothing in the training
+objective controls it. \emph{Halting rule.} With Armijo backtracking the energy model halts
+81.8\% of the OOD puzzles within $128$ iterations and the energy never increases; the patience rule,
+which starts at $\eta=1$, halts about half as many (\cref{app:pilot}).
+\emph{Energy selection.} Energy voting does not help here: selecting the lowest-energy halted
+state among $B=64$ restarts gives 12.4\% OOD on $4\times4$, below the single-restart accuracy, while
+majority voting gives 20.6\% and the oracle 36.0\%. The premise of \cref{prop:voting} fails, as the
+lowest minima of the learned energy are not the correct boards; deep supervision never asks them
+to be. Anchor-angle selection fails in the same way for both models. \Cref{sec:energy-memory} shows that tying
+the readout to a codebook in the energy is enough to make it rank solutions.
+
+\begin{table}[t]
+  \caption{Pilot comparison on $4\times4$ and $6\times6$ Sudoku ($500$ test puzzles each; board
+  accuracy in \%; one restart unless stated; iterations to halt at $\tau_c=10^{-4}$ over halted
+  puzzles, median / 90th percentile; spectrum of $\mathrm dF$ at polished halted OOD states). The
+  energy model uses Armijo backtracking at test time, SFPRM the patience rule. Details and the ID
+  numbers in \cref{app:pilot}.}
+  \label{tab:pilot}
+  \vskip 0.1in
+  \begin{center}
+  \begin{footnotesize}
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+     & \multicolumn{2}{c}{$4\times4$} & \multicolumn{2}{c}{$6\times6$} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+     & SFPRM & Energy & SFPRM & Energy \\
+    \midrule
+    Parameters ($\times10^3$) & 101 & 79 & 101 & 80 \\
+    Steps to $90\%$ train acc.\ & 200 & 1250 & 400 & $>4000$ \\
+    Board acc.\ ID & 97.8 & 82.4 & 99.8 & 0.0 \\
+    Board acc.\ OOD & 65.6 & 17.2 & 89.2 & 0.0 \\
+    Halted, OOD ($\le128$ it.) & 73.4 & 81.8 & 90.6 & 30.4 \\
+    Iterations to halt, OOD & 19 / 45 & 68 / 114 & 19 / 37 & 102 / 122 \\
+    Complex $\zeta$ & 96.4 & 0.0 & 96.4 & 0.0 \\
+    $\max|\operatorname{Im}\zeta|$ & 0.61 & $0$ & 0.65 & 0.02 \\
+    $\lambda_{\max}(\operatorname{Hess}E)$ & -- & 12.2 & -- & 17.9 \\
+    Window (\cref{cor:window}) & 1.40 & 0.16 & 1.33 & 0.12 \\
+    OOD, $B{=}64$: energy & -- & 12.4 & -- & 0.0 \\
+    OOD, $B{=}64$: anchor & 48.8 & 20.4 & 92.8 & 0.0 \\
+    OOD, $B{=}64$: majority & 67.0 & 20.6 & 90.6 & 0.0 \\
+    OOD, $B{=}64$: oracle & 81.8 & 36.0 & 93.8 & 0.0 \\
+    \bottomrule
+  \end{tabular}
+  \end{footnotesize}
+  \end{center}
+  \vskip -0.1in
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/spectrum_4x4.pdf}\\[2pt]
+  \includegraphics[width=\columnwidth]{figures/restarts_4x4.pdf}
+  \caption{$4\times4$ pilot. Top: eigenvalues of the tangent Jacobian at polished halted OOD states
+  (three puzzles pooled); SFPRM at $\eta=1$, the energy model for the damped map at
+  $\eta=1/\lambda_{\max}(\operatorname{Hess}E)$, half its window. Bottom: OOD board accuracy against
+  the number of restarts $B$ under the selection rules of \cref{prop:voting}.}
+  \label{fig:pilot}
+\end{figure}
+
+\subsection{The Memory as a Codebook: Readout, Commitment and Annealing}
+\label{sec:energy-memory}
+
+The memory term has a probabilistic reading that suggests three further changes. With memories of
+fixed norm $\norm{\xi_\mu}=r$, $e^{\beta\ip{\xi_\mu}{z}}$ is, up to normalization, a von
+Mises--Fisher density on $\Sph^{d-1}$ with mean direction $\xi_\mu/r$ and concentration $\beta r$
+\citep{mardia2000}, so $E_M(z_t)=-\tfrac1\beta\log p(z_t)+\mathrm{const}$ for an equal-weight
+vMF mixture centred on the memories, and the memory step is Riemannian gradient ascent on a learned
+mixture density. Each term of \eqref{eq:energy} then has a role in a continuous relaxation of a
+discrete constraint problem: the injection is the evidence, the attention energy holds the pairwise
+constraints, and the memory is a unary potential whose minima are the codebook points. At large
+$\beta$ the memory energy of a token approaches $-\max_\mu\ip{\xi_\mu}{z_t}$, a pinning potential
+toward the nearest prototype, the learned analogue of the sub-harmonic injection locking that
+oscillator Ising machines use to force continuous phases onto discrete values \citep{wang2019oim}.
+This motivates the following \emph{codebook variant} of \cref{def:esfprm}.
+\emph{Answer codebook and tied readout.} An extra memory term
+$E_{\mathrm{ans}}(z)=-\tfrac{\kappa_{\mathrm{ans}}}{\beta_{\mathrm{ans}}}\sum_t\log\sum_{k=1}^{n}e^{\beta_{\mathrm{ans}}\ip{\xi^{\mathrm{ans}}_k}{z_t}}$
+on the visible tokens has one unit-norm prototype per output symbol; the readout is
+$\mathrm{logits}_t=s\,\Xi^{\mathrm{ans}}z_t$, so the prediction is the prototype the token sits in,
+the cross-entropy trains the prototypes directly, and the digit embedding of the input shares the
+same prototypes. \emph{Commitment.} $c_t=\max_k\operatorname{softmax}(\beta_{\mathrm{ans}}\Xi^{\mathrm{ans}}z_t)_k$
+is a label-free certificate; a token is committed when $c_t>1-\epsilon$, and ``residual below
+$\tau$ and every token committed'' is a stronger halting test than the residual alone.
+\emph{Annealing.} $\beta$ controls the landscape \citep{ramsauer2021hopfield}: small $\beta$ gives a
+single smooth minimum near the mean of the memories, large $\beta$ one minimum per memory. A
+schedule $\beta_i=\beta\,\rho^{-(1-\min(i/K,1))}$ over iterations lets coupling and injection act
+first and commits tokens late; like an annealed frequency (\cref{sec:oscillatory}) it cannot be
+folded into the weight-tied block, and \cref{thm:lyapunov} applies once the schedule has ended.
+\emph{Ranking loss.} To make the premise of \cref{prop:voting} hold, training adds, over $R$
+restarts of the same puzzle, the hinge $\max(0,E(w^\star_{\mathrm{correct}})-E(w^\star_{\mathrm{wrong}})+m)$
+whenever both kinds of halted state occur, so that the energy learns to rank solutions.
+\Cref{tab:v2} repeats the pilot protocol for the codebook variant, and \cref{fig:v2} shows its
+$4\times4$ curves. Five findings.
+\emph{The codebook changes the picture.} Without the ranking loss the variant solves $98.0\%$ of
+ID and $74.4\%$ of OOD boards on $4\times4$ with one restart, against $97.8\%$ and $65.6\%$ for SFPRM
+and $82.4\%$ and $17.2\%$ for the first energy model, and it trains in fewer steps than the first
+energy model.
+\emph{Energy selection now works.} Selecting the lowest-energy halted state among $B$ restarts
+matches the oracle at every $B$: OOD accuracy rises from $75.4\%$ at $B=1$ to $99.0\%$ at $B=64$,
+whereas majority voting reaches $91.2\%$ and anchor-angle selection falls to $25.2\%$. SFPRM's best
+rule at $B=64$ reaches $67.0\%$ and its oracle $81.8\%$. The premise of \cref{prop:voting} holds for
+the learned energy: whenever a restart finds the solution, it is the lowest minimum.
+\emph{The schedule is necessary, the ranking loss is not.} With $\beta$ fixed at its final value from
+the first iteration the variant never leaves the plateau ($0\%$ boards): tokens commit to
+prototypes before attention can propagate the constraints. The ranking loss does not improve
+selection, which already matches the oracle without it, and it costs single-restart accuracy
+($94.6\%$ / $62.8\%$ with it); energy selection behaves well because the readout and the energy share
+the prototypes, not because ranking is trained explicitly.
+\emph{Commitment certifies.} At the halted state, $75.6\%$ of committed OOD boards are correct and
+none of the uncommitted ones; requiring commitment in the halting test changes accuracy by less than
+one point, because almost every halted state is committed.
+\emph{Spectrum and halting.} All eigenvalues at halted states are real, as \cref{prop:real-spectrum}
+requires, and Armijo backtracking halts $98\%$ of the OOD puzzles, against $24\%$ for the patience
+rule. The learned Hessian remains stiff ($\lambda_{\max}\approx13$), so halting takes a median of
+$43$ OOD iterations against $19$ for SFPRM; the $\beta$ schedule does not remove the stiffness.
+Replacing only SFPRM's MLP by a tied memory, without any energy, costs a third of the parameters and
+some accuracy ($95.8\%$ / $55.0\%$ on $4\times4$, $99.2\%$ / $69.8\%$ on $6\times6$) and leaves
+$94\%$ of the eigenvalues complex: the benefits above come from the energy, not from the memory
+layer alone. V6TEXT
+
+\begin{table*}[t]
+  \caption{Codebook variant on $4\times4$ and $6\times6$ Sudoku (same protocol as \cref{tab:pilot};
+  board accuracy in \%; OOD unless stated; energy models with Armijo backtracking). ``Codebook'':
+  hidden-token energy model with answer codebook, tied readout and embedding, and the $\beta$ schedule
+  ($\rho=8$, $K=8$). ``$+$rank'' adds the ranking loss ($m=1$, $R=2$); ``fixed $\beta$'' is
+  $+$rank without the schedule. ``Mem.\ MLP'' is SFPRM with only its MLP replaced by the tied memory
+  $\Xi^\top\operatorname{softmax}(\beta\Xi h)$ (no energy). Committed: fraction of boards with all
+  tokens committed ($\epsilon=0.1$) at the halted state, with the accuracy among committed /
+  uncommitted boards. Ranking: fraction of (correct, wrong) restart pairs in which the correct state
+  has lower energy, end of training.}
+  \label{tab:v2}
+  \vskip 0.1in
+  \begin{center}
+  \begin{footnotesize}
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{@{}lcccccc@{}}
+    \toprule
+     & \multicolumn{4}{c}{$4\times4$} & \multicolumn{2}{c}{$6\times6$} \\
+    \cmidrule(lr){2-5}\cmidrule(lr){6-7}
+     & Codebook & $+$rank & fixed $\beta$ & Mem.\ MLP & $+$rank & Mem.\ MLP \\
+    \midrule
+    Parameters ($\times10^3$) & PF4 & PR4 & PB4 & PM4 & PF6 & PM6 \\
+    Steps to $90\%$ train acc. & TF4 & TR4 & TB4 & TM4 & TF6 & TM6 \\
+    Board acc.\ ID & AF4I & AR4I & AB4I & AM4I & AF6I & AM6I \\
+    Board acc.\ OOD & AF4O & AR4O & AB4O & AM4O & AF6O & AM6O \\
+    Halted ($\le128$ it.) & HF4 & HR4 & HB4 & HM4 & HF6 & HM6 \\
+    Iterations (med./p90) & IF4 & IR4 & IB4 & IM4 & IF6 & IM6 \\
+    Complex $\zeta$ & CF4 & CR4 & CB4 & CM4 & CF6 & CM6 \\
+    $\lambda_{\max}(\operatorname{Hess}E)$ & LF4 & LR4 & LB4 & -- & LF6 & -- \\
+    Window (Cor.~\ref{cor:window}) & WF4 & WR4 & WB4 & WM4 & WF6 & WM6 \\
+    $B{=}64$: energy/summed & EF4 & ER4 & EB4 & -- & EF6 & -- \\
+    $B{=}64$: anchor/major./oracle & NF4 & NR4 & NB4 & NM4 & NF6 & NM6 \\
+    Committed (acc.\ comm./uncomm.) & KF4 & KR4 & KB4 & -- & KF6 & -- \\
+    Ranking: correct lower & GF4 & GR4 & GB4 & -- & GF6 & -- \\
+    \bottomrule
+  \end{tabular}
+  \end{footnotesize}
+  \end{center}
+  \vskip -0.1in
+\end{table*}

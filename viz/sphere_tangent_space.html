@@ -1,0 +1,1761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unit Spheres and Projectors</title>
+<style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --ink: #161a22; --ink-2: #4b5263; --muted: #7b8292; --rule: #dde1e8;
+  --accent: #3346a8; --blue: #2a78d6; --orange: #eb6834; --green: #1baf7a; --red: #d03b3b;
+  --sph1: #eef1f8; --sph2: #cfd6e6;
+  --f-text: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151b; --surface: #1a1e26; --ink: #eceef2; --ink-2: #b9bfcc; --muted: #8a91a0; --rule: #2c323d;
+    --accent: #9aa8ff; --blue: #3987e5; --orange: #e8703e; --green: #22b886; --red: #e46a6a;
+    --sph1: #2a3040; --sph2: #1d2230;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--f-text); padding: 0 16px 72px; }
+main { max-width: 760px; margin: 0 auto; }
+header { padding: 48px 0 12px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font: 600 12px/1.2 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-weight: 600; font-size: clamp(28px, 5vw, 40px); line-height: 1.12; margin: 10px 0 12px; text-wrap: balance; }
+h2 { font-weight: 600; font-size: 24px; line-height: 1.25; margin: 52px 0 10px; text-wrap: balance; }
+p { margin: 0 0 14px; max-width: 68ch; }
+.lede { font-size: 19px; color: var(--ink-2); }
+.math { font-family: "STIX Two Text", "Cambria Math", "Times New Roman", serif; font-style: italic; white-space: nowrap; }
+.math .u { font-style: normal; }
+.claim {
+  background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--accent);
+  border-radius: 6px; padding: 14px 18px; margin: 18px 0; font-size: 19px;
+}
+.steps { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 18px; margin: 16px 0; }
+.step { display: grid; grid-template-columns: 1fr; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.step:last-child { border-bottom: 0; }
+.step .eq { font: italic 20px/1.4 "STIX Two Text", "Cambria Math", serif; }
+.step .why { font: 14.5px/1.45 var(--f-ui); color: var(--ink-2); }
+figure { margin: 24px 0 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px; }
+canvas { width: 100%; display: block; touch-action: none; cursor: grab; }
+canvas:active { cursor: grabbing; }
+figcaption { font: 14px/1.5 var(--f-ui); color: var(--ink-2); padding: 8px 4px 2px; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 18px; padding: 10px 4px 4px; font: 14px var(--f-ui); }
+.controls label { display: grid; gap: 2px; color: var(--ink-2); }
+.controls label b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+button {
+  font: 600 14px var(--f-ui); color: var(--ink); background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 7px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 4px 2px; align-items: center; }
+button[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.readout {
+  display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 10px 6px 4px; margin-top: 6px; border-top: 1px solid var(--rule);
+  font: 14px var(--f-ui); color: var(--ink-2);
+}
+.readout b { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.note { font: 14.5px/1.5 var(--f-ui); color: var(--ink-2); border-top: 1px solid var(--rule); margin-top: 48px; padding-top: 14px; }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Geometry of unit spheres, projectors and products of spheres</div>
+  <h1>Why every velocity on a sphere is perpendicular to the position</h1>
+  <p class="lede">
+    If a point is forced to stay at distance 1 from the origin, then the only directions it can move
+    are the ones that don't change that distance. This page explains why that is the same as
+    <span class="math">⟨ż, z⟩ = 0</span>, and why it matters for dynamics on spheres.
+  </p>
+</header>
+
+<div class="claim">
+  Differentiating <span class="math">⟨z(t), z(t)⟩ = 1</span> along a curve on
+  <span class="math">S<sup>n−1</sup></span> gives <span class="math">⟨ż, z⟩ = 0</span>,
+  so the tangent space at <span class="math">z</span> is the hyperplane
+  <span class="math">T<sub>z</sub>S<sup>n−1</sup> = {v : ⟨v, z⟩ = 0}</span>.
+</div>
+
+<h2>The picture in one sentence</h2>
+<p>
+  Imagine standing on a ball of radius 1, with a string tied from the ball's center to your feet.
+  Walk anywhere you like, but the string stays taut and the same length. Your velocity can't have any part
+  pointing along the string, because that would stretch it or slacken it. So your velocity must point
+  <em>sideways</em>, perpendicular to the string. The string is <span class="math">z</span>.
+  Your velocity is <span class="math">ż</span>. "Perpendicular" is the equation
+  <span class="math">⟨ż, z⟩ = 0</span>.
+</p>
+
+<h2>1. A circle first (n = 2)</h2>
+<p>
+  On the circle you can see everything at once. Below, <span class="math">z</span> is the point on the circle
+  and <span class="math">v</span> is a candidate velocity. Split <span class="math">v</span> into a part along
+  <span class="math">z</span> (orange) and a part along the tangent line (green).
+  The orange part is exactly <span class="math">⟨v, z⟩</span>. It is the rate at which you move away from the center.
+</p>
+<p>
+  Drag the point <span class="math">z</span> or the tip of <span class="math">v</span>.
+  Then drag the step size ε to see where one small step in direction <span class="math">v</span> lands.
+  Only when the orange part is zero does the step stay (to first order) on the circle.
+</p>
+
+<figure>
+  <canvas id="c1" tabindex="0" aria-label="Unit circle with a movable point z, its tangent line, and a movable velocity vector v split into radial and tangent parts"></canvas>
+  <div class="controls">
+    <label>Position of z: <b id="o-a">55°</b><input id="s-a" type="range" min="0" max="360" step="1" value="55"></label>
+    <label>Tilt of v away from the tangent: <b id="o-tilt">35°</b><input id="s-tilt" type="range" min="-180" max="180" step="1" value="35"></label>
+    <label>Step size ε: <b id="o-eps">0.60</b><input id="s-eps" type="range" min="0" max="1" step="0.01" value="0.6"></label>
+  </div>
+  <div class="btns"><button id="b-snap" type="button">Snap v into the tangent line</button></div>
+  <div class="readout">
+    <span><span class="sw" style="background:var(--orange)"></span>radial part ⟨v, z⟩ = <b id="r-dot">0</b></span>
+    <span>‖z + εv‖ = <b id="r-norm">1</b></span>
+    <span>first-order change in ‖z‖² = 2ε⟨v, z⟩ = <b id="r-first">0</b></span>
+  </div>
+  <figcaption>
+    The dashed circle through the open dot is the circle of radius ‖z + εv‖. When v has a radial part the step lands off the unit circle.
+    Even a perfectly tangent step leaves the circle slightly (second-order effect ε²‖v‖²). That is why numerical schemes re-normalize after each step.
+  </figcaption>
+</figure>
+
+<h2>2. Why the derivative gives exactly this</h2>
+<p>
+  Everything on the sphere satisfies <span class="math">⟨z, z⟩ = ‖z‖² = 1</span>.
+  Now let <span class="math">z(t)</span> move along any smooth curve that stays on the sphere. The quantity
+  <span class="math">⟨z(t), z(t)⟩</span> is the constant 1 for all t, so its rate of change is zero. Computing that rate
+  with the product rule gives the claim:
+</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">d/dt ⟨z, z⟩ = ⟨ż, z⟩ + ⟨z, ż⟩</div>
+    <div class="why">Product rule for the inner product. Each of the two copies of z gets differentiated once.</div>
+  </div>
+  <div class="step">
+    <div class="eq">= 2⟨ż, z⟩</div>
+    <div class="why">The inner product is symmetric, so both terms are equal.</div>
+  </div>
+  <div class="step">
+    <div class="eq">d/dt ⟨z, z⟩ = d/dt (1) = 0</div>
+    <div class="why">On the sphere ⟨z, z⟩ never changes.</div>
+  </div>
+  <div class="step">
+    <div class="eq">⟹ ⟨ż, z⟩ = 0</div>
+    <div class="why">Same quantity, two ways: 2⟨ż, z⟩ = 0. Velocity is perpendicular to position.</div>
+  </div>
+</div>
+<p>
+  There is a second way to read the same line. Since <span class="math">‖z‖ = 1</span>, the number
+  <span class="math">⟨ż, z⟩</span> is the speed at which you are moving <em>outward</em>
+  (velocity component along the unit vector z). The equation says: outward speed = 0.
+  This is the string argument from the top of the page in symbols.
+</p>
+<p>
+  That shows every velocity of a curve on the sphere lies in the hyperplane
+  <span class="math">{v : ⟨v, z⟩ = 0}</span>. The reverse also holds: for any
+  <span class="math">v</span> in that hyperplane, the great circle
+  <span class="math">γ(s) = cos(s)·z + sin(s)·v/‖v‖</span> stays on the sphere and has velocity
+  <span class="math">v/‖v‖</span> at s = 0. So the hyperplane is exactly the set of possible velocities.
+  Try it in the next figure.
+</p>
+
+<h2>3. The same thing on a ball (n = 3)</h2>
+<p>
+  In three dimensions the "hyperplane" is an ordinary plane touching the sphere at one point
+  (blue patch). The string z is its normal. The orange curve is a great circle through z; its velocity at z
+  (orange arrow) always lies in the blue plane, whichever direction you choose. The red arrow shows a
+  velocity with an outward component: it sticks out of the plane, and its inner product with z is no longer 0.
+</p>
+
+<figure>
+  <canvas id="c2" tabindex="0" aria-label="Rotatable unit sphere with a tangent plane at a point z, a great circle through z, and its velocity vector"></canvas>
+  <div class="controls">
+    <label>Longitude of z: <b id="o-lon">40°</b><input id="s-lon" type="range" min="-180" max="180" step="1" value="40"></label>
+    <label>Latitude of z: <b id="o-lat">25°</b><input id="s-lat" type="range" min="-85" max="85" step="1" value="25"></label>
+    <label>Direction of motion in the plane: <b id="o-psi">30°</b><input id="s-psi" type="range" min="0" max="360" step="1" value="30"></label>
+    <label>Tilt out of the plane (red): <b id="o-delta">35°</b><input id="s-delta" type="range" min="-90" max="90" step="1" value="35"></label>
+  </div>
+  <div class="readout">
+    <span><span class="sw" style="background:var(--orange)"></span>⟨ż, z⟩ for the curve = <b id="r2-a">0.000</b></span>
+    <span><span class="sw" style="background:var(--red)"></span>⟨w, z⟩ for the tilted vector = <b id="r2-b">0.000</b></span>
+    <span>dimension of the tangent plane: <b>2 = n − 1</b></span>
+  </div>
+  <figcaption>Drag the sphere to rotate the view. Moving the "direction" slider sweeps the orange arrow around the plane (a 2-dimensional family of velocities, hence the dimension n − 1 = 2).</figcaption>
+</figure>
+
+<p>
+  In general <span class="math">z</span> lives in <span class="math">ℝⁿ</span>. The single condition
+  <span class="math">⟨v, z⟩ = 0</span> removes one dimension, leaving an
+  <span class="math">(n−1)</span>-dimensional hyperplane. That matches the dimension of the sphere
+  <span class="math">S<sup>n−1</sup></span> itself. You have <span class="math">n−1</span> independent
+  directions to move in, and one forbidden direction (the radial one).
+</p>
+
+<h2>4. Why this matters: forces must be projected</h2>
+<p>
+  Suppose an energy <span class="math">E(z)</span> pushes <span class="math">z</span> with some force
+  <span class="math">u</span> (for instance <span class="math">u = −∇E</span>), and <span class="math">z</span> is
+  required to stay on the sphere. The force usually has a radial part, which would push you off the sphere.
+  The part of the force that can actually move you is the tangent part:
+</p>
+<div class="claim">
+  <span class="math">Proj<sub>z</sub>(u) = u − ⟨u, z⟩ z</span>
+</div>
+<p>
+  Subtract the component along z. What remains has <span class="math">⟨Proj<sub>z</sub>(u), z⟩ = ⟨u,z⟩ − ⟨u,z⟩⟨z,z⟩ = 0</span>,
+  so it lies in the tangent hyperplane. This is the standard form of the Riemannian gradient on a sphere, and it is how
+  oscillator-style dynamics with unit-norm states are written: a force plus a projection that removes the part that
+  would change the length.
+</p>
+<p>
+  Below, the energy is <span class="math">E(z) = −½ zᵀAz</span> with <span class="math">A</span> a symmetric
+  2×2 matrix, so the force is <span class="math">u = Az</span>. Orange: the raw force. Gray: the radial part that
+  gets thrown away. Green: the tangent part that drives the update
+  <span class="math">z ← normalize(z + η·Proj<sub>z</sub>(Az))</span>. The ring is colored by energy (strong blue = low).
+  The motion stops where the green arrow vanishes: <span class="math">Az</span> is parallel to <span class="math">z</span>,
+  i.e. at an eigenvector of A.
+</p>
+
+<figure>
+  <canvas id="c3" tabindex="0" aria-label="Gradient descent of an energy on the unit circle, showing the raw force, its radial part and its tangent part"></canvas>
+  <div class="controls">
+    <label>Orientation of A: <b id="o-th">30°</b><input id="s-th" type="range" min="0" max="180" step="1" value="30"></label>
+    <label>Step size η: <b id="o-eta">0.35</b><input id="s-eta" type="range" min="0.05" max="1" step="0.01" value="0.35"></label>
+  </div>
+  <div class="btns">
+    <button id="b-step" type="button">Step</button>
+    <button id="b-play" type="button">Play</button>
+    <button id="b-rand" type="button">Random start</button>
+    <span style="font:13px var(--f-ui);color:var(--muted)">You can also drag the point along the ring.</span>
+  </div>
+  <div class="readout">
+    <span><span class="sw" style="background:var(--orange)"></span>force u = Az</span>
+    <span><span class="sw" style="background:var(--muted)"></span>radial ⟨u, z⟩z</span>
+    <span><span class="sw" style="background:var(--green)"></span>tangent Proj(u)</span>
+    <span>E = <b id="r3-e">0</b></span>
+    <span>‖Proj(u)‖ = <b id="r3-g">0</b></span>
+    <span>steps = <b id="r3-n">0</b></span>
+  </div>
+  <figcaption id="cap3">Only the green arrow moves the point. The gray part is cancelled by the constraint.</figcaption>
+</figure>
+
+<h2>5. The projector P<sub>z</sub> = I − zzᵀ</h2>
+<p>
+  Section 4 already used a recipe, "subtract the part along z". As a matrix, that recipe is
+  <span class="math">P<sub>z</sub> = I − zzᵀ</span>. The matrix <span class="math">zzᵀ</span> is a shadow machine:
+  feed it <span class="math">u</span> and it returns <span class="math">(zzᵀ)u = ⟨z, u⟩ z</span>, the piece of
+  <span class="math">u</span> that lies along z. Subtracting it leaves only the piece perpendicular to z.
+</p>
+<p>Four properties, each with a plain meaning:</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">Symmetric: P<sub>z</sub>ᵀ = P<sub>z</sub></div>
+    <div class="why">The shadow is cast straight down (perpendicular), with no slant. Equivalent statement: ⟨P u, w⟩ = ⟨u, P w⟩, so it doesn't matter which of the two vectors you project.</div>
+  </div>
+  <div class="step">
+    <div class="eq">Idempotent: P<sub>z</sub>² = P<sub>z</sub></div>
+    <div class="why">Projecting twice is the same as projecting once. After the first projection the vector is already flat against the tangent line, so there is nothing left to remove. Proof: (I − zzᵀ)² = I − 2zzᵀ + z(zᵀz)zᵀ = I − zzᵀ, using zᵀz = 1.</div>
+  </div>
+  <div class="step">
+    <div class="eq">P<sub>z</sub> z = 0</div>
+    <div class="why">The "string" direction is erased completely: z − ⟨z, z⟩ z = z − z = 0.</div>
+  </div>
+  <div class="step">
+    <div class="eq">⟨v, z⟩ = 0 ⟹ P<sub>z</sub> v = v</div>
+    <div class="why">Tangent vectors have no component along z, so there's nothing to subtract and they pass through unchanged.</div>
+  </div>
+</div>
+<p>
+  Note that all of this relies on <span class="math">‖z‖ = 1</span>. For a general z you'd need
+  <span class="math">I − zzᵀ/‖z‖²</span>.
+</p>
+<p>
+  In the picture below, <span class="math">P<sub>z</sub></span> acts on vectors based at the origin. Drag the tips of
+  <span class="math">u</span> (orange) and <span class="math">w</span> (blue). Each lands on the blue-accent line, the tangent line (the
+  image of P), by sliding along the direction of z (the kernel, which P kills). The readouts below verify each property numerically.
+</p>
+
+<figure>
+  <canvas id="c5" tabindex="0" aria-label="Projection of two draggable vectors u and w onto the tangent line perpendicular to z"></canvas>
+  <div class="controls">
+    <label>Position of z: <b id="o-z5">70°</b><input id="s-z5" type="range" min="0" max="360" step="1" value="70"></label>
+  </div>
+  <div class="readout">
+    <span>P = <b id="r5-mat"></b></span>
+    <span>‖P z‖ = <b id="r5-pz">0</b></span>
+    <span>‖P t − t‖ (t tangent) = <b id="r5-pt">0</b></span>
+    <span>‖P(Pu) − Pu‖ = <b id="r5-idem">0</b></span>
+    <span>⟨Pu, w⟩ = <b id="r5-s1">0</b> &nbsp;vs&nbsp; ⟨u, Pw⟩ = <b id="r5-s2">0</b></span>
+  </div>
+  <figcaption>
+    Gray dashed segments are the removed radial parts. They are always parallel to z and perpendicular to the tangent line (symmetric = orthogonal projection).
+    P(Pu) sits exactly on Pu (idempotent).
+  </figcaption>
+</figure>
+
+<h2>6. The radial part is invisible after normalization</h2>
+<p>
+  "Normalize" means: take a vector <span class="math">q ≠ 0</span> and replace it by
+  <span class="math">q/‖q‖</span>. Geometrically, you slide <span class="math">q</span> along the ray from the origin through
+  <span class="math">q</span> until it hits the unit sphere. Now ask what a push <span class="math">u = r·z + s·t</span> (radial part
+  <span class="math">r z</span>, tangent part <span class="math">s t</span>) does to <span class="math">z</span>:
+</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">q = z + u = (1 + r) z + s t</div>
+    <div class="why">The radial part only changes how far out along z you are. The tangent part moves you sideways.</div>
+  </div>
+  <div class="step">
+    <div class="eq">q/‖q‖ = z   if s = 0</div>
+    <div class="why">With no tangent part, q is a multiple of z. It is on the same ray, so normalization puts it exactly back at z. The radial part changed the length and nothing else.</div>
+  </div>
+  <div class="step">
+    <div class="eq">angle moved = arctan( s / (1 + r) )</div>
+    <div class="why">With a tangent part, the direction of q is set by the ratio of sideways to outward. The radial part only enters as the scale 1 + r that sets how big a sideways step looks. It never creates motion by itself.</div>
+  </div>
+</div>
+<p>
+  So "only the tangential part moves a point along the sphere" is literally true: set the tangent part to zero and the point cannot move,
+  no matter how large the radial part is. Play with the sliders: with <span class="math">s = 0</span> nothing moves for any r.
+</p>
+
+<figure>
+  <canvas id="c6" tabindex="0" aria-label="A point on the circle pushed by a radial and a tangent amount, then normalized back onto the circle"></canvas>
+  <div class="controls">
+    <label>Position of z: <b id="o-a6">60°</b><input id="s-a6" type="range" min="0" max="360" step="1" value="60"></label>
+    <label>Radial amount r: <b id="o-r6">0.80</b><input id="s-r6" type="range" min="-0.7" max="1.2" step="0.01" value="0.8"></label>
+    <label>Tangent amount s: <b id="o-s6">0.70</b><input id="s-s6" type="range" min="-1" max="1" step="0.01" value="0.7"></label>
+  </div>
+  <div class="readout">
+    <span>‖z + u‖ = <b id="r6-n">1</b></span>
+    <span>angle moved after normalizing = <b id="r6-ang">0°</b></span>
+    <span>angle if r were 0 = <b id="r6-ang0">0°</b></span>
+    <span>angle moved from the radial part alone = <b>0°</b></span>
+  </div>
+  <figcaption>
+    The orange segment is the radial part and the green one the tangent part. The open dot is z + u. The faint ray is the line the dot
+    slides along when we normalize, and the filled dot is where it ends up. The thick arc is the distance actually travelled.
+  </figcaption>
+</figure>
+
+<h2>7. Many unit vectors at once: the product manifold</h2>
+<p>
+  So far there was one vector on one sphere. In practice the state is a <em>collection</em>:
+  M unit vectors <span class="math">z = (z₁, …, z<sub>M</sub>)</span>, each <span class="math">z<sub>m</sub> ∈ S<sup>N−1</sup></span>.
+  Picture M clocks, each with a hand of length 1 (in N dimensions rather than 2). The state of the whole system is the position of all hands at once,
+  and the set of all such states is the <em>product manifold</em> <span class="math">(S<sup>N−1</sup>)<sup>M</sup></span>.
+</p>
+<p>
+  <strong>Tangent space = product of tangent spaces.</strong> Each hand has its own constraint
+  <span class="math">⟨z<sub>m</sub>, z<sub>m</sub>⟩ = 1</span>, and the constraints don't interact. So each hand can move
+  sideways independently of the others, and the allowed velocities are all tuples
+  <span class="math">(v₁, …, v<sub>M</sub>)</span> with <span class="math">⟨v<sub>m</sub>, z<sub>m</sub>⟩ = 0</span> for each m.
+  Count: each block contributes <span class="math">N − 1</span> free directions, for <span class="math">M(N − 1)</span> in total. That's the
+  <span class="math">MN</span> numbers in the state minus <span class="math">M</span> constraints, one per hand.
+</p>
+<p>
+  <strong>The projector acts block by block.</strong> Stack the hands into one long vector in
+  <span class="math">ℝ<sup>MN</sup></span>. The projector onto the tangent space is the block-diagonal matrix
+  <span class="math">P = diag(P<sub>z₁</sub>, …, P<sub>z<sub>M</sub></sub>)</span>: the m-th block of the output only depends on the m-th block of the input.
+  The off-diagonal blocks are exactly zero, since forces on hand k can't change the length constraint of hand m.
+</p>
+<p>
+  In the setting you pasted, AKOrN uses <span class="math">M = C/N</span> small factors per position (each a short vector of N channels),
+  whereas SFPRM uses one factor per token, <span class="math">N = d</span>, giving the state space <span class="math">(S<sup>d−1</sup>)<sup>T</sup></span> for T tokens.
+  Same geometry, different choices of M and N.
+</p>
+<p>
+  Change M and N below. The left plot shows the matrix P for a random state. Orange cells are negative entries (−z<sub>i</sub>z<sub>j</sub>),
+  blue are positive. The right shows what is kept and what is thrown away. A random force is also projected block by block, and the
+  table confirms every block ends up tangent.
+</p>
+
+<figure>
+  <canvas id="c7" tabindex="0" aria-label="Block diagonal projector matrix for M unit vectors in N dimensions with a bar showing kept and removed dimensions"></canvas>
+  <div class="controls">
+    <label>M, number of blocks (tokens / oscillators): <b id="o-M">3</b><input id="s-M" type="range" min="1" max="6" step="1" value="3"></label>
+    <label>N, size of each block: <b id="o-N">3</b><input id="s-N" type="range" min="2" max="5" step="1" value="3"></label>
+  </div>
+  <div class="btns"><button id="b-new7" type="button">New random state</button></div>
+  <div class="readout" id="r7"></div>
+  <figcaption>
+    Green squares on the right are the M(N−1) tangent directions that remain. Orange squares are the M radial directions (one per block) that P removes.
+  </figcaption>
+</figure>
+
+<h3 style="font:600 17px/1.3 var(--f-ui);margin:30px 0 6px">A concrete case: two circles make a torus</h3>
+<p>
+  Take N = 2 (each block is a circle) and M = 2. Each state is a pair of angles <span class="math">(θ₁, θ₂)</span>, so the product manifold
+  <span class="math">S¹ × S¹</span> is a torus. Cut it open and you get a square where opposite edges are glued. The dimension is
+  <span class="math">M(N−1) = 2</span>. A tangent vector is just a pair of angular velocities, and the left/right panels are two views of one number pair.
+  Drag the dot, or press Play and watch each hand rotate by its own tangent velocity while the dot on the square wraps around.
+</p>
+
+<figure>
+  <canvas id="c8" tabindex="0" aria-label="A point on a flat torus (square with glued edges) alongside the two circles whose angles it encodes"></canvas>
+  <div class="controls">
+    <label>Angular velocity of z₁: <b id="o-w1">0.60</b><input id="s-w1" type="range" min="-1" max="1" step="0.01" value="0.6"></label>
+    <label>Angular velocity of z₂: <b id="o-w2">0.23</b><input id="s-w2" type="range" min="-1" max="1" step="0.01" value="0.23"></label>
+  </div>
+  <div class="btns"><button id="b-play8" type="button">Play</button><button id="b-clr8" type="button">Clear trail</button></div>
+  <div class="readout">
+    <span>state (θ₁, θ₂) = <b id="r8-th"></b></span>
+    <span>tangent dimension M(N−1) = <b>2</b></span>
+    <span>ambient dimension MN = <b>4</b></span>
+  </div>
+  <figcaption>
+    Left: the torus as a square with left/right and top/bottom edges identified. Right: the same state as two points on two circles, each with its own tangent arrow.
+    Velocities of different blocks are chosen independently.
+  </figcaption>
+</figure>
+
+<h2>8. Rescaling by 1/√M: all blocks inside one big sphere</h2>
+<p>
+  You can also forget the block structure and treat the stacked vector <span class="math">(z₁, …, z<sub>M</sub>) ∈ ℝ<sup>MN</sup></span> as a single vector.
+  If every block has norm 1, the stacked vector has squared norm <span class="math">1 + 1 + ⋯ + 1 = M</span>. Dividing by <span class="math">√M</span> makes it a unit vector, so
+  <span class="math">(z₁, …, z<sub>M</sub>)/√M ∈ S<sup>MN−1</sup></span>. This is the embedding.
+</p>
+<p>
+  The embedding is <em>not</em> onto. A generic point of the big sphere has blocks of unequal lengths, and its blocks can't be rescaled to unit
+  without moving it. Only the points where all M blocks have the <em>same</em> norm (necessarily <span class="math">1/√M</span>)
+  come from the product manifold. That is <span class="math">M − 1</span> extra equations
+  (<span class="math">‖z₁‖ = ‖z₂‖ = ⋯ = ‖z<sub>M</sub>‖</span>), which is exactly why the dimension drops from
+  <span class="math">MN − 1</span> to <span class="math">M(N−1) = MN − 1 − (M−1)</span>.
+</p>
+<p>
+  For M = 2 you can see all of it in the plane of block norms <span class="math">(r₁, r₂) = (‖z₁‖, ‖z₂‖)</span>. The big sphere says
+  <span class="math">r₁² + r₂² = 1</span>, a quarter circle. The product manifold is the single point on the diagonal
+  <span class="math">r₁ = r₂ = 1/√2</span>.
+</p>
+
+<figure>
+  <canvas id="c9" tabindex="0" aria-label="Plane of block norms showing the quarter circle of the big sphere and the single diagonal point where all blocks have equal norm"></canvas>
+  <div class="controls">
+    <label>Position on the big sphere: <b id="o-phi">20°</b><input id="s-phi" type="range" min="2" max="88" step="0.5" value="20"></label>
+  </div>
+  <div class="btns"><button id="b-diag" type="button">Jump to equal block norms</button></div>
+  <div class="readout">
+    <span>r₁ = <b id="r9-1">0</b></span>
+    <span>r₂ = <b id="r9-2">0</b></span>
+    <span>r₁² + r₂² = <b id="r9-s">1</b></span>
+    <span>comes from (S<sup>N−1</sup>)² ? <b id="r9-in">no</b></span>
+  </div>
+  <figcaption>
+    Right panel: the two blocks as arrows. Each dashed circle has radius 1/√2, the length every block must have to come from unit vectors. The arrow turns blue when it fits.
+    Example for N = 2: big sphere S³ has dimension 3, the torus has dimension 2, and the gap is M − 1 = 1.
+  </figcaption>
+</figure>
+
+<h2>9. Distance on a sphere: the arc versus the chord</h2>
+<p>
+  Take two unit vectors <span class="math">u</span> and <span class="math">v</span>. There are two natural ways to ask how far apart they are:
+</p>
+<p>
+  <strong>Geodesic distance</strong>: walk along the sphere, never leaving it. The length of the shortest walk is the angle
+  <span class="math">θ = ∠(u, v)</span> (radius 1, so arc length = angle).
+  <strong>Chordal distance</strong>: tunnel straight through the ball. That length is <span class="math">‖u − v‖</span>.
+</p>
+<p>
+  The squared chord is cheap to compute and tied to the angle by one line of algebra. Since
+  <span class="math">‖u − v‖² = ‖u‖² − 2⟨u, v⟩ + ‖v‖² = 2 − 2⟨u, v⟩</span>:
+</p>
+<div class="claim">
+  <span class="math">1 − ⟨u, v⟩ = 1 − cos θ = ½ ‖u − v‖²</span>
+</div>
+<p>
+  This is the quantity used in the halting test you quoted. It needs no arccos, it grows monotonically with θ on [0, π] (so a threshold on it is a threshold on the angle),
+  and for small angles <span class="math">1 − cos θ ≈ θ²/2</span>. Drag u and v in the figure. The right plot compares the chordal quantity with the squared angle over 2: they agree near 0 and then separate,
+  with the chordal one saturating at 2 when the vectors are opposite.
+</p>
+
+<figure>
+  <canvas id="c10" tabindex="0" aria-label="Two points on a circle with the arc (geodesic) and chord between them, and a plot of 1 minus cos theta versus theta"></canvas>
+  <div class="controls">
+    <label>Position of u: <b id="o-ua">20°</b><input id="s-ua" type="range" min="0" max="360" step="1" value="20"></label>
+    <label>Signed angle from u to v: <b id="o-th10">100°</b><input id="s-th10" type="range" min="-180" max="180" step="1" value="100"></label>
+  </div>
+  <div class="readout">
+    <span>θ = <b id="r10-th">0</b></span>
+    <span>1 − cos θ = <b id="r10-a">0</b></span>
+    <span>½‖u − v‖² = <b id="r10-b">0</b></span>
+    <span>arc length = <b id="r10-arc">0</b></span>
+    <span>chord ‖u − v‖ = <b id="r10-chord">0</b></span>
+  </div>
+  <figcaption id="cap10">The accent arc is the geodesic, the dashed orange segment is the chord.</figcaption>
+</figure>
+
+<h2>10. Geodesics, Exp, Log and Slerp</h2>
+<p>
+  A <strong>geodesic</strong> is the sphere's version of a straight line: a path that never turns. On a sphere those are <strong>great circles</strong>, the
+  circles you get by slicing the ball with a plane through the center (equator, meridians, flight routes). Starting at <span class="math">u</span> and heading in the
+  unit tangent direction <span class="math">e</span> (so <span class="math">⟨e, u⟩ = 0</span>, <span class="math">‖e‖ = 1</span>), you trace
+</p>
+<div class="claim">
+  <span class="math">Exp<sub>u</sub>(t e) = cos(t) u + sin(t) e</span>
+</div>
+<p>
+  Why this works: <span class="math">u ⟂ e</span> gives <span class="math">‖cos(t)u + sin(t)e‖² = cos²t + sin²t = 1</span>, so the path stays on the sphere.
+  At t = 0 it is at u, with velocity e, and t is the angle travelled. Nothing is stretched: the tangent vector <span class="math">t e</span> is "wrapped" onto the sphere
+  with its length preserved as arc length.
+</p>
+<p><strong>Log is the inverse: unwrap.</strong> Given a target <span class="math">v</span>, how do you find the tangent vector that wraps onto it?</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">v = cos θ · u + sin θ · e</div>
+    <div class="why">Decompose v into its part along u and its part in the tangent space. By the formula for Exp, the weights are cos θ and sin θ.</div>
+  </div>
+  <div class="step">
+    <div class="eq">P<sub>u</sub> v = v − cos θ · u = sin θ · e,&nbsp; so&nbsp; ‖P<sub>u</sub> v‖² = 1 − cos²θ = sin²θ</div>
+    <div class="why">Project away the u part (Section 5). What's left points in the direction e and has length sin θ.</div>
+  </div>
+  <div class="step">
+    <div class="eq">e = P<sub>u</sub> v / ‖P<sub>u</sub> v‖,&nbsp;&nbsp; θ = atan2(‖P<sub>u</sub> v‖, ⟨u, v⟩)</div>
+    <div class="why">Direction from the projection. The angle needs both sin θ (the length of P v) and cos θ (= ⟨u, v⟩), since sin alone can't tell θ from π − θ.</div>
+  </div>
+  <div class="step">
+    <div class="eq">Log<sub>u</sub> v = θ · P<sub>u</sub> v / ‖P<sub>u</sub> v‖</div>
+    <div class="why">The tangent vector in direction e whose length is the arc length θ, longer than the shadow sin θ.</div>
+  </div>
+</div>
+<p>
+  <strong>Slerp</strong> (spherical linear interpolation) is just walking a fraction of the way along that geodesic:
+  <span class="math">Slerp(u, v; t) = Exp<sub>u</sub>(t · Log<sub>u</sub> v) = [sin((1−t)θ) u + sin(tθ) v] / sin θ</span>.
+  It is <em>undefined at antipodal pairs</em>: for <span class="math">v = −u</span> we have <span class="math">sin θ = 0</span> and
+  <span class="math">P<sub>u</sub> v = 0</span>, so there is no direction to normalize. Every half great circle from u to −u has the same length π, so the shortest arc isn't unique.
+</p>
+<p>
+  In the figure the sphere is rotated so that u is always at the top, and its tangent line is the horizontal line. The green point is where the projection <span class="math">P<sub>u</sub> v</span> lands.
+  The orange point is where <span class="math">Log<sub>u</sub> v</span> lands. It is farther out than green, because the arc is longer than its shadow. Drag v towards the bottom and watch the green point collapse to the origin of the line.
+</p>
+
+<figure>
+  <canvas id="c11" tabindex="0" aria-label="Circle with u at the top and its tangent line, showing the projection of v and the logarithm of v on the tangent line"></canvas>
+  <div class="controls">
+    <label>Angle from u to v (signed): <b id="o-th11">110°</b><input id="s-th11" type="range" min="-180" max="180" step="1" value="110"></label>
+  </div>
+  <div class="btns"><button id="b-anti" type="button">Jump to the antipode</button></div>
+  <div class="readout">
+    <span><span class="sw" style="background:var(--green)"></span>‖P<sub>u</sub> v‖ = <b id="r11-p">0</b></span>
+    <span>sin θ = <b id="r11-s">0</b></span>
+    <span>cos θ = ⟨u, v⟩ = <b id="r11-c">0</b></span>
+    <span><span class="sw" style="background:var(--orange)"></span>‖Log<sub>u</sub> v‖ = θ = <b id="r11-l">0</b></span>
+    <span>‖Exp<sub>u</sub>(Log<sub>u</sub> v) − v‖ = <b id="r11-e">0</b></span>
+  </div>
+  <figcaption id="cap11">Green: P<sub>u</sub> v (the shadow of v, length sin θ). Orange: Log<sub>u</sub> v (the unrolled arc, length θ). The dashed vertical line is the removed radial part.</figcaption>
+</figure>
+
+<h2>11. Retractions: a cheaper way to wrap</h2>
+<p>
+  Computing Exp needs a sine and a cosine, and it moves exactly along the great circle. A <strong>retraction</strong>
+  <span class="math">R<sub>z</sub> : T<sub>z</sub>S<sup>n−1</sup> → S<sup>n−1</sup></span> is any cheaper map that does the same job approximately:
+  it must satisfy <span class="math">R<sub>z</sub>(0) = z</span> (no step, no move) and have the identity as derivative at 0 (small steps move in the requested direction at the requested speed).
+  So it agrees with Exp to first order and may differ after that.
+</p>
+<p>
+  The retraction used by AKOrN and nGPT is the one you already met in Section 6: <strong>add the step, then normalize</strong>,
+  <span class="math">R<sub>z</sub>(v) = Π(z + v)</span> with <span class="math">Π(q) = q/‖q‖</span>. For a tangent <span class="math">v</span>:
+</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">‖z + v‖² = ‖z‖² + 2⟨z, v⟩ + ‖v‖² = 1 + ‖v‖²</div>
+    <div class="why">The cross term vanishes because v is tangent (⟨z, v⟩ = 0). This is the Pythagorean theorem for the right triangle with legs z and v.</div>
+  </div>
+  <div class="step">
+    <div class="eq">Π(z + v) = cos φ · z + sin φ · v/‖v‖,&nbsp; tan φ = ‖v‖</div>
+    <div class="why">Divide by √(1+‖v‖²): cos φ = 1/√(1+‖v‖²) and sin φ = ‖v‖/√(1+‖v‖²). The triangle has "adjacent" side 1 (the string z) and "opposite" side ‖v‖ (the step), so the angle at the origin is arctan ‖v‖.</div>
+  </div>
+  <div class="step">
+    <div class="eq">Exp<sub>z</sub>(v) travels ‖v‖,&nbsp; Π(z + v) travels arctan ‖v‖</div>
+    <div class="why">Same great circle, same direction, different distance along it. Since arctan x ≤ x with equality to first order, they agree for small steps.</div>
+  </div>
+</div>
+<p>
+  Two consequences. First, <strong>normalization can never move more than a quarter turn</strong>:
+  <span class="math">arctan ‖v‖ &lt; π/2</span> however big the step. Second, the three operations (Exp, retraction, Slerp) all walk the same great circle and
+  differ only in <em>how a step parameter is converted into an angle</em>. To land at the same point at angle α:
+</p>
+<p style="padding-left:18px">
+  Exp: step length <span class="math">‖v‖ = α</span> &nbsp;·&nbsp; retraction: <span class="math">‖v‖ = tan α</span> (needs α &lt; π/2) &nbsp;·&nbsp; Slerp toward a target at angle θ: <span class="math">t = α/θ</span>.
+</p>
+<p>
+  That's why step sizes can be traded between them exactly. In the figure, drag the step length τ. Green is Exp (it lands at angle τ). Orange is normalization (it lands at angle arctan τ, a smaller angle).
+  Tick the box to give the retraction the converted step tan τ instead. It then lands on exactly the same point, and so does Slerp with t = τ/θ.
+</p>
+
+<figure>
+  <canvas id="c12" tabindex="0" aria-label="Tangent line at the top of a circle, with the exponential map, normalization retraction and Slerp landing points for a step of length tau"></canvas>
+  <div class="controls">
+    <label>Step length τ = ‖v‖: <b id="o-tau">0.90</b><input id="s-tau" type="range" min="0" max="3" step="0.01" value="0.9"></label>
+    <label>Slerp target at angle θ: <b id="o-thT">100°</b><input id="s-thT" type="range" min="20" max="175" step="1" value="100"></label>
+  </div>
+  <div class="btns">
+    <label style="font:14px var(--f-ui);display:flex;gap:8px;align-items:center;color:var(--ink-2)">
+      <input id="chk-match" type="checkbox"> Give the retraction the converted step tan τ
+    </label>
+  </div>
+  <div class="readout">
+    <span><span class="sw" style="background:var(--green)"></span>Exp angle = <b id="r12-e">0</b></span>
+    <span><span class="sw" style="background:var(--orange)"></span>retraction angle = <b id="r12-r">0</b></span>
+    <span>step that makes retraction match = tan τ = <b id="r12-t">0</b></span>
+    <span><span class="sw" style="background:var(--blue)"></span>Slerp fraction t = τ/θ = <b id="r12-s">0</b></span>
+  </div>
+  <figcaption>
+    Tangent line at the top. The orange ray is the normalization: it runs from the origin through the tip of the step and hits the circle at angle arctan(step).
+    The curves on the right plot "angle reached" against "step length".
+  </figcaption>
+</figure>
+
+<h2>12. Riemannian gradients and Riemannian gradient descent</h2>
+<p>
+  Take a smooth function <span class="math">f</span> defined on all of <span class="math">ℝⁿ</span>, and look at it only on the sphere. Its ordinary gradient
+  <span class="math">∇f(z)</span> points in the direction of steepest increase in the whole space. But on the sphere you can only move tangentially (Section 1), so the useful part is the
+  tangent part (Section 5):
+</p>
+<div class="claim">
+  <span class="math">grad f(z) = P<sub>z</sub> ∇f(z)</span>
+</div>
+<p>
+  <strong>Riemannian gradient descent</strong> is then "take a tangent step downhill and wrap it back onto the sphere":
+  <span class="math">z ← R<sub>z</sub>(−γ grad f(z))</span>, where R is any retraction, for instance normalization.
+</p>
+<p>The two potentials from the text, side by side:</p>
+<div class="steps">
+  <div class="step">
+    <div class="eq">f(z) = −⟨c, z⟩&nbsp;&nbsp;⟹&nbsp;&nbsp;grad f = −P<sub>z</sub> c</div>
+    <div class="why">Linear potential (AKOrN's stimulus). ∇f = −c is constant, so grad f is just minus the tangent part of c. Descent pulls z toward the direction of c. The pull has size ‖c‖ sin θ: it is weak when z is nearly opposite to c and also vanishes at θ = π, an unstable standstill.</div>
+  </div>
+  <div class="step">
+    <div class="eq">f(z) = ½ ∠(z, x)²&nbsp;&nbsp;⟹&nbsp;&nbsp;grad f = −Log<sub>z</sub> x</div>
+    <div class="why">Geodesic potential (SFPRM's injection). The force is the unrolled arc to x: a vector pointing straight along the shortest path with length θ, the true distance. The pull grows with distance instead of fading out when far away. It is undefined at the antipode.</div>
+  </div>
+</div>
+<p>
+  Try both below. Set x (the target, or the direction of c with ‖c‖ = 1) and z by dragging. The right-hand plot shows the size of the pull as a function of the angle θ:
+  <span class="math">sin θ</span> for the linear potential, <span class="math">θ</span> for the geodesic one. Starting far away, the geodesic force is much stronger. Near the target they coincide, since sin θ ≈ θ.
+  Use a large step γ in the geodesic mode and watch the retraction overshoot: near the target, a step arctan(γθ) exceeds θ whenever γ &gt; 1 and ends up on the other side of x (it overshoots more and more once γ &gt; 2).
+</p>
+
+<figure>
+  <canvas id="c13" tabindex="0" aria-label="Riemannian gradient descent on a circle toward a target, with a plot comparing the force magnitude of the linear and the geodesic potential"></canvas>
+  <div class="btns">
+    <button id="b-lin" type="button" aria-pressed="false">Linear potential −⟨c, z⟩</button>
+    <button id="b-geo" type="button" aria-pressed="true">Geodesic potential ½∠(z, x)²</button>
+  </div>
+  <div class="controls">
+    <label>Step size γ: <b id="o-gam">0.50</b><input id="s-gam" type="range" min="0.05" max="2.5" step="0.01" value="0.5"></label>
+  </div>
+  <div class="btns">
+    <button id="b-step13" type="button">Step</button>
+    <button id="b-play13" type="button">Play</button>
+    <button id="b-rand13" type="button">Random start</button>
+    <span style="font:13px var(--f-ui);color:var(--muted)">Drag z or the target x on the circle.</span>
+  </div>
+  <div class="readout">
+    <span>θ = <b id="r13-th">0</b></span>
+    <span>f(z) = <b id="r13-f">0</b></span>
+    <span>‖grad f‖ = <b id="r13-g">0</b></span>
+    <span>steps = <b id="r13-n">0</b></span>
+  </div>
+  <figcaption id="cap13">Green: the descent step −grad f. In the linear mode the raw force c (orange) is split into the radial part (gray, discarded) and the tangent part (green). Geodesic arrows are drawn at half scale.</figcaption>
+</figure>
+
+<div class="note">
+  Self-contained page: no external libraries or network requests.
+  Notation: <span class="math">⟨·,·⟩</span> is the Euclidean inner product, <span class="math">ż = dz/dt</span>,
+  and <span class="math">T<sub>z</sub>S<sup>n−1</sup></span> is the tangent space of the unit sphere at z.
+</div>
+
+</main>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const DEG = Math.PI / 180, TAU = Math.PI * 2;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const fmt = (x, d = 3) => (Math.abs(x) < 0.5 * Math.pow(10, -d) ? 0 : x).toFixed(d);
+
+function fit(canvas, aspect) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = Math.round(w * aspect);
+  canvas.style.height = h + 'px';
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  return { ctx, w, h };
+}
+function arrow(ctx, x0, y0, x1, y1, col, lw, dash) {
+  const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy);
+  if (L < 3) return;
+  const ux = dx / L, uy = dy / L, hl = Math.min(11, L * 0.45);
+  ctx.save();
+  ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  ctx.setLineDash(dash || []);
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1 - ux * hl * 0.6, y1 - uy * hl * 0.6); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x1 - ux * hl - uy * hl * 0.45, y1 - uy * hl + ux * hl * 0.45);
+  ctx.lineTo(x1 - ux * hl + uy * hl * 0.45, y1 - uy * hl - ux * hl * 0.45);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function text(ctx, s, x, y, col, size, align) {
+  ctx.save();
+  ctx.font = `${size || 14}px "STIX Two Text","Cambria Math",Georgia,serif`;
+  ctx.fillStyle = col; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+  ctx.restore();
+}
+function dot(ctx, x, y, r, fill, stroke) {
+  ctx.beginPath(); ctx.arc(x, y, r, 0, TAU);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+}
+function pointerPos(canvas, e) {
+  const r = canvas.getBoundingClientRect();
+  return [e.clientX - r.left, e.clientY - r.top];
+}
+
+/* ---------------- Figure 1: the circle ---------------- */
+const f1 = { a: 55, tilt: 35, eps: 0.6, speed: 0.85, drag: null };
+const c1 = $('c1');
+function geom1(w, h) {
+  const S = Math.min(w, h) / 3.1;
+  return { S, cx: w / 2, cy: h / 2 };
+}
+function draw1() {
+  const { ctx, w, h } = fit(c1, 0.72);
+  const { S, cx, cy } = geom1(w, h);
+  const P = (x, y) => [cx + S * x, cy - S * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+
+  const a = f1.a * DEG, tilt = f1.tilt * DEG;
+  const z = [Math.cos(a), Math.sin(a)], t = [-Math.sin(a), Math.cos(a)];
+  const vt = f1.speed * Math.cos(tilt), vr = f1.speed * Math.sin(tilt);
+  const v = [vt * t[0] + vr * z[0], vt * t[1] + vr * z[1]];
+
+  // faint axes
+  ctx.strokeStyle = rule; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(...P(-1.5, 0)); ctx.lineTo(...P(1.5, 0)); ctx.moveTo(...P(0, -1.5)); ctx.lineTo(...P(0, 1.5)); ctx.stroke();
+
+  // ghost step circle + ghost point
+  const p = [z[0] + f1.eps * v[0], z[1] + f1.eps * v[1]];
+  const pn = Math.hypot(p[0], p[1]);
+  if (f1.eps > 0.005 && Math.abs(pn - 1) > 0.004) {
+    ctx.save(); ctx.setLineDash([4, 5]); ctx.strokeStyle = orange; ctx.globalAlpha = 0.55; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, S * pn, 0, TAU); ctx.stroke(); ctx.restore();
+  }
+  // unit circle
+  ctx.strokeStyle = ink2; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, S, 0, TAU); ctx.stroke();
+
+  // radius (the "string")
+  ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = muted; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(...P(0, 0)); ctx.lineTo(...P(z[0], z[1])); ctx.stroke(); ctx.restore();
+  dot(ctx, ...P(0, 0), 3, muted);
+
+  // tangent line
+  ctx.strokeStyle = acc; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(...P(z[0] - 1.25 * t[0], z[1] - 1.25 * t[1])); ctx.lineTo(...P(z[0] + 1.25 * t[0], z[1] + 1.25 * t[1])); ctx.stroke();
+  // right-angle marker
+  const q = 0.09;
+  ctx.strokeStyle = acc; ctx.lineWidth = 1.2; ctx.beginPath();
+  ctx.moveTo(...P(z[0] - q * z[0], z[1] - q * z[1]));
+  ctx.lineTo(...P(z[0] - q * z[0] + q * t[0], z[1] - q * z[1] + q * t[1]));
+  ctx.lineTo(...P(z[0] + q * t[0], z[1] + q * t[1]));
+  ctx.stroke();
+
+  // components of v
+  const tipT = [z[0] + vt * t[0], z[1] + vt * t[1]];
+  const tipR = [z[0] + vr * z[0], z[1] + vr * z[1]];
+  const tip = [z[0] + v[0], z[1] + v[1]];
+  ctx.save(); ctx.setLineDash([3, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(...P(tipT[0], tipT[1])); ctx.lineTo(...P(tip[0], tip[1]));
+  ctx.moveTo(...P(tipR[0], tipR[1])); ctx.lineTo(...P(tip[0], tip[1])); ctx.stroke(); ctx.restore();
+  arrow(ctx, ...P(z[0], z[1]), ...P(tipT[0], tipT[1]), green, 3);
+  arrow(ctx, ...P(z[0], z[1]), ...P(tipR[0], tipR[1]), orange, 3);
+  arrow(ctx, ...P(z[0], z[1]), ...P(tip[0], tip[1]), ink, 2.2);
+
+  // ghost point
+  dot(ctx, ...P(p[0], p[1]), 5, null, orange);
+
+  // handles and labels
+  dot(ctx, ...P(z[0], z[1]), 7, acc);
+  dot(ctx, ...P(tip[0], tip[1]), 6, css('--surface'), ink);
+  text(ctx, 'z', ...P(z[0] * 1.14 - 0.05 * t[0], z[1] * 1.14 - 0.05 * t[1]), acc, 20);
+  text(ctx, 'v', ...P(tip[0] + 0.1 * (v[0] / (Math.hypot(...v) || 1)), tip[1] + 0.1 * (v[1] / (Math.hypot(...v) || 1))), ink, 19);
+  text(ctx, 'tangent line', ...P(z[0] + 1.2 * t[0] + 0.0 * z[0], z[1] + 1.2 * t[1]), acc, 13, t[0] >= 0 ? 'right' : 'left');
+  if (Math.abs(vr) > 0.12) text(ctx, 'radial', ...P(tipR[0] + 0.14 * z[0], tipR[1] + 0.14 * z[1]), orange, 13);
+  if (Math.abs(vt) > 0.12) text(ctx, 'tangent', ...P(tipT[0] + 0.14 * t[0] * Math.sign(vt), tipT[1] + 0.14 * t[1] * Math.sign(vt)), green, 13);
+  text(ctx, 'unit circle', ...P(-0.72, -1.2), ink2, 13);
+
+  // readouts
+  $('o-a').textContent = Math.round(f1.a) + '°';
+  $('o-tilt').textContent = Math.round(f1.tilt) + '°';
+  $('o-eps').textContent = f1.eps.toFixed(2);
+  $('r-dot').textContent = fmt(vr);
+  $('r-norm').textContent = fmt(pn);
+  $('r-first').textContent = fmt(2 * f1.eps * vr);
+}
+function sync1() {
+  $('s-a').value = f1.a; $('s-tilt').value = f1.tilt; $('s-eps').value = f1.eps; draw1();
+}
+$('s-a').addEventListener('input', e => { f1.a = +e.target.value; draw1(); });
+$('s-tilt').addEventListener('input', e => { f1.tilt = +e.target.value; draw1(); });
+$('s-eps').addEventListener('input', e => { f1.eps = +e.target.value; draw1(); });
+$('b-snap').addEventListener('click', () => { f1.tilt = 0; sync1(); });
+c1.addEventListener('pointerdown', e => {
+  const [px, py] = pointerPos(c1, e), w = c1.clientWidth, h = c1.clientHeight;
+  const { S, cx, cy } = geom1(w, h);
+  const a = f1.a * DEG, tl = f1.tilt * DEG;
+  const z = [Math.cos(a), Math.sin(a)], t = [-Math.sin(a), Math.cos(a)];
+  const vt = f1.speed * Math.cos(tl), vr = f1.speed * Math.sin(tl);
+  const zp = [cx + S * z[0], cy - S * z[1]];
+  const tp = [cx + S * (z[0] + vt * t[0] + vr * z[0]), cy - S * (z[1] + vt * t[1] + vr * z[1])];
+  const dz = Math.hypot(px - zp[0], py - zp[1]), dv = Math.hypot(px - tp[0], py - tp[1]);
+  f1.drag = Math.min(dz, dv) > 40 ? null : (dv < dz ? 'v' : 'z');
+  if (f1.drag) c1.setPointerCapture(e.pointerId);
+});
+c1.addEventListener('pointermove', e => {
+  if (!f1.drag) return;
+  const [px, py] = pointerPos(c1, e), w = c1.clientWidth, h = c1.clientHeight;
+  const { S, cx, cy } = geom1(w, h);
+  const x = (px - cx) / S, y = -(py - cy) / S;
+  if (f1.drag === 'z') {
+    f1.a = ((Math.atan2(y, x) / DEG) % 360 + 360) % 360;
+  } else {
+    const a = f1.a * DEG, z = [Math.cos(a), Math.sin(a)], t = [-Math.sin(a), Math.cos(a)];
+    const dx = x - z[0], dy = y - z[1];
+    const vt = dx * t[0] + dy * t[1], vr = dx * z[0] + dy * z[1];
+    f1.speed = clamp(Math.hypot(vt, vr), 0.15, 1.3);
+    f1.tilt = Math.atan2(vr, vt) / DEG;
+  }
+  sync1();
+});
+const end1 = () => { f1.drag = null; };
+c1.addEventListener('pointerup', end1); c1.addEventListener('pointercancel', end1);
+c1.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { f1.a = (f1.a - 3 + 360) % 360; sync1(); e.preventDefault(); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { f1.a = (f1.a + 3) % 360; sync1(); e.preventDefault(); }
+});
+
+/* ---------------- Figure 2: the sphere ---------------- */
+const f2 = { lon: 40, lat: 25, psi: 30, delta: 35, yaw: -0.6, pitch: 0.35, drag: null };
+const c2 = $('c2');
+const add = (a, b, s = 1) => [a[0] + s * b[0], a[1] + s * b[1], a[2] + s * b[2]];
+const scl = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+function view(p) {
+  const cy = Math.cos(f2.yaw), sy = Math.sin(f2.yaw), cp = Math.cos(f2.pitch), sp = Math.sin(f2.pitch);
+  const x1 = p[0] * cy + p[2] * sy, z1 = -p[0] * sy + p[2] * cy;
+  return [x1, p[1] * cp - z1 * sp, p[1] * sp + z1 * cp];   // [screen x, screen y(up), depth(toward viewer)]
+}
+function draw2() {
+  const { ctx, w, h } = fit(c2, 0.78);
+  const S = Math.min(w, h) / 3.0, cx = w / 2, cy = h / 2;
+  const scr = p => { const q = view(p); return [cx + S * q[0], cy - S * q[1], q[2]]; };
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted');
+  const acc = css('--accent'), blue = css('--blue'), orange = css('--orange'), red = css('--red');
+
+  const lon = f2.lon * DEG, lat = f2.lat * DEG, psi = f2.psi * DEG, dl = f2.delta * DEG;
+  const z = [Math.cos(lat) * Math.cos(lon), Math.sin(lat), Math.cos(lat) * Math.sin(lon)];
+  const e = [-Math.sin(lon), 0, Math.cos(lon)];
+  const n = cross(e, z);
+  const t = add(scl(e, Math.cos(psi)), n, Math.sin(psi));      // unit tangent direction
+  const wv = add(scl(t, Math.cos(dl)), z, Math.sin(dl));       // tilted vector
+  const zFront = scr(z)[2] >= 0;
+
+  // sphere body
+  const g = ctx.createRadialGradient(cx - S * 0.35, cy - S * 0.4, S * 0.1, cx, cy, S);
+  g.addColorStop(0, css('--sph1')); g.addColorStop(1, css('--sph2'));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, S, 0, TAU); ctx.fill();
+  ctx.strokeStyle = muted; ctx.lineWidth = 1; ctx.globalAlpha = 0.6; ctx.stroke(); ctx.globalAlpha = 1;
+
+  const poly = (pts, col, lw, aF, aB) => {
+    ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round';
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = scr(pts[i]), b = scr(pts[i + 1]);
+      ctx.globalAlpha = (a[2] + b[2]) / 2 >= 0 ? aF : aB;
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  };
+  // wireframe
+  for (let la = -60; la <= 60; la += 30) {
+    const pts = []; for (let k = 0; k <= 72; k++) { const l = k * 5 * DEG; pts.push([Math.cos(la * DEG) * Math.cos(l), Math.sin(la * DEG), Math.cos(la * DEG) * Math.sin(l)]); }
+    poly(pts, ink2, 1, 0.3, 0.08);
+  }
+  for (let lo = 0; lo < 180; lo += 30) {
+    const pts = []; for (let k = 0; k <= 72; k++) { const l = k * 5 * DEG; pts.push([Math.cos(l) * Math.cos(lo * DEG), Math.sin(l), Math.cos(l) * Math.sin(lo * DEG)]); }
+    poly(pts, ink2, 1, 0.3, 0.08);
+  }
+  // great circle through z with direction t
+  const gc = []; for (let k = 0; k <= 120; k++) { const s = k * TAU / 120; gc.push(add(scl(z, Math.cos(s)), t, Math.sin(s))); }
+  poly(gc, orange, 2.6, 1, 0.25);
+
+  // tangent plane patch
+  const A = 0.7, corner = (i, j) => add(add(z, e, i * A), n, j * A);
+  const quad = [corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)].map(scr);
+  ctx.save();
+  ctx.globalAlpha = zFront ? 0.22 : 0.08; ctx.fillStyle = blue;
+  ctx.beginPath(); quad.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = zFront ? 0.9 : 0.35; ctx.strokeStyle = blue; ctx.lineWidth = 1.6; ctx.stroke();
+  ctx.globalAlpha = zFront ? 0.35 : 0.15; ctx.lineWidth = 1;
+  for (const o of [-0.5, 0, 0.5]) {
+    let a = scr(corner(o * 2, -1)), b = scr(corner(o * 2, 1));
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    a = scr(corner(-1, o * 2)); b = scr(corner(1, o * 2));
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+  ctx.restore();
+
+  // arrows
+  ctx.save();
+  ctx.globalAlpha = zFront ? 1 : 0.5;
+  const zs = scr(z);
+  const arrowTo = (v, col, lw, len) => { const b = scr(add(z, v, len)); arrow(ctx, zs[0], zs[1], b[0], b[1], col, lw); return b; };
+  const nb = scr(scl(z, 1.55)); arrow(ctx, zs[0], zs[1], nb[0], nb[1], ink, 2);
+  const tb = arrowTo(t, orange, 3.2, 0.62);
+  let wb = null;
+  if (Math.abs(f2.delta) > 1) wb = arrowTo(wv, red, 3, 0.62);
+  dot(ctx, zs[0], zs[1], 6.5, acc);
+  text(ctx, 'z', nb[0] + 12, nb[1] - 6, ink, 20);
+  text(ctx, 'ż', tb[0] + 12, tb[1] - 2, orange, 19);
+  if (wb) text(ctx, 'w', wb[0] + 10, wb[1] + 12, red, 18);
+  const ql = scr(corner(1, -1)); text(ctx, 'tangent plane', ql[0] + 8, ql[1] + 14, blue, 13, 'left');
+  ctx.restore();
+
+  $('o-lon').textContent = Math.round(f2.lon) + '°';
+  $('o-lat').textContent = Math.round(f2.lat) + '°';
+  $('o-psi').textContent = Math.round(f2.psi) + '°';
+  $('o-delta').textContent = Math.round(f2.delta) + '°';
+  $('r2-a').textContent = fmt(dot3(t, z));
+  $('r2-b').textContent = fmt(dot3(wv, z));
+}
+for (const [id, key] of [['lon', 'lon'], ['lat', 'lat'], ['psi', 'psi'], ['delta', 'delta']]) {
+  $('s-' + id).addEventListener('input', ev => { f2[key] = +ev.target.value; draw2(); });
+}
+c2.addEventListener('pointerdown', e => { f2.drag = pointerPos(c2, e); c2.setPointerCapture(e.pointerId); });
+c2.addEventListener('pointermove', e => {
+  if (!f2.drag) return;
+  const p = pointerPos(c2, e);
+  f2.yaw += (p[0] - f2.drag[0]) * 0.008;
+  f2.pitch = clamp(f2.pitch + (p[1] - f2.drag[1]) * 0.008, -1.4, 1.4);
+  f2.drag = p; draw2();
+});
+const end2 = () => { f2.drag = null; };
+c2.addEventListener('pointerup', end2); c2.addEventListener('pointercancel', end2);
+c2.addEventListener('keydown', e => {
+  const k = { ArrowLeft: [-0.08, 0], ArrowRight: [0.08, 0], ArrowUp: [0, -0.08], ArrowDown: [0, 0.08] }[e.key];
+  if (k) { f2.yaw += k[0]; f2.pitch = clamp(f2.pitch + k[1], -1.4, 1.4); draw2(); e.preventDefault(); }
+});
+
+/* ---------------- Figure 3: projected gradient flow on the circle ---------------- */
+const L1 = 1.0, L2 = -0.4;
+const f3 = { th: 30, eta: 0.35, a: 140 * DEG, steps: 0, trail: [], playing: false, last: 0, drag: false };
+const c3 = $('c3');
+function A3() {
+  const th = f3.th * DEG, u = [Math.cos(th), Math.sin(th)], w = [-u[1], u[0]];
+  return z => { const pu = z[0] * u[0] + z[1] * u[1], pw = z[0] * w[0] + z[1] * w[1];
+    return [L1 * pu * u[0] + L2 * pw * w[0], L1 * pu * u[1] + L2 * pw * w[1]]; };
+}
+function state3() {
+  const z = [Math.cos(f3.a), Math.sin(f3.a)], Az = A3()(z);
+  const rad = Az[0] * z[0] + Az[1] * z[1];
+  const tan = [Az[0] - rad * z[0], Az[1] - rad * z[1]];
+  return { z, Az, rad, tan, E: -0.5 * rad, g: Math.hypot(...tan) };
+}
+function step3() {
+  const s = state3();
+  const p = [s.z[0] + f3.eta * s.tan[0], s.z[1] + f3.eta * s.tan[1]];
+  f3.trail.push(f3.a); if (f3.trail.length > 40) f3.trail.shift();
+  f3.a = Math.atan2(p[1], p[0]); f3.steps++;
+}
+function geom3(w, h) { return { S: Math.min(w, h) / 3.0, cx: w / 2, cy: h / 2 }; }
+function draw3() {
+  const { ctx, w, h } = fit(c3, 0.72);
+  const { S, cx, cy } = geom3(w, h);
+  const P = (x, y) => [cx + S * x, cy - S * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+  const s = state3(), Af = A3();
+  const Emin = -0.5 * L1, Emax = -0.5 * L2;
+
+  // energy ring: strong blue = low energy, faint gray = high
+  ctx.lineWidth = 11; ctx.lineCap = 'butt';
+  const N = 180;
+  for (let k = 0; k < N; k++) {
+    const a0 = k * TAU / N, a1 = (k + 1.6) * TAU / N, am = (a0 + a1) / 2;
+    const zm = [Math.cos(am), Math.sin(am)], Az = Af(zm);
+    const E = -0.5 * (Az[0] * zm[0] + Az[1] * zm[1]);
+    const u = clamp((E - Emin) / (Emax - Emin), 0, 1);
+    ctx.strokeStyle = `rgba(${Math.round(42 + u * 100)},${Math.round(120 + u * 30)},${Math.round(214 - u * 44)},${(1 - 0.72 * u).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(cx, cy, S, -a0, -a1, true); ctx.stroke();
+  }
+  ctx.strokeStyle = ink2; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, S + 6.5, 0, TAU); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, S - 6.5, 0, TAU); ctx.stroke();
+
+  // minima markers (eigenvector of the largest eigenvalue)
+  const th = f3.th * DEG;
+  for (const sg of [1, -1]) {
+    const m = [sg * Math.cos(th), sg * Math.sin(th)];
+    ctx.strokeStyle = ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(...P(m[0] * 1.1, m[1] * 1.1)); ctx.lineTo(...P(m[0] * 1.2, m[1] * 1.2)); ctx.stroke();
+  }
+  text(ctx, 'E minimal', ...P(1.45 * Math.cos(th), 1.45 * Math.sin(th)), ink2, 12);
+  text(ctx, 'E minimal', ...P(-1.45 * Math.cos(th), -1.45 * Math.sin(th)), ink2, 12);
+
+  // trail
+  f3.trail.forEach((a, i) => { dot(ctx, ...P(Math.cos(a), Math.sin(a)), 3, acc); ctx.globalAlpha = 1; });
+  ctx.globalAlpha = 1;
+
+  const z = s.z;
+  // vectors: raw force (orange), radial part (gray), tangent part (green)
+  const sc = 1.0;
+  const radV = [s.rad * z[0], s.rad * z[1]];
+  arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + sc * radV[0], z[1] + sc * radV[1]), muted, 3, [5, 4]);
+  arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + sc * s.Az[0], z[1] + sc * s.Az[1]), orange, 2.2);
+  arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + sc * s.tan[0], z[1] + sc * s.tan[1]), green, 3.4);
+  dot(ctx, ...P(z[0], z[1]), 7.5, acc, css('--surface'));
+  text(ctx, 'z', ...P(z[0] * 1.2, z[1] * 1.2), acc, 20);
+
+  $('o-th').textContent = Math.round(f3.th) + '°';
+  $('o-eta').textContent = f3.eta.toFixed(2);
+  $('r3-e').textContent = fmt(s.E);
+  $('r3-g').textContent = fmt(s.g);
+  $('r3-n').textContent = f3.steps;
+  $('cap3').textContent = s.g < 2e-3
+    ? 'Fixed point: Az is parallel to z, so the tangent part is zero and nothing moves (an eigenvector of A).'
+    : 'Only the green arrow moves the point. The gray part is cancelled by the constraint.';
+}
+function reset3(a) { f3.a = a; f3.steps = 0; f3.trail = []; draw3(); }
+function loop3(ts) {
+  if (!f3.playing) return;
+  if (ts - f3.last > 70) { f3.last = ts; step3(); draw3(); }
+  requestAnimationFrame(loop3);
+}
+$('s-th').addEventListener('input', e => { f3.th = +e.target.value; f3.steps = 0; f3.trail = []; draw3(); });
+$('s-eta').addEventListener('input', e => { f3.eta = +e.target.value; draw3(); });
+$('b-step').addEventListener('click', () => { step3(); draw3(); });
+$('b-play').addEventListener('click', e => {
+  f3.playing = !f3.playing; e.target.textContent = f3.playing ? 'Pause' : 'Play';
+  if (f3.playing) requestAnimationFrame(loop3);
+});
+$('b-rand').addEventListener('click', () => reset3(Math.random() * TAU));
+c3.addEventListener('pointerdown', e => { f3.drag = true; c3.setPointerCapture(e.pointerId); moveTo3(e); });
+c3.addEventListener('pointermove', e => { if (f3.drag) moveTo3(e); });
+const end3 = () => { f3.drag = false; };
+c3.addEventListener('pointerup', end3); c3.addEventListener('pointercancel', end3);
+function moveTo3(e) {
+  const [px, py] = pointerPos(c3, e), { cx, cy } = geom3(c3.clientWidth, c3.clientHeight);
+  reset3(Math.atan2(-(py - cy), px - cx));
+}
+c3.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { step3(); draw3(); e.preventDefault(); }
+});
+
+/* ---------------- Figure 5: the projector ---------------- */
+const f5 = { zdeg: 70, u: [0.95, 1.0], v: [-1.2, 0.45], drag: null };
+const c5 = $('c5');
+const geom5 = (w, h) => ({ S: Math.min(w, h) / 3.8, cx: w / 2, cy: h / 2 });
+function proj5(z, v) { const d = v[0] * z[0] + v[1] * z[1]; return [v[0] - d * z[0], v[1] - d * z[1]]; }
+function draw5() {
+  const { ctx, w, h } = fit(c5, 0.72);
+  const { S, cx, cy } = geom5(w, h);
+  const P = (x, y) => [cx + S * x, cy - S * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+  const a = f5.zdeg * DEG, z = [Math.cos(a), Math.sin(a)], t = [-Math.sin(a), Math.cos(a)];
+  const u = f5.u, v = f5.v, pu = proj5(z, u), pv = proj5(z, v);
+
+  // kernel (span z) and range (tangent line)
+  ctx.save(); ctx.setLineDash([6, 6]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(...P(-2 * z[0], -2 * z[1])); ctx.lineTo(...P(2 * z[0], 2 * z[1])); ctx.stroke(); ctx.restore();
+  ctx.strokeStyle = acc; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(...P(-2 * t[0], -2 * t[1])); ctx.lineTo(...P(2 * t[0], 2 * t[1])); ctx.stroke();
+  text(ctx, 'tangent line = image of P', ...P(1.85 * t[0] + 0.0, 1.85 * t[1] - 0.15), acc, 13, t[0] >= 0 ? 'right' : 'left');
+  text(ctx, 'direction P erases', ...P(-1.95 * z[0] + 0.0, -1.95 * z[1] - 0.12), muted, 13, 'center');
+
+  // projection connectors
+  ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2;
+  for (const [q, pq] of [[u, pu], [v, pv]]) { ctx.beginPath(); ctx.moveTo(...P(q[0], q[1])); ctx.lineTo(...P(pq[0], pq[1])); ctx.stroke(); }
+  ctx.restore();
+
+  arrow(ctx, ...P(0, 0), ...P(z[0], z[1]), ink, 2.6);
+  arrow(ctx, ...P(0, 0), ...P(pu[0], pu[1]), green, 3.2);
+  arrow(ctx, ...P(0, 0), ...P(pv[0], pv[1]), blue, 3.2, [6, 4]);
+  arrow(ctx, ...P(0, 0), ...P(u[0], u[1]), orange, 2.2);
+  arrow(ctx, ...P(0, 0), ...P(v[0], v[1]), blue, 2.2);
+  dot(ctx, ...P(0, 0), 3.5, muted);
+  // idempotence: ring around Pu shows P(Pu) lands on the same point
+  const ppu = proj5(z, pu);
+  dot(ctx, ...P(ppu[0], ppu[1]), 9, null, green);
+  dot(ctx, ...P(u[0], u[1]), 6, css('--surface'), orange);
+  dot(ctx, ...P(v[0], v[1]), 6, css('--surface'), blue);
+  const off = (q, k) => { const L = Math.hypot(q[0], q[1]) || 1; return [q[0] + k * q[0] / L, q[1] + k * q[1] / L]; };
+  text(ctx, 'z', ...P(...off(z, 0.17)), ink, 19);
+  text(ctx, 'u', ...P(...off(u, 0.16)), orange, 19);
+  text(ctx, 'Pu', ...P(pu[0] + 0.0 * t[0] + 0.17 * t[0], pu[1] + 0.17 * t[1]), green, 17);
+  text(ctx, 'w', ...P(...off(v, 0.16)), blue, 19);
+  text(ctx, 'Pw', ...P(pv[0] + 0.17 * t[0], pv[1] + 0.17 * t[1] - 0.05), blue, 17);
+
+  const pzv = proj5(z, z), ptv = proj5(z, t), pp = proj5(z, pu);
+  $('o-z5').textContent = Math.round(f5.zdeg) + '°';
+  const m = [[1 - z[0] * z[0], -z[0] * z[1]], [-z[0] * z[1], 1 - z[1] * z[1]]];
+  $('r5-mat').textContent = `[[${fmt(m[0][0], 2)}, ${fmt(m[0][1], 2)}], [${fmt(m[1][0], 2)}, ${fmt(m[1][1], 2)}]]`;
+  $('r5-pz').textContent = fmt(Math.hypot(...pzv));
+  $('r5-pt').textContent = fmt(Math.hypot(ptv[0] - t[0], ptv[1] - t[1]));
+  $('r5-idem').textContent = fmt(Math.hypot(pp[0] - pu[0], pp[1] - pu[1]));
+  $('r5-s1').textContent = fmt(pu[0] * v[0] + pu[1] * v[1]);
+  $('r5-s2').textContent = fmt(u[0] * pv[0] + u[1] * pv[1]);
+}
+$('s-z5').addEventListener('input', e => { f5.zdeg = +e.target.value; draw5(); });
+c5.addEventListener('pointerdown', e => {
+  const [px, py] = pointerPos(c5, e), { S, cx, cy } = geom5(c5.clientWidth, c5.clientHeight);
+  const du = Math.hypot(px - (cx + S * f5.u[0]), py - (cy - S * f5.u[1]));
+  const dv = Math.hypot(px - (cx + S * f5.v[0]), py - (cy - S * f5.v[1]));
+  f5.drag = Math.min(du, dv) > 40 ? null : (du <= dv ? 'u' : 'v');
+  if (f5.drag) c5.setPointerCapture(e.pointerId);
+});
+c5.addEventListener('pointermove', e => {
+  if (!f5.drag) return;
+  const [px, py] = pointerPos(c5, e), { S, cx, cy } = geom5(c5.clientWidth, c5.clientHeight);
+  let x = (px - cx) / S, y = -(py - cy) / S; const L = Math.hypot(x, y);
+  if (L > 1.7) { x *= 1.7 / L; y *= 1.7 / L; }
+  f5[f5.drag] = [x, y]; draw5();
+});
+const end5 = () => { f5.drag = null; };
+c5.addEventListener('pointerup', end5); c5.addEventListener('pointercancel', end5);
+
+/* ---------------- Figure 6: radial part is invisible ---------------- */
+const f6 = { a: 60, r: 0.8, s: 0.7 };
+const c6 = $('c6');
+function draw6() {
+  const { ctx, w, h } = fit(c6, 0.72);
+  const S = Math.min(w, h) / 4.6, cx = w / 2, cy = h / 2 + 4;
+  const P = (x, y) => [cx + S * x, cy - S * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green');
+  const a = f6.a * DEG, z = [Math.cos(a), Math.sin(a)], t = [-Math.sin(a), Math.cos(a)];
+  const qx = (1 + f6.r) * z[0] + f6.s * t[0], qy = (1 + f6.r) * z[1] + f6.s * t[1];
+  const qn = Math.hypot(qx, qy), qh = [qx / qn, qy / qn];
+  const ang = Math.atan2(f6.s, 1 + f6.r);
+
+  ctx.strokeStyle = rule; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(...P(-2.4, 0)); ctx.lineTo(...P(2.4, 0)); ctx.moveTo(...P(0, -2.2)); ctx.lineTo(...P(0, 2.2)); ctx.stroke();
+  // dashed circle of radius |q|
+  if (Math.abs(qn - 1) > 0.004) {
+    ctx.save(); ctx.setLineDash([4, 5]); ctx.strokeStyle = orange; ctx.globalAlpha = 0.5; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(cx, cy, S * qn, 0, TAU); ctx.stroke(); ctx.restore();
+  }
+  ctx.strokeStyle = ink2; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, S, 0, TAU); ctx.stroke();
+  // the distance actually travelled
+  const a0 = Math.atan2(z[1], z[0]), a1 = Math.atan2(qh[1], qh[0]);
+  ctx.strokeStyle = green; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(cx, cy, S, -a0, -a1, ang > 0); ctx.stroke();
+  // normalization ray
+  ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = muted; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(...P(0, 0)); ctx.lineTo(...P(qh[0] * Math.max(1, qn), qh[1] * Math.max(1, qn))); ctx.stroke(); ctx.restore();
+  dot(ctx, ...P(0, 0), 3, muted);
+  // push u = r z + s t, drawn as two legs from z
+  const mid = [z[0] + f6.r * z[0], z[1] + f6.r * z[1]];
+  arrow(ctx, ...P(z[0], z[1]), ...P(mid[0], mid[1]), orange, 3.2);
+  arrow(ctx, ...P(mid[0], mid[1]), ...P(qx, qy), green, 3.2);
+  dot(ctx, ...P(z[0], z[1]), 7, acc);
+  dot(ctx, ...P(qx, qy), 6, css('--surface'), orange);
+  dot(ctx, ...P(qh[0], qh[1]), 6, green, css('--surface'));
+  text(ctx, 'z', ...P(z[0] * 1.0 - 0.28 * t[0] * 0 + 0.0, z[1]) .map((v, i) => v + (i ? 0 : -16)), acc, 19);
+  text(ctx, 'z + u', ...P(qx + 0.2 * qh[0], qy + 0.2 * qh[1]), orange, 15);
+  text(ctx, 'normalized', ...P(qh[0] * 1.0 + 0.0, qh[1] * 1.0).map((v, i) => v + (i ? 18 * (qh[1] > 0 ? -1 : 1) : 0)), green, 13);
+  if (Math.abs(f6.r) > 0.15) text(ctx, 'radial', ...P(mid[0] - 0.05 * t[0] - 0.2 * t[0], mid[1] - 0.2 * t[1]), orange, 13);
+  if (Math.abs(f6.s) > 0.15) text(ctx, 'tangent', ...P((mid[0] + qx) / 2 + 0.2 * z[0], (mid[1] + qy) / 2 + 0.2 * z[1]), green, 13);
+
+  $('o-a6').textContent = Math.round(f6.a) + '°';
+  $('o-r6').textContent = f6.r.toFixed(2);
+  $('o-s6').textContent = f6.s.toFixed(2);
+  $('r6-n').textContent = fmt(qn);
+  $('r6-ang').textContent = fmt(ang / DEG, 1) + '°';
+  $('r6-ang0').textContent = fmt(Math.atan(f6.s) / DEG, 1) + '°';
+}
+for (const [id, key] of [['a6', 'a'], ['r6', 'r'], ['s6', 's']]) {
+  $('s-' + id).addEventListener('input', ev => { f6[key] = +ev.target.value; draw6(); });
+}
+
+/* ---------------- Figure 7: block-diagonal projector ---------------- */
+const f7 = { M: 3, N: 3, seed: 7 };
+const c7 = $('c7');
+function rng(seed) {
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function make7() {
+  const r = rng(f7.seed * 9973 + f7.M * 31 + f7.N);
+  const g = () => Math.sqrt(-2 * Math.log(r() || 1e-9)) * Math.cos(TAU * r());
+  f7.z = []; f7.u = [];
+  for (let m = 0; m < f7.M; m++) {
+    const zz = Array.from({ length: f7.N }, g), L = Math.hypot(...zz);
+    f7.z.push(zz.map(x => x / L)); f7.u.push(Array.from({ length: f7.N }, g));
+  }
+}
+function draw7() {
+  const { ctx, w, h } = fit(c7, 0.6);
+  const { M, N } = f7, K = M * N;
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const blue = css('--blue'), orange = css('--orange'), green = css('--green'), surf = css('--surface');
+  const side = Math.min(h - 44, w * 0.5), x0 = 10, y0 = 34, cell = side / K;
+  text(ctx, 'P = blockdiag(P₁, …, P_M)', x0 + side / 2, 16, ink, 15);
+  const zi = i => f7.z[Math.floor(i / N)][i % N];
+  for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) {
+    const same = Math.floor(i / N) === Math.floor(j / N);
+    const val = same ? (i === j ? 1 : 0) - zi(i) * zi(j) : 0;
+    ctx.fillStyle = surf; ctx.fillRect(x0 + j * cell, y0 + i * cell, cell, cell);
+    if (val !== 0) {
+      ctx.globalAlpha = clamp(Math.abs(val), 0, 1) * 0.9;
+      ctx.fillStyle = val > 0 ? blue : orange; ctx.fillRect(x0 + j * cell, y0 + i * cell, cell, cell);
+      ctx.globalAlpha = 1;
+    }
+    if (cell >= 30 && same) text(ctx, val.toFixed(2), x0 + (j + 0.5) * cell, y0 + (i + 0.5) * cell, ink, 12);
+  }
+  ctx.strokeStyle = rule; ctx.lineWidth = 1;
+  for (let k = 0; k <= K; k++) {
+    ctx.beginPath(); ctx.moveTo(x0 + k * cell, y0); ctx.lineTo(x0 + k * cell, y0 + side);
+    ctx.moveTo(x0, y0 + k * cell); ctx.lineTo(x0 + side, y0 + k * cell); ctx.stroke();
+  }
+  ctx.strokeStyle = ink2; ctx.lineWidth = 2;
+  for (let m = 0; m < M; m++) ctx.strokeRect(x0 + m * N * cell, y0 + m * N * cell, N * cell, N * cell);
+  ctx.strokeStyle = muted; ctx.lineWidth = 1; ctx.strokeRect(x0, y0, side, side);
+  if (M > 1) text(ctx, 'zeros', x0 + side * 0.82, y0 + side * 0.14, muted, 13);
+
+  // right panel: kept vs removed directions
+  const x1 = x0 + side + 34, rw = w - x1 - 10;
+  const c = Math.min(22, (rw - (M - 1) * 8) / K), gap = 8;
+  text(ctx, `directions in ℝ^${K}`, x1, 16, ink, 15, 'left');
+  const y1 = y0 + 4;
+  for (let m = 0; m < M; m++) for (let k = 0; k < N; k++) {
+    const x = x1 + (m * N + k) * c + m * gap;
+    ctx.fillStyle = k < N - 1 ? green : orange; ctx.fillRect(x, y1, c - 1.5, c * 1.4);
+  }
+  const ly = y1 + c * 1.4 + 26;
+  ctx.fillStyle = green; ctx.fillRect(x1, ly - 8, 14, 14); text(ctx, `tangent: M(N−1) = ${M * (N - 1)}`, x1 + 22, ly, ink2, 14, 'left');
+  ctx.fillStyle = orange; ctx.fillRect(x1, ly + 22, 14, 14); text(ctx, `radial, removed: M = ${M}`, x1 + 22, ly + 30, ink2, 14, 'left');
+  text(ctx, `ambient total: MN = ${K}`, x1, ly + 62, ink2, 14, 'left');
+  text(ctx, 'Block m only sees z_m and u_m.', x1, ly + 96, muted, 13, 'left');
+
+  // readout table: project a random force blockwise
+  const rows = [];
+  for (let m = 0; m < M; m++) {
+    const z = f7.z[m], u = f7.u[m], d = u.reduce((s, x, i) => s + x * z[i], 0);
+    const pu = u.map((x, i) => x - d * z[i]), d2 = pu.reduce((s, x, i) => s + x * z[i], 0);
+    rows.push(`<span>block ${m + 1}: ⟨u, z⟩ = <b>${fmt(d)}</b> → ⟨Pu, z⟩ = <b>${fmt(d2)}</b></span>`);
+  }
+  $('r7').innerHTML = rows.join('');
+  $('o-M').textContent = M; $('o-N').textContent = N;
+}
+$('s-M').addEventListener('input', e => { f7.M = +e.target.value; make7(); draw7(); });
+$('s-N').addEventListener('input', e => { f7.N = +e.target.value; make7(); draw7(); });
+$('b-new7').addEventListener('click', () => { f7.seed = Math.floor(Math.random() * 1e6); make7(); draw7(); });
+make7();
+
+/* ---------------- Figure 8: two circles = torus ---------------- */
+const f8 = { t1: 1.0, t2: 2.2, w1: 0.6, w2: 0.23, trail: [], playing: false, last: 0, drag: false };
+const c8 = $('c8');
+const geom8 = (w, h) => { const Q = Math.min(h - 28, w * 0.55); return { Q, x0: 12, y0: (h - Q) / 2 }; };
+const wrap = x => ((x % TAU) + TAU) % TAU;
+function draw8() {
+  const { ctx, w, h } = fit(c8, 0.56);
+  const { Q, x0, y0 } = geom8(w, h);
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+  const X = th => x0 + th / TAU * Q, Y = th => y0 + Q - th / TAU * Q;
+
+  ctx.fillStyle = css('--sph1'); ctx.globalAlpha = 0.5; ctx.fillRect(x0, y0, Q, Q); ctx.globalAlpha = 1;
+  ctx.strokeStyle = rule; ctx.lineWidth = 1;
+  for (let k = 1; k < 4; k++) {
+    ctx.beginPath(); ctx.moveTo(x0 + k * Q / 4, y0); ctx.lineTo(x0 + k * Q / 4, y0 + Q);
+    ctx.moveTo(x0, y0 + k * Q / 4); ctx.lineTo(x0 + Q, y0 + k * Q / 4); ctx.stroke();
+  }
+  ctx.strokeStyle = ink2; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, Q, Q);
+  text(ctx, 'θ₁', x0 + Q / 2, y0 + Q + 14, ink2, 14);
+  text(ctx, 'θ₂', x0 - 2, y0 + Q / 2, ink2, 14, 'right');
+  text(ctx, 'opposite edges are glued', x0 + Q / 2, y0 + 14, muted, 12);
+
+  // trail with wrap-around breaks
+  ctx.strokeStyle = acc; ctx.globalAlpha = 0.55; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  f8.trail.forEach((p, i) => {
+    const q = f8.trail[i - 1];
+    if (!q || Math.abs(p[0] - q[0]) > Math.PI || Math.abs(p[1] - q[1]) > Math.PI) ctx.moveTo(X(p[0]), Y(p[1])); else ctx.lineTo(X(p[0]), Y(p[1]));
+  });
+  ctx.stroke(); ctx.globalAlpha = 1;
+
+  // point and velocity arrow
+  const px = X(f8.t1), py = Y(f8.t2);
+  const k = Q * 0.22;
+  arrow(ctx, px, py, px + f8.w1 * k, py - f8.w2 * k, orange, 3);
+  dot(ctx, px, py, 7, acc, css('--surface'));
+
+  // the two circles
+  const rx = x0 + Q + (w - x0 - Q) / 2;
+  const R = Math.min(Q * 0.19, (w - x0 - Q) / 2 - 24);
+  [[f8.t1, f8.w1, y0 + Q * 0.27, '₁'], [f8.t2, f8.w2, y0 + Q * 0.73, '₂']].forEach(([th, om, cyy, sub], i) => {
+    ctx.strokeStyle = ink2; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(rx, cyy, R, 0, TAU); ctx.stroke();
+    const zx = rx + R * Math.cos(th), zy = cyy - R * Math.sin(th);
+    const tx = -Math.sin(th), ty = -Math.cos(th);  // screen-space tangent (y flipped)
+    ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(rx, cyy); ctx.lineTo(zx, zy); ctx.stroke(); ctx.restore();
+    arrow(ctx, zx, zy, zx + om * R * 1.1 * tx, zy + om * R * 1.1 * ty, orange, 3);
+    dot(ctx, zx, zy, 6, acc, css('--surface'));
+    text(ctx, 'z' + sub + ' ∈ S¹', rx, cyy + R + 20, ink2, 14);
+  });
+
+  $('o-w1').textContent = f8.w1.toFixed(2); $('o-w2').textContent = f8.w2.toFixed(2);
+  $('r8-th').textContent = `(${fmt(f8.t1, 2)}, ${fmt(f8.t2, 2)})`;
+}
+function loop8(ts) {
+  if (!f8.playing) return;
+  const dt = f8.last ? Math.min(0.05, (ts - f8.last) / 1000) : 0.016; f8.last = ts;
+  f8.t1 = wrap(f8.t1 + f8.w1 * dt * 2); f8.t2 = wrap(f8.t2 + f8.w2 * dt * 2);
+  f8.trail.push([f8.t1, f8.t2]); if (f8.trail.length > 900) f8.trail.shift();
+  draw8(); requestAnimationFrame(loop8);
+}
+$('s-w1').addEventListener('input', e => { f8.w1 = +e.target.value; draw8(); });
+$('s-w2').addEventListener('input', e => { f8.w2 = +e.target.value; draw8(); });
+$('b-play8').addEventListener('click', e => {
+  f8.playing = !f8.playing; e.target.textContent = f8.playing ? 'Pause' : 'Play';
+  f8.last = 0; if (f8.playing) requestAnimationFrame(loop8);
+});
+$('b-clr8').addEventListener('click', () => { f8.trail = []; draw8(); });
+function moveTo8(e) {
+  const [px, py] = pointerPos(c8, e), { Q, x0, y0 } = geom8(c8.clientWidth, c8.clientHeight);
+  f8.t1 = wrap((px - x0) / Q * TAU); f8.t2 = wrap((y0 + Q - py) / Q * TAU);
+  f8.trail = []; draw8();
+}
+c8.addEventListener('pointerdown', e => { f8.drag = true; c8.setPointerCapture(e.pointerId); moveTo8(e); });
+c8.addEventListener('pointermove', e => { if (f8.drag) moveTo8(e); });
+const end8 = () => { f8.drag = false; };
+c8.addEventListener('pointerup', end8); c8.addEventListener('pointercancel', end8);
+
+/* ---------------- Figure 9: rescaling embeds the product into the big sphere ---------------- */
+const f9 = { phi: 20 };
+const c9 = $('c9');
+function draw9() {
+  const { ctx, w, h } = fit(c9, 0.56);
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), blue = css('--blue'), green = css('--green');
+  const Q = Math.min(h - 70, w * 0.46), ox = 44, oy = h - 36;
+  const P = (x, y) => [ox + Q * x, oy - Q * y];
+  const phi = f9.phi * DEG, r1 = Math.cos(phi), r2 = Math.sin(phi);
+  const ok = Math.abs(r1 - r2) < 0.015;
+
+  arrow(ctx, ...P(0, 0), ...P(1.12, 0), ink2, 1.5); arrow(ctx, ...P(0, 0), ...P(0, 1.12), ink2, 1.5);
+  text(ctx, 'r₁ = ‖z₁‖', ...P(1.0, -0.075), ink2, 14); text(ctx, 'r₂ = ‖z₂‖', ox + 4, oy - Q * 1.17, ink2, 14, 'left');
+  // big sphere: quarter circle
+  ctx.strokeStyle = acc; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(ox, oy, Q, -Math.PI / 2, 0); ctx.stroke();
+  text(ctx, 'big sphere: r₁² + r₂² = 1', ...P(0.62, 0.9).map((v, i) => v + (i ? -14 : 40)), acc, 14, 'left');
+  // diagonal
+  ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = muted; ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.moveTo(...P(0, 0)); ctx.lineTo(...P(0.78, 0.78)); ctx.stroke(); ctx.restore();
+  text(ctx, 'r₁ = r₂', ...P(0.79, 0.84), muted, 13);
+  // special point: image of the product manifold
+  const s2 = Math.SQRT1_2;
+  dot(ctx, ...P(s2, s2), 10, null, green);
+  dot(ctx, ...P(s2, s2), 4, green);
+  text(ctx, '(S^{N−1})^M after ÷√M', ...P(s2, s2).map((v, i) => v + (i ? 24 : 16)), green, 13, 'left');
+  // current point
+  ctx.save(); ctx.setLineDash([3, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(...P(r1, 0)); ctx.lineTo(...P(r1, r2)); ctx.lineTo(...P(0, r2)); ctx.stroke(); ctx.restore();
+  dot(ctx, ...P(r1, r2), 7, ok ? green : orange, css('--surface'));
+
+  // right: the two blocks as arrows
+  const x1 = ox + Q + 70, rw = w - x1 - 10, K2 = Math.min(rw * 0.42, Q * 0.42);
+  const cxs = [x1 + rw * 0.25, x1 + rw * 0.78], cyy = oy - Q * 0.5;
+  const dirs = [35 * DEG, 125 * DEG], rs = [r1, r2];
+  for (let m = 0; m < 2; m++) {
+    ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = muted; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cxs[m], cyy, K2 * s2, 0, TAU); ctx.stroke(); ctx.restore();
+    const ex = cxs[m] + K2 * rs[m] * Math.cos(dirs[m]), ey = cyy - K2 * rs[m] * Math.sin(dirs[m]);
+    arrow(ctx, cxs[m], cyy, ex, ey, ok ? green : (rs[m] > s2 ? orange : blue), 3.4);
+    text(ctx, `block ${m + 1}`, cxs[m], cyy + K2 + 18, ink2, 14);
+    text(ctx, `‖z${m ? '₂' : '₁'}‖ = ${rs[m].toFixed(3)}`, cxs[m], cyy + K2 + 36, ink, 13);
+  }
+  text(ctx, 'dashed circle: length 1/√2 = 0.707', (cxs[0] + cxs[1]) / 2, cyy - K2 - 16, muted, 13);
+
+  $('o-phi').textContent = f9.phi.toFixed(1) + '°';
+  $('r9-1').textContent = fmt(r1); $('r9-2').textContent = fmt(r2);
+  $('r9-s').textContent = fmt(r1 * r1 + r2 * r2);
+  $('r9-in').textContent = ok ? 'yes (equal norms)' : 'no (unequal norms)';
+}
+$('s-phi').addEventListener('input', e => { f9.phi = +e.target.value; draw9(); });
+$('b-diag').addEventListener('click', () => { f9.phi = 45; $('s-phi').value = 45; draw9(); });
+
+/* ---------------- Figure 10: arc versus chord ---------------- */
+const wrap180 = d => ((d + 180) % 360 + 360) % 360 - 180;
+const f10 = { ua: 20, va: 120, drag: null };
+const c10 = $('c10');
+const geom10 = (w, h) => ({ R: Math.min(h * 0.34, w * 0.2), cx: w * 0.27, cy: h / 2 });
+function draw10() {
+  const { ctx, w, h } = fit(c10, 0.5);
+  const { R, cx, cy } = geom10(w, h);
+  const P = (x, y) => [cx + R * x, cy - R * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green');
+  const thd = wrap180(f10.va - f10.ua), ua = wrap180(f10.ua) * DEG, va = ua + thd * DEG, th = Math.abs(thd) * DEG;
+  const U = [Math.cos(ua), Math.sin(ua)], V = [Math.cos(va), Math.sin(va)];
+  const antip = Math.abs(thd) > 177;
+
+  ctx.strokeStyle = ink2; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+  // geodesic arc
+  ctx.lineCap = 'round'; ctx.strokeStyle = acc; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.arc(cx, cy, R, -ua, -va, thd > 0); ctx.stroke();
+  if (antip) { ctx.globalAlpha = 0.45; ctx.beginPath(); ctx.arc(cx, cy, R, -ua, -va, thd <= 0); ctx.stroke(); ctx.globalAlpha = 1; }
+  // chord
+  ctx.save(); ctx.setLineDash([6, 5]); ctx.strokeStyle = orange; ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.moveTo(...P(U[0], U[1])); ctx.lineTo(...P(V[0], V[1])); ctx.stroke(); ctx.restore();
+  // angle wedge
+  ctx.strokeStyle = muted; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(...P(U[0], U[1])); ctx.moveTo(cx, cy); ctx.lineTo(...P(V[0], V[1])); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, R * 0.28, -ua, -va, thd > 0); ctx.stroke();
+  const mid = ua + thd * DEG / 2;
+  text(ctx, 'θ', ...P(0.46 * Math.cos(mid), 0.46 * Math.sin(mid)), ink2, 17);
+  dot(ctx, cx, cy, 3, muted);
+  dot(ctx, ...P(U[0], U[1]), 7, ink); dot(ctx, ...P(V[0], V[1]), 7, green);
+  text(ctx, 'u', ...P(1.2 * U[0], 1.2 * U[1]), ink, 19); text(ctx, 'v', ...P(1.2 * V[0], 1.2 * V[1]), green, 19);
+
+  // plot: 1 - cos θ against θ²/2
+  if (w >= 520) {
+    const pxL = w * 0.6, pxR = w - 22, pyB = cy + R - 6, pyT = cy - R + 8, ymax = 2.4;
+    const X = a => pxL + a / Math.PI * (pxR - pxL), Y = y => pyB - y / ymax * (pyB - pyT);
+    ctx.strokeStyle = ink2; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(pxL, pyT); ctx.lineTo(pxL, pyB); ctx.lineTo(pxR, pyB); ctx.stroke();
+    ctx.strokeStyle = css('--rule');
+    for (const y of [1, 2]) { ctx.beginPath(); ctx.moveTo(pxL, Y(y)); ctx.lineTo(pxR, Y(y)); ctx.stroke(); text(ctx, String(y), pxL - 8, Y(y), muted, 12, 'right'); }
+    for (const [a, s] of [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π']]) text(ctx, s, X(a), pyB + 14, muted, 12);
+    text(ctx, 'θ', pxR - 4, pyB - 12, muted, 13);
+    ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 2; ctx.beginPath();
+    for (let k = 0; k <= 100; k++) { const a = k / 100 * Math.PI, y = a * a / 2; if (y > ymax) break; k ? ctx.lineTo(X(a), Y(y)) : ctx.moveTo(X(a), Y(y)); }
+    ctx.stroke(); ctx.restore();
+    ctx.strokeStyle = orange; ctx.lineWidth = 3; ctx.beginPath();
+    for (let k = 0; k <= 100; k++) { const a = k / 100 * Math.PI; k ? ctx.lineTo(X(a), Y(1 - Math.cos(a))) : ctx.moveTo(X(a), Y(1 - Math.cos(a))); }
+    ctx.stroke();
+    dot(ctx, X(th), Y(1 - Math.cos(th)), 6.5, orange, css('--surface'));
+    text(ctx, '1 − cos θ', X(2.35), Y(1.75), orange, 14, 'right');
+    text(ctx, 'θ²/2', X(1.75), Y(2.2), muted, 13, 'right');
+  }
+
+  const chord = Math.hypot(U[0] - V[0], U[1] - V[1]);
+  $('o-ua').textContent = Math.round(((f10.ua % 360) + 360) % 360) + '°';
+  $('o-th10').textContent = Math.round(thd) + '°';
+  $('r10-th').textContent = fmt(th) + ' rad';
+  $('r10-a').textContent = fmt(1 - (U[0] * V[0] + U[1] * V[1]));
+  $('r10-b').textContent = fmt(0.5 * chord * chord);
+  $('r10-arc').textContent = fmt(th);
+  $('r10-chord').textContent = fmt(chord);
+  $('cap10').textContent = antip
+    ? 'Antipodal: two different half circles (both drawn) are equally short, so the geodesic from u to v is not unique.'
+    : 'The accent arc is the geodesic, the dashed orange segment is the chord.';
+}
+function sync10() {
+  $('s-ua').value = ((f10.ua % 360) + 360) % 360; $('s-th10').value = wrap180(f10.va - f10.ua); draw10();
+}
+$('s-ua').addEventListener('input', e => { const th = wrap180(f10.va - f10.ua); f10.ua = +e.target.value; f10.va = f10.ua + th; sync10(); });
+$('s-th10').addEventListener('input', e => { f10.va = f10.ua + +e.target.value; sync10(); });
+c10.addEventListener('pointerdown', e => {
+  const [px, py] = pointerPos(c10, e), { R, cx, cy } = geom10(c10.clientWidth, c10.clientHeight);
+  const pt = a => [cx + R * Math.cos(a * DEG), cy - R * Math.sin(a * DEG)];
+  const du = Math.hypot(px - pt(f10.ua)[0], py - pt(f10.ua)[1]), dv = Math.hypot(px - pt(f10.va)[0], py - pt(f10.va)[1]);
+  f10.drag = Math.min(du, dv) > 44 ? null : (du <= dv ? 'ua' : 'va');
+  if (f10.drag) c10.setPointerCapture(e.pointerId);
+});
+c10.addEventListener('pointermove', e => {
+  if (!f10.drag) return;
+  const [px, py] = pointerPos(c10, e), { cx, cy } = geom10(c10.clientWidth, c10.clientHeight);
+  f10[f10.drag] = Math.atan2(-(py - cy), px - cx) / DEG; sync10();
+});
+const end10 = () => { f10.drag = null; };
+c10.addEventListener('pointerup', end10); c10.addEventListener('pointercancel', end10);
+
+/* ---------------- Figure 11: Exp / Log with u at the top ---------------- */
+const f11 = { th: 110, drag: false };
+const c11 = $('c11');
+const geom11 = (w, h) => ({ R: Math.min(h * 0.3, (w / 2 - 30) / 3.4), cx: w / 2, cy: h * 0.64 });
+const CAP11 = 'Green: P<sub>u</sub> v (the shadow of v, length sin θ). Orange: Log<sub>u</sub> v (the unrolled arc, length θ). The dashed vertical line is the removed radial part.';
+function draw11() {
+  const { ctx, w, h } = fit(c11, 0.62);
+  const { R, cx, cy } = geom11(w, h);
+  const P = (x, y) => [cx + R * x, cy - R * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green');
+  const ths = f11.th * DEG, v = [Math.sin(ths), Math.cos(ths)];
+  const pn = Math.abs(v[0]), cosT = v[1], th = Math.atan2(pn, cosT);
+  const ok = pn > 1e-9;
+  const logx = ok ? th * Math.sign(v[0]) : 0;
+
+  // tangent line with ticks
+  ctx.strokeStyle = acc; ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.moveTo(...P(-3.4, 1)); ctx.lineTo(...P(3.4, 1)); ctx.stroke();
+  for (const [x, s] of [[-Math.PI, '−π'], [-Math.PI / 2, '−π/2'], [0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π']]) {
+    ctx.beginPath(); ctx.moveTo(...P(x, 0.97)); ctx.lineTo(...P(x, 1.03)); ctx.stroke();
+    text(ctx, s, ...P(x, 1.0).map((q, i) => q + (i ? 14 : 0)), muted, 12);
+  }
+  text(ctx, 'tangent line at u', ...P(-3.35, 1).map((q, i) => q + (i ? -14 : 0)), acc, 13, 'left');
+  // circle, arc
+  ctx.strokeStyle = ink2; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+  ctx.lineCap = 'round'; ctx.strokeStyle = acc; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, ths - Math.PI / 2, ths < 0); ctx.stroke();
+  dot(ctx, cx, cy, 3, muted);
+  ctx.save(); ctx.setLineDash([4, 5]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(...P(v[0], v[1])); ctx.lineTo(...P(v[0], 1)); ctx.stroke(); ctx.restore();
+
+  // P_u v (green, on the line) and Log_u v (orange, lifted)
+  arrow(ctx, ...P(0, 1), ...P(v[0], 1), green, 4.5);
+  arrow(ctx, ...P(0, 1.16), ...P(logx, 1.16), orange, 4.5);
+  ctx.save(); ctx.setLineDash([3, 4]); ctx.strokeStyle = orange; ctx.globalAlpha = 0.6; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(...P(logx, 1.16)); ctx.lineTo(...P(logx, 1)); ctx.stroke(); ctx.restore();
+  dot(ctx, ...P(logx, 1), 5, orange); dot(ctx, ...P(v[0], 1), 5, green);
+  dot(ctx, 0 + cx, cy - R, 7, acc);
+  dot(ctx, ...P(v[0], v[1]), 7.5, ink, css('--surface'));
+  text(ctx, 'u', cx - 14, cy - R + 18, acc, 19);
+  text(ctx, 'v', ...P(1.2 * v[0], 1.2 * v[1]), ink, 19);
+  if (Math.abs(v[0]) > 0.2) text(ctx, 'P_u v', ...P(v[0] / 2, 1).map((q, i) => q + (i ? 32 : 0)), green, 13);
+  if (Math.abs(logx) > 0.4) text(ctx, 'Log_u v', ...P(logx / 2, 1.16).map((q, i) => q + (i ? -15 : 0)), orange, 13);
+
+  // Exp(Log) check
+  let err = NaN;
+  if (ok) {
+    const e = [Math.sign(v[0]), 0], E = [Math.sin(th) * e[0], Math.cos(th)];
+    err = Math.hypot(E[0] - v[0], E[1] - v[1]);
+  }
+  const antip = !ok || (cosT < 0 && pn < 0.03);
+  $('o-th11').textContent = Math.round(wrap180(f11.th)) + '°';
+  $('r11-p').textContent = fmt(pn);
+  $('r11-s').textContent = fmt(Math.sin(th));
+  $('r11-c').textContent = fmt(cosT);
+  $('r11-l').textContent = fmt(th);
+  $('r11-e').textContent = ok ? fmt(err, 4) : 'undefined';
+  $('cap11').innerHTML = antip && cosT < 0
+    ? 'Antipodal: P<sub>u</sub> v ≈ 0, so there is no direction to normalize. Log and Slerp are undefined, and both half circles are shortest paths.'
+    : CAP11;
+}
+function sync11() { $('s-th11').value = wrap180(f11.th); draw11(); }
+$('s-th11').addEventListener('input', e => { f11.th = +e.target.value; draw11(); });
+$('b-anti').addEventListener('click', () => { f11.th = 180; sync11(); });
+function moveTo11(e) {
+  const [px, py] = pointerPos(c11, e), { cx, cy } = geom11(c11.clientWidth, c11.clientHeight);
+  f11.th = wrap180(90 - Math.atan2(-(py - cy), px - cx) / DEG); sync11();
+}
+c11.addEventListener('pointerdown', e => { f11.drag = true; c11.setPointerCapture(e.pointerId); moveTo11(e); });
+c11.addEventListener('pointermove', e => { if (f11.drag) moveTo11(e); });
+const end11 = () => { f11.drag = false; };
+c11.addEventListener('pointerup', end11); c11.addEventListener('pointercancel', end11);
+
+/* ---------------- Figure 12: Exp vs retraction vs Slerp ---------------- */
+const f12 = { tau: 0.9, thT: 100, match: false };
+const c12 = $('c12');
+function draw12() {
+  const { ctx, w, h } = fit(c12, 0.62);
+  const { R, cx, cy } = geom11(w, h);
+  const P = (x, y) => [cx + R * x, cy - R * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted'), rule = css('--rule');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+  const tau = f12.tau, thT = f12.thT * DEG;
+  const stepR = f12.match ? (tau < Math.PI / 2 - 0.01 ? Math.tan(tau) : null) : tau;
+  const angR = stepR === null ? null : Math.atan(stepR);
+  const E = [Math.sin(tau), Math.cos(tau)];
+  const V = [Math.sin(thT), Math.cos(thT)], U = [0, 1], tt = tau / thT;
+  const S = [(Math.sin((1 - tt) * thT) * U[0] + Math.sin(tt * thT) * V[0]) / Math.sin(thT),
+             (Math.sin((1 - tt) * thT) * U[1] + Math.sin(tt * thT) * V[1]) / Math.sin(thT)];
+
+  ctx.strokeStyle = acc; ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.moveTo(...P(-3.4, 1)); ctx.lineTo(...P(3.4, 1)); ctx.stroke();
+  for (const [x, s] of [[0, '0'], [1, '1'], [2, '2'], [3, '3']]) {
+    ctx.beginPath(); ctx.moveTo(...P(x, 0.97)); ctx.lineTo(...P(x, 1.03)); ctx.stroke();
+    text(ctx, s, ...P(x, 1.0).map((q, i) => q + (i ? 14 : 0)), muted, 12);
+  }
+  text(ctx, 'tangent line (step length)', ...P(-3.35, 1).map((q, i) => q + (i ? -14 : 0)), acc, 13, 'left');
+  ctx.strokeStyle = ink2; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+  dot(ctx, cx, cy, 3, muted);
+
+  // normalization ray through the tip of the retraction step
+  if (stepR !== null) {
+    ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = orange; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(...P(stepR, 1)); ctx.stroke(); ctx.restore();
+  }
+  // arcs
+  ctx.lineCap = 'round'; ctx.lineWidth = 6;
+  ctx.strokeStyle = green; ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, tau - Math.PI / 2); ctx.stroke();
+  if (angR !== null) { ctx.strokeStyle = orange; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, R * 0.9, -Math.PI / 2, angR - Math.PI / 2); ctx.stroke(); }
+  // step arrows on the tangent line
+  arrow(ctx, ...P(0, 1.12), ...P(tau, 1.12), green, 3.5);
+  if (stepR !== null) arrow(ctx, ...P(0, 1), ...P(stepR, 1), orange, 3.5);
+  text(ctx, f12.match ? 'tan τ' : 'τ', ...P(stepR === null ? 0 : stepR / 2, 1).map((q, i) => q + (i ? 32 : 0)), orange, 13);
+  text(ctx, 'τ', ...P(tau / 2, 1.12).map((q, i) => q + (i ? -12 : 0)), green, 13);
+
+  // landing points
+  const Q = V; // target
+  ctx.strokeStyle = blue; ctx.lineWidth = 2; ctx.strokeRect(...P(Q[0], Q[1]).map(q => q - 5), 10, 10);
+  text(ctx, 'target v', ...P(1.18 * Q[0], 1.18 * Q[1]), blue, 13);
+  dot(ctx, ...P(S[0], S[1]), 11, null, blue);
+  dot(ctx, ...P(E[0], E[1]), 6, green);
+  if (angR !== null) dot(ctx, ...P(Math.sin(angR), Math.cos(angR)), 3.5, orange);
+  dot(ctx, cx, cy - R, 7, acc);
+  text(ctx, 'u', cx - 14, cy - R + 18, acc, 19);
+
+  // plot of angle versus step length
+  if (w >= 640) {
+    const pxL = w - 215, pxR = w - 24, pyB = cy + R - 14, pyT = cy - R + 46;
+    const X = x => pxL + x / 3 * (pxR - pxL), Y = a => pyB - a / Math.PI * (pyB - pyT);
+    ctx.strokeStyle = ink2; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(pxL, pyT); ctx.lineTo(pxL, pyB); ctx.lineTo(pxR, pyB); ctx.stroke();
+    ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = muted;
+    ctx.beginPath(); ctx.moveTo(pxL, Y(Math.PI / 2)); ctx.lineTo(pxR, Y(Math.PI / 2)); ctx.stroke(); ctx.restore();
+    text(ctx, 'π/2', pxL - 6, Y(Math.PI / 2), muted, 12, 'right'); text(ctx, 'π', pxL - 6, Y(Math.PI), muted, 12, 'right');
+    for (const x of [0, 1, 2, 3]) text(ctx, String(x), X(x), pyB + 13, muted, 12);
+    text(ctx, 'angle reached vs step length', (pxL + pxR) / 2, pyT - 12, ink2, 13);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = green; ctx.beginPath(); for (let k = 0; k <= 60; k++) { const x = k / 20; k ? ctx.lineTo(X(x), Y(x)) : ctx.moveTo(X(x), Y(x)); } ctx.stroke();
+    ctx.strokeStyle = orange; ctx.beginPath(); for (let k = 0; k <= 60; k++) { const x = k / 20; k ? ctx.lineTo(X(x), Y(Math.atan(x))) : ctx.moveTo(X(x), Y(Math.atan(x))); } ctx.stroke();
+    text(ctx, 'Exp (= τ)', X(2.1), Y(2.2), green, 13, 'right');
+    text(ctx, 'arctan τ', X(3), Y(1.1) + 14, orange, 13, 'right');
+    dot(ctx, X(tau), Y(tau), 5.5, green, css('--surface')); dot(ctx, X(tau), Y(Math.atan(tau)), 5.5, orange, css('--surface'));
+  }
+
+  const dg = a => ` (${(a / DEG).toFixed(1)}°)`;
+  $('o-tau').textContent = tau.toFixed(2);
+  $('o-thT').textContent = Math.round(f12.thT) + '°';
+  $('r12-e').textContent = tau.toFixed(3) + ' rad' + dg(tau);
+  $('r12-r').textContent = angR === null ? 'n/a (needs τ < π/2)' : angR.toFixed(3) + ' rad' + dg(angR);
+  $('r12-t').textContent = tau < Math.PI / 2 - 0.005 ? Math.tan(tau).toFixed(3) : 'none (τ ≥ π/2)';
+  $('r12-s').textContent = tt.toFixed(3);
+}
+$('s-tau').addEventListener('input', e => { f12.tau = +e.target.value; draw12(); });
+$('s-thT').addEventListener('input', e => { f12.thT = +e.target.value; draw12(); });
+$('chk-match').addEventListener('change', e => { f12.match = e.target.checked; draw12(); });
+
+/* ---------------- Figure 13: Riemannian gradient descent ---------------- */
+const f13 = { mode: 'geo', a: 200, b: 60, gam: 0.5, steps: 0, trail: [], playing: false, last: 0, drag: null };
+const c13 = $('c13');
+function force13() {
+  const a = f13.a * DEG, b = f13.b * DEG;
+  const z = [Math.cos(a), Math.sin(a)], x = [Math.cos(b), Math.sin(b)];
+  const d = z[0] * x[0] + z[1] * x[1], pv = [x[0] - d * z[0], x[1] - d * z[1]], pn = Math.hypot(pv[0], pv[1]);
+  const th = Math.atan2(pn, d), undef = pn < 1e-6 && d < 0;
+  let g, f;
+  if (f13.mode === 'lin') { g = pv; f = -d; }
+  else { g = pn > 1e-9 ? [pv[0] * th / pn, pv[1] * th / pn] : [0, 0]; f = 0.5 * th * th; }
+  return { z, x, d, pv, th, g, f, gn: Math.hypot(g[0], g[1]), undef };
+}
+function step13() {
+  const s = force13();
+  const p = [s.z[0] + f13.gam * s.g[0], s.z[1] + f13.gam * s.g[1]];
+  f13.trail.push(f13.a); if (f13.trail.length > 40) f13.trail.shift();
+  f13.a = Math.atan2(p[1], p[0]) / DEG; f13.steps++;
+}
+function draw13() {
+  const { ctx, w, h } = fit(c13, 0.5);
+  const { R, cx, cy } = geom10(w, h);
+  const P = (x, y) => [cx + R * x, cy - R * y];
+  const ink = css('--ink'), ink2 = css('--ink-2'), muted = css('--muted');
+  const acc = css('--accent'), orange = css('--orange'), green = css('--green'), blue = css('--blue');
+  const s = force13(), z = s.z, x = s.x;
+
+  ctx.strokeStyle = ink2; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+  f13.trail.forEach(t => dot(ctx, ...P(Math.cos(t * DEG), Math.sin(t * DEG)), 3, acc));
+  const sc = f13.mode === 'geo' ? 0.5 : 1;
+  if (f13.mode === 'lin') {
+    arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + x[0], z[1] + x[1]), orange, 2.2);
+    arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + s.d * z[0], z[1] + s.d * z[1]), muted, 3, [5, 4]);
+  }
+  arrow(ctx, ...P(z[0], z[1]), ...P(z[0] + sc * s.g[0], z[1] + sc * s.g[1]), green, 3.6);
+  ctx.fillStyle = blue; const xp = P(x[0], x[1]);
+  ctx.save(); ctx.translate(xp[0], xp[1]); ctx.rotate(Math.PI / 4); ctx.fillRect(-6, -6, 12, 12); ctx.restore();
+  text(ctx, f13.mode === 'lin' ? 'c/‖c‖' : 'x', ...P(1.22 * x[0], 1.22 * x[1]), blue, 17);
+  dot(ctx, ...P(z[0], z[1]), 7.5, acc, css('--surface'));
+  text(ctx, 'z', ...P(1.22 * z[0], 1.22 * z[1]), acc, 19);
+
+  if (w >= 520) {
+    const pxL = w * 0.6, pxR = w - 22, pyB = cy + R - 6, pyT = cy - R + 8, ymax = 3.4;
+    const X = a => pxL + a / Math.PI * (pxR - pxL), Y = y => pyB - y / ymax * (pyB - pyT);
+    ctx.strokeStyle = ink2; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(pxL, pyT); ctx.lineTo(pxL, pyB); ctx.lineTo(pxR, pyB); ctx.stroke();
+    for (const [a, t] of [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π']]) text(ctx, t, X(a), pyB + 14, muted, 12);
+    for (const y of [1, 2, 3]) text(ctx, String(y), pxL - 8, Y(y), muted, 12, 'right');
+    text(ctx, 'θ', pxR - 4, pyB - 12, muted, 13);
+    text(ctx, 'size of the pull ‖grad f‖', (pxL + pxR) / 2, pyT - 4, ink2, 13);
+    const curve = (fn, col, lw) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); for (let k = 0; k <= 100; k++) { const a = k / 100 * Math.PI; k ? ctx.lineTo(X(a), Y(fn(a))) : ctx.moveTo(X(a), Y(fn(a))); } ctx.stroke(); };
+    curve(Math.sin, blue, f13.mode === 'lin' ? 3.6 : 1.6);
+    curve(a => a, green, f13.mode === 'geo' ? 3.6 : 1.6);
+    text(ctx, 'sin θ (linear)', X(3.1), Y(0.25) - 10, blue, 13, 'right');
+    text(ctx, 'θ (geodesic)', X(1.9), Y(2.2), green, 13, 'right');
+    dot(ctx, X(s.th), Y(s.gn), 6.5, f13.mode === 'geo' ? green : blue, css('--surface'));
+  }
+
+  $('o-gam').textContent = f13.gam.toFixed(2);
+  $('r13-th').textContent = fmt(s.th) + ' rad';
+  $('r13-f').textContent = fmt(s.f);
+  $('r13-g').textContent = fmt(s.gn);
+  $('r13-n').textContent = f13.steps;
+  $('cap13').textContent = s.undef
+    ? (f13.mode === 'geo' ? 'z is antipodal to x: Log is undefined, so there is no geodesic force. Nudge z to leave this point.'
+                          : 'z is antipodal to c: the tangent part of c is zero, a standstill that any perturbation escapes (unstable).')
+    : (f13.mode === 'lin'
+      ? 'Green: the descent step −grad f = P_z c. The raw force c (orange) is split into the radial part (gray, discarded) and the tangent part (green).'
+      : 'Green: the descent step −grad f = Log_z x, drawn at half scale. It points along the shortest arc and its length is θ.');
+}
+function setMode13(m) {
+  f13.mode = m; f13.steps = 0; f13.trail = [];
+  $('b-lin').setAttribute('aria-pressed', m === 'lin'); $('b-geo').setAttribute('aria-pressed', m === 'geo'); draw13();
+}
+function loop13(ts) {
+  if (!f13.playing) return;
+  if (ts - f13.last > 120) { f13.last = ts; step13(); draw13(); }
+  requestAnimationFrame(loop13);
+}
+$('b-lin').addEventListener('click', () => setMode13('lin'));
+$('b-geo').addEventListener('click', () => setMode13('geo'));
+$('s-gam').addEventListener('input', e => { f13.gam = +e.target.value; draw13(); });
+$('b-step13').addEventListener('click', () => { step13(); draw13(); });
+$('b-play13').addEventListener('click', e => {
+  f13.playing = !f13.playing; e.target.textContent = f13.playing ? 'Pause' : 'Play';
+  if (f13.playing) requestAnimationFrame(loop13);
+});
+$('b-rand13').addEventListener('click', () => { f13.a = f13.b + 40 + Math.random() * 280; f13.steps = 0; f13.trail = []; draw13(); });
+c13.addEventListener('pointerdown', e => {
+  const [px, py] = pointerPos(c13, e), { R, cx, cy } = geom10(c13.clientWidth, c13.clientHeight);
+  const pt = a => [cx + R * Math.cos(a * DEG), cy - R * Math.sin(a * DEG)];
+  const dz = Math.hypot(px - pt(f13.a)[0], py - pt(f13.a)[1]), dx = Math.hypot(px - pt(f13.b)[0], py - pt(f13.b)[1]);
+  f13.drag = Math.min(dz, dx) > 44 ? null : (dz <= dx ? 'a' : 'b');
+  if (f13.drag) c13.setPointerCapture(e.pointerId);
+});
+c13.addEventListener('pointermove', e => {
+  if (!f13.drag) return;
+  const [px, py] = pointerPos(c13, e), { cx, cy } = geom10(c13.clientWidth, c13.clientHeight);
+  f13[f13.drag] = Math.atan2(-(py - cy), px - cx) / DEG; f13.steps = 0; f13.trail = []; draw13();
+});
+const end13 = () => { f13.drag = null; };
+c13.addEventListener('pointerup', end13); c13.addEventListener('pointercancel', end13);
+
+/* ---------------- boot ---------------- */
+const all = () => { draw1(); draw2(); draw3(); draw5(); draw6(); draw7(); draw8(); draw9(); draw10(); draw11(); draw12(); draw13(); };
+new ResizeObserver(all).observe(document.querySelector('main'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', all);
+all();
+})();
+</script>
+</body>
+</html>

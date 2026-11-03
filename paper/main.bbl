@@ -1,0 +1,223 @@
+\begin{thebibliography}{34}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Absil et~al.(2005)Absil, Mahony, and Andrews]{absil2005analytic}
+Absil, P.-A., Mahony, R., and Andrews, B.
+\newblock Convergence of the iterates of descent methods for analytic cost
+  functions.
+\newblock \emph{SIAM Journal on Optimization}, 16\penalty0 (2):\penalty0
+  531--547, 2005.
+
+\bibitem[Absil et~al.(2008)Absil, Mahony, and Sepulchre]{absil2008}
+Absil, P.-A., Mahony, R., and Sepulchre, R.
+\newblock \emph{Optimization Algorithms on Matrix Manifolds}.
+\newblock Princeton University Press, Princeton, NJ, 2008.
+
+\bibitem[Adler(1946)]{adler1946locking}
+Adler, R.
+\newblock A study of locking phenomena in oscillators.
+\newblock \emph{Proceedings of the IRE}, 34\penalty0 (6):\penalty0 351--357,
+  1946.
+
+\bibitem[Ahmadi(2026)]{ahmadi2026phase}
+Ahmadi, M.~R.
+\newblock The phase is the gradient: Equilibrium propagation for frequency
+  learning in {K}uramoto networks, 2026.
+\newblock arXiv:2604.10272.
+
+\bibitem[Anonymous(2026)]{sfprm}
+Anonymous.
+\newblock Spherical fixed-point reasoning models, 2026.
+\newblock Under review.
+
+\bibitem[Bai et~al.(2019)Bai, Kolter, and Koltun]{bai2019deq}
+Bai, S., Kolter, J.~Z., and Koltun, V.
+\newblock Deep equilibrium models.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2019.
+
+\bibitem[Boumal(2023)]{boumal2023}
+Boumal, N.
+\newblock \emph{An Introduction to Optimization on Smooth Manifolds}.
+\newblock Cambridge University Press, 2023.
+
+\bibitem[Darlow et~al.(2025)Darlow, Regan, Risi, Seely, and
+  Jones]{darlow2025ctm}
+Darlow, L., Regan, C., Risi, S., Seely, J., and Jones, L.
+\newblock Continuous thought machines, 2025.
+\newblock arXiv:2505.05522.
+
+\bibitem[Daulbaev et~al.(2026)Daulbaev, Glazkov, Rakhuba, and
+  Oseledets]{daulbaev2026gfpr}
+Daulbaev, T., Glazkov, I., Rakhuba, M., and Oseledets, I.
+\newblock Reasoning on the simplex: Geometric fixed-point models, 2026.
+\newblock arXiv:2609.33540.
+
+\bibitem[Dehghani et~al.(2019)Dehghani, Gouws, Vinyals, Uszkoreit, and
+  Kaiser]{dehghani2019universal}
+Dehghani, M., Gouws, S., Vinyals, O., Uszkoreit, J., and Kaiser, {\L}.
+\newblock Universal transformers.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2019.
+
+\bibitem[Hestenes \& Stiefel(1952)Hestenes and Stiefel]{hestenes1952cg}
+Hestenes, M.~R. and Stiefel, E.
+\newblock Methods of conjugate gradients for solving linear systems.
+\newblock \emph{Journal of Research of the National Bureau of Standards},
+  49\penalty0 (6):\penalty0 409--436, 1952.
+
+\bibitem[Hoover et~al.(2023)Hoover, Liang, Pham, Panda, Strobelt, Chau, Zaki,
+  and Krotov]{hoover2023et}
+Hoover, B., Liang, Y., Pham, B., Panda, R., Strobelt, H., Chau, D.~H., Zaki,
+  M.~J., and Krotov, D.
+\newblock Energy transformer.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2023.
+
+\bibitem[Huang et~al.(2026)Huang, Geng, and Kolter]{huang2026eqr}
+Huang, B., Geng, Z., and Kolter, Z.
+\newblock Equilibrium reasoners: Learning attractors enables scalable
+  reasoning, 2026.
+\newblock arXiv:2605.21488.
+
+\bibitem[Jolicoeur-Martineau(2025)]{jolicoeur2025trm}
+Jolicoeur-Martineau, A.
+\newblock Less is more: Recursive reasoning with tiny networks, 2025.
+\newblock arXiv:2510.04871.
+
+\bibitem[Keller \& Welling(2023)Keller and Welling]{keller2023nwm}
+Keller, T.~A. and Welling, M.
+\newblock Neural wave machines: Learning spatiotemporally structured
+  representations with locally coupled oscillatory recurrent neural networks.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, volume
+  202 of \emph{Proceedings of Machine Learning Research}, 2023.
+
+\bibitem[Krotov(2021)]{krotov2021hierarchical}
+Krotov, D.
+\newblock Hierarchical associative memory.
+\newblock In \emph{arXiv preprint arXiv:2107.06446}, 2021.
+
+\bibitem[Krotov \& Hopfield(2016)Krotov and Hopfield]{krotov2016dam}
+Krotov, D. and Hopfield, J.~J.
+\newblock Dense associative memory for pattern recognition.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2016.
+
+\bibitem[Kuramoto(1984)]{kuramoto1984}
+Kuramoto, Y.
+\newblock \emph{Chemical Oscillations, Waves, and Turbulence}.
+\newblock Springer, Berlin, 1984.
+
+\bibitem[Lee et~al.(2019)Lee, Panageas, Piliouras, Simchowitz, Jordan, and
+  Recht]{lee2019saddle}
+Lee, J.~D., Panageas, I., Piliouras, G., Simchowitz, M., Jordan, M.~I., and
+  Recht, B.
+\newblock First-order methods almost always avoid strict saddle points.
+\newblock \emph{Mathematical Programming}, 176:\penalty0 311--337, 2019.
+
+\bibitem[Lohe(2009)]{lohe2009}
+Lohe, M.~A.
+\newblock Non-{A}belian {K}uramoto models and synchronization.
+\newblock \emph{Journal of Physics A: Mathematical and Theoretical},
+  42\penalty0 (39):\penalty0 395101, 2009.
+
+\bibitem[Loshchilov et~al.(2025)Loshchilov, Hsieh, Sun, and
+  Ginsburg]{loshchilov2025ngpt}
+Loshchilov, I., Hsieh, C.-P., Sun, S., and Ginsburg, B.
+\newblock {nGPT}: Normalized transformer with representation learning on the
+  hypersphere.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2025.
+
+\bibitem[Mann(1953)]{mann1953}
+Mann, W.~R.
+\newblock Mean value methods in iteration.
+\newblock \emph{Proceedings of the American Mathematical Society}, 4\penalty0
+  (3):\penalty0 506--510, 1953.
+
+\bibitem[Mardia \& Jupp(2000)Mardia and Jupp]{mardia2000}
+Mardia, K.~V. and Jupp, P.~E.
+\newblock Directional statistics.
+\newblock \emph{Wiley Series in Probability and Statistics}, 2000.
+
+\bibitem[Miyato et~al.(2025)Miyato, L{\"o}we, Geiger, and
+  Welling]{miyato2025akorn}
+Miyato, T., L{\"o}we, S., Geiger, A., and Welling, M.
+\newblock Artificial {K}uramoto oscillatory neurons.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2025.
+\newblock arXiv:2410.13821.
+
+\bibitem[Movahedi et~al.(2026)Movahedi, Milovanovi{\'c}, Feigin, Theus,
+  Hofmann, Boeva, Rusch, and Orvieto]{movahedi2026fprm}
+Movahedi, S., Milovanovi{\'c}, V., Feigin, S.~L., Theus, A., Hofmann, T.,
+  Boeva, V., Rusch, T.~K., and Orvieto, A.
+\newblock Fixed-point reasoners: Stable and adaptive deep looped transformers,
+  2026.
+\newblock arXiv:2606.18206.
+
+\bibitem[Nocedal \& Wright(2006)Nocedal and Wright]{nocedal2006}
+Nocedal, J. and Wright, S.~J.
+\newblock \emph{Numerical Optimization}.
+\newblock Springer, New York, 2nd edition, 2006.
+
+\bibitem[Ramsauer et~al.(2021)Ramsauer, Sch{\"a}fl, Lehner, Seidl, Widrich,
+  Adler, Gruber, Holzleitner, Pavlovi{\'c}, Sandve, Greiff, Kreil, Kopp,
+  Klambauer, Brandstetter, and Hochreiter]{ramsauer2021hopfield}
+Ramsauer, H., Sch{\"a}fl, B., Lehner, J., Seidl, P., Widrich, M., Adler, T.,
+  Gruber, L., Holzleitner, M., Pavlovi{\'c}, M., Sandve, G.~K., Greiff, V.,
+  Kreil, D., Kopp, M., Klambauer, G., Brandstetter, J., and Hochreiter, S.
+\newblock Hopfield networks is all you need.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[Rusch \& Mishra(2021)Rusch and Mishra]{rusch2021cornn}
+Rusch, T.~K. and Mishra, S.
+\newblock Coupled oscillatory recurrent neural network ({coRNN}): An accurate
+  and (gradient) stable architecture for learning long time dependencies.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[Scellier \& Bengio(2017)Scellier and Bengio]{scellier2017ep}
+Scellier, B. and Bengio, Y.
+\newblock Equilibrium propagation: Bridging the gap between energy-based models
+  and backpropagation.
+\newblock \emph{Frontiers in Computational Neuroscience}, 11:\penalty0 24,
+  2017.
+
+\bibitem[Strogatz(2000)]{strogatz2000}
+Strogatz, S.~H.
+\newblock From {K}uramoto to {C}rawford: Exploring the onset of synchronization
+  in populations of coupled oscillators.
+\newblock \emph{Physica D: Nonlinear Phenomena}, 143\penalty0 (1--4):\penalty0
+  1--20, 2000.
+
+\bibitem[Trotter(1959)]{trotter1959}
+Trotter, H.~F.
+\newblock On the product of semi-groups of operators.
+\newblock \emph{Proceedings of the American Mathematical Society}, 10\penalty0
+  (4):\penalty0 545--551, 1959.
+
+\bibitem[Wang et~al.(2025)]{wang2025hrm}
+Wang, G. et~al.
+\newblock Hierarchical reasoning model, 2025.
+\newblock arXiv:2506.21734.
+
+\bibitem[Wang \& Roychowdhury(2019)Wang and Roychowdhury]{wang2019oim}
+Wang, T. and Roychowdhury, J.
+\newblock {OIM}: Oscillator-based {I}sing machines for solving combinatorial
+  optimisation problems.
+\newblock \emph{Unconventional Computation and Natural Computation (UCNC), LNCS
+  11493}, pp.\  232--256, 2019.
+
+\bibitem[Xiao et~al.(2026)Xiao, Wang, Han, Shan, and Li]{xiao2026kope}
+Xiao, M., Wang, Y., Han, D., Shan, C., and Li, D.
+\newblock Kuramoto oscillatory phase encoding: Neuro-inspired synchronization
+  for improved learning efficiency, 2026.
+\newblock arXiv:2604.07904.
+
+\end{thebibliography}

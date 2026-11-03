@@ -1,0 +1,738 @@
+%%%%%%%% ICML 2026 SUBMISSION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Converted from the report "SFPRM as an Operator-Split AKOrN: Exact
+% Correspondences Between Spherical Fixed-Point Reasoning and Artificial
+% Kuramoto Oscillatory Neurons" (sfprm_akorn_equivalence.pdf).
+% Built on the ICML 2026 example template (icml2026.sty, version of 2025-10-29).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\usepackage{hyperref}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Blind version for review:
+\usepackage{icml2026}
+% Preprint: \usepackage[preprint]{icml2026}
+% Camera-ready: \usepackage[accepted]{icml2026}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Shared numbering through alias counters, so that cleveref names each environment correctly.
+\usepackage{aliascnt}
+\newcommand{\sharedtheorem}[2]{%
+  \newaliascnt{#1}{theorem}\newtheorem{#1}[#1]{#2}\aliascntresetthe{#1}%
+  \crefname{#1}{#2}{#2s}\Crefname{#1}{#2}{#2s}}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\crefname{theorem}{Theorem}{Theorems}
+\sharedtheorem{proposition}{Proposition}
+\sharedtheorem{lemma}{Lemma}
+\sharedtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\sharedtheorem{definition}{Definition}
+\theoremstyle{remark}
+\sharedtheorem{remark}{Remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Sph}{\mathbb{S}}
+\newcommand{\ip}[2]{\langle #1,\, #2\rangle}
+\newcommand{\norm}[1]{\lVert #1\rVert}
+\newcommand{\Proj}{\operatorname{P}}
+\newcommand{\Norm}{\operatorname{Norm}}
+\newcommand{\Ret}{\Pi}
+\newcommand{\Slerp}{\operatorname{Slerp}}
+\newcommand{\Exp}{\operatorname{Exp}}
+\newcommand{\Log}{\operatorname{Log}}
+\newcommand{\Attn}{\operatorname{Attn}}
+\newcommand{\MLP}{\operatorname{MLP}}
+\newcommand{\Id}{\mathrm{I}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\tang}{\mathrm{T}}
+\newcommand{\grad}{\operatorname{grad}}
+
+\icmltitlerunning{SFPRM as an Operator-Split AKOrN}
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{SFPRM as an Operator-Split AKOrN: Exact Correspondences Between\\
+    Spherical Fixed-Point Reasoning and Kuramoto Oscillatory Neurons}
+
+  % Author information is removed automatically in the blind version.
+  \begin{icmlauthorlist}
+    \icmlauthor{Anonymous Author}{anon}
+  \end{icmlauthorlist}
+  \icmlaffiliation{anon}{Anonymous Institution}
+  \icmlcorrespondingauthor{Anonymous Author}{anon@example.com}
+
+  \icmlkeywords{Fixed-point reasoning, looped transformers, Kuramoto oscillators, hypersphere, Riemannian optimization}
+
+  \vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+  Looped fixed-point reasoners and oscillator-based networks have developed separately, although both
+  evolve unit vectors on spheres. We show that the Spherical Fixed-Point Reasoning Model (SFPRM) is,
+  at the level of its update rule, a generalized network of Artificial Kuramoto Oscillatory Neurons
+  (AKOrN) with zero natural frequency. Two elementary lemmas establish that normalized residual updates
+  and spherical linear interpolation are exactly AKOrN Euler steps with state-dependent step sizes.
+  Consequently, one SFPRM iteration is exactly an AKOrN step driven by the full recurrent map, its
+  geodesic input injection and nGPT attention sub-layers are exactly AKOrN's stimulus and coupling
+  steps, the iteration collapses to a single AKOrN step up to $O(\varepsilon^2)$ when step sizes are
+  small, and the two forms share their linearization and hence SFPRM's damping window. We delineate
+  where the models differ, read SFPRM's existence and convergence results as oscillator locking, and
+  derive the locking condition of an oscillatory extension, showing also that a constant natural
+  frequency can be absorbed into the recurrent block. The correspondence then suggests a model: an
+  energy-based SFPRM whose recurrent map is a Riemannian gradient step on an explicit energy built
+  from the geodesic injection, a symmetric attention energy with signed heads and hidden tokens, and
+  a Hopfield memory. It inherits an energy that decreases at every iteration, convergence from any
+  start with an a priori halting bound, a real Jacobian spectrum at halted states with the widest
+  possible damping window, energy-based selection over random restarts, and training by conjugate
+  gradient or equilibrium propagation. Reading the memory as a von Mises--Fisher mixture leads to a
+  codebook variant whose readout is tied to answer prototypes and whose concentration is annealed
+  over iterations. All identities are verified numerically. In a small Sudoku pilot the first energy
+  model trains slowly and its energy does not rank solutions. The codebook variant matches SFPRM on
+  $4\times4$ boards with one restart and lags it on $6\times6$, but its lowest-energy restart tracks
+  the oracle on both, raising out-of-distribution accuracy from $74\%$ to $99\%$ on $4\times4$ and
+  from $11\%$ to $88\%$ on $6\times6$ with $64$ restarts.
+\end{abstract}
+
+% ===========================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Looped, weight-tied models apply one block repeatedly and read their prediction from the state it
+converges to, so that depth becomes an iteration count chosen per input
+\citep{dehghani2019universal,bai2019deq}. Recent recurrent reasoners for puzzles such as Sudoku and
+mazes follow this pattern \citep{wang2025hrm,jolicoeur2025trm}, and the Fixed-Point Reasoning Model
+(FPRM) makes the loop an explicit damped fixed-point solve with residual-based halting
+\citep{movahedi2026fprm}. Its spherical counterpart, SFPRM \citep{sfprm}, runs the same loop on the
+unit hypersphere of the normalized Transformer nGPT \citep{loshchilov2025ngpt}: input injection and
+damping become geodesic operations, boundedness holds by construction, input injection guarantees a
+fixed point, and damping comes with an explicit step-size window.
+
+A separate line of work builds networks from coupled oscillators. Artificial Kuramoto Oscillatory
+Neurons (AKOrN) generalize the Kuramoto model \citep{kuramoto1984} to unit vectors in $N$ dimensions
+that rotate at natural frequencies, interact through learned couplings and are driven by a
+conditional stimulus \citep{miyato2025akorn}. Both families evolve unit vectors by moving along a
+tangent direction and renormalizing, yet the connection between them has not been made precise. A
+precise connection matters for two reasons: it lets results proved for one family (SFPRM's existence
+and damping guarantees, AKOrN's energy and synchronization picture) be read in the language of the
+other, and it identifies which oscillator mechanisms SFPRM already contains and which it lacks.
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item Two lemmas showing that normalized residual updates and spherical linear interpolation are
+        exactly AKOrN Euler steps with state-dependent step sizes (\cref{sec:lemmas}).
+  \item An exact equivalence: one SFPRM iteration is an AKOrN step with $\Omega=0$, one oscillator per
+        token and the full recurrent map as drive; geodesic injection and nGPT attention sub-layers are
+        exactly AKOrN's stimulus and coupling steps, so an iteration is an operator-split AKOrN step
+        (\cref{sec:correspondence}).
+  \item A first-order collapse to a single AKOrN Euler step with explicit stimulus, coupling and
+        self-drive, and an exact correspondence of linearizations that transfers SFPRM's damping window
+        to the AKOrN form (\cref{sec:collapse,sec:linearization}).
+  \item A delineation of the differences between the models, an oscillator reading of SFPRM's theory,
+        and an oscillatory extension with its locking condition, together with the observation that a
+        constant natural frequency can be absorbed into the recurrent block
+        (\cref{sec:differences,sec:oscillatory}).
+  \item An energy-based SFPRM whose recurrent map is a gradient step on an explicit energy, with
+        a Lyapunov and halting guarantee from any start, a real Jacobian spectrum at halted states,
+        energy-based voting over restarts, and conjugate-gradient or equilibrium-propagation
+        training, and a codebook variant whose energy ranks solutions; a pilot study measures what
+        the energy costs and what it buys (\cref{sec:energy}).
+\end{itemize}
+Our analysis concerns update rules. All identities are verified numerically (\cref{sec:numerics}),
+and the energy-based model is tested in a small controlled experiment. \Cref{tab:summary}
+summarizes the results.
+
+\begin{table}[t]
+  \caption{Summary of results. ``Exact'' statements hold for any step sizes satisfying stated
+  positivity conditions.}
+  \label{tab:summary}
+  \vskip 0.1in
+  \begin{center}
+  \begin{small}
+  \begin{tabular}{@{}p{0.6\columnwidth}ll@{}}
+    \toprule
+    Statement & Type & Where \\
+    \midrule
+    Renormalized residual step $=$ tangent step & exact & Lem.~\ref{lem:renorm} \\
+    $\Slerp$ $=$ tangent step & exact & Lem.~\ref{lem:slerp} \\
+    SFPRM iteration $=$ AKOrN step ($\Omega=0$, $N=d$) & exact & Thm.~\ref{thm:outer} \\
+    Injection $=$ stimulus step & exact & Prop.~\ref{prop:injection} \\
+    Attention sub-layer $=$ coupling step & exact & Prop.~\ref{prop:attention} \\
+    Iteration $=$ composition of AKOrN steps & exact & Thm.~\ref{thm:splitting} \\
+    Collapse to a single AKOrN step & $O(\varepsilon^2)$ & Thm.~\ref{thm:trotter} \\
+    Shared linearization and damping window & exact & Cor.~\ref{cor:window} \\
+    Constant $\Omega$ absorbed into the block & exact & Prop.~\ref{prop:absorb} \\
+    Locking condition with natural frequencies & exact & Prop.~\ref{prop:adler} \\
+    \midrule
+    Energy SFPRM: gradient $=$ injection $+$ symmetric coupling $+$ memory & exact & Prop.~\ref{prop:energy-gradient} \\
+    Energy descent, convergence, halting bound & exact & Thm.~\ref{thm:lyapunov} \\
+    Real spectrum, window $\eta<2/\lambda_{\max}$ & exact & Prop.~\ref{prop:real-spectrum} \\
+    Energy selection over restarts & exact & Prop.~\ref{prop:voting} \\
+    \bottomrule
+  \end{tabular}
+  \end{small}
+  \end{center}
+  \vskip -0.1in
+\end{table}
+
+% ===========================================================================
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Looped and fixed-point reasoners.} Universal Transformers share weights across depth
+\citep{dehghani2019universal}, and deep equilibrium models compute the fixed point of a weight-tied
+layer and differentiate through it implicitly \citep{bai2019deq}. Hierarchical and tiny recursive
+models refine latent states with nested loops and deep supervision
+\citep{wang2025hrm,jolicoeur2025trm}. FPRM replaces the hierarchy by a single damped fixed-point
+loop with pre-norm, residual scaling and residual-based halting \citep{movahedi2026fprm}; SFPRM moves
+this loop to the hypersphere \citep{sfprm}. Equilibrium Reasoners learn task-conditioned attractors
+and scale test-time compute through depth and random restarts \citep{huang2026eqr}, and
+\citet{daulbaev2026gfpr} constrain the state to products of simplices and analyse the Jacobian at
+FPRM's halted states. We do not propose a new reasoner; we characterize SFPRM's update rule.
+
+\paragraph{Normalized networks.} nGPT keeps every hidden vector on the unit sphere and folds each
+sub-layer into the state by a normalized residual step with learned eigen learning rates
+\citep{loshchilov2025ngpt}. SFPRM uses this block, and \cref{lem:renorm} is the observation that each
+such step is a tangent step.
+
+\paragraph{Oscillatory networks.} The Kuramoto model is the canonical model of synchronization
+\citep{kuramoto1984,strogatz2000}, and its non-Abelian generalizations evolve unit vectors on
+higher-dimensional spheres \citep{lohe2009}. Oscillatory recurrent networks exploit oscillator
+dynamics for stable long-range memory \citep{rusch2021cornn} and for spatiotemporally structured
+representations through travelling waves \citep{keller2023nwm}. AKOrN builds feed-forward and
+recurrent networks from $N$-dimensional Kuramoto units \citep{miyato2025akorn}; Kuramoto phase
+encodings modulate attention in vision transformers \citep{xiao2026kope}; and Continuous Thought
+Machines use the synchronization of neural activity as their representation \citep{darlow2025ctm}.
+Equilibrium propagation \citep{scellier2017ep} has been extended to learn natural frequencies of
+Kuramoto networks at phase-locked equilibria \citep{ahmadi2026phase}.
+
+% ===========================================================================
+\section{Background}
+\label{sec:background}
+
+\Cref{app:prelim} gives a self-contained account of the mathematics used here: retractions and
+Riemannian gradients, rotations, gradient flows, damped fixed-point iterations, nGPT and operator
+splitting. We summarize the essentials.
+
+\subsection{Geometry of the Sphere}
+\label{sec:geometry}
+
+Let $\Sph^{n-1}=\{z\in\R^n:\norm{z}=1\}$. Every $v\in\R^n$ splits at $z$ into a radial and a
+tangential part,
+\begin{equation}
+  v = \ip{v}{z}\,z + \Proj_z v,\qquad \Proj_z v := (\Id-zz^\top)\,v,
+  \label{eq:proj}
+\end{equation}
+where $\Proj_z$ projects onto the tangent space $\tang_z\Sph^{n-1}=\{v:\ip{v}{z}=0\}$. We write
+$\Ret(y):=y/\norm{y}$ for normalization and $\theta=\angle(u,v):=\arccos\ip{u}{v}$. The exponential
+and logarithm maps are
+\begin{align}
+  \Exp_u(w) &= \cos(\norm{w})\,u+\sin(\norm{w})\,\tfrac{w}{\norm{w}},\\
+  \Log_u(v) &= \tfrac{\theta}{\sin\theta}\,\Proj_u v,
+\end{align}
+for $w\in\tang_u\Sph^{n-1}$ and $\theta\in(0,\pi)$,
+and spherical linear interpolation is
+\begin{equation}
+  \Slerp_\eta(u,v) = \frac{\sin((1-\eta)\theta)}{\sin\theta}\,u + \frac{\sin(\eta\theta)}{\sin\theta}\,v,
+  \quad \eta\in[0,1].
+  \label{eq:slerp}
+\end{equation}
+For sequences $z=(z_1,\dots,z_T)$ all operators act token-wise; $\odot$ is the element-wise product.
+
+\subsection{Kuramoto Oscillators and AKOrN}
+\label{sec:akorn}
+
+The Kuramoto model $\dot\theta_i=\omega_i+\sum_jK_{ij}\sin(\theta_j-\theta_i)$ becomes, for
+$x_i=(\cos\theta_i,\sin\theta_i)$ and the $90^\circ$ rotation $R$,
+\begin{equation}
+  \dot x_i = \omega_i R\,x_i + \Proj_{x_i}\Big(\sum_j K_{ij}x_j\Big),
+  \label{eq:kuramoto-vector}
+\end{equation}
+since $\Proj_{x_i}x_j=\sin(\theta_j-\theta_i)\,Rx_i$ (\cref{app:kuramoto}). AKOrN
+\citep{miyato2025akorn} generalizes this to oscillators $x_i\in\Sph^{N-1}$, typically with $N\in\{2,4\}$:
+\begin{equation}
+  \dot x_i = \Omega_i x_i + \Proj_{x_i}\Big(c_i + \sum_j J_{ij} x_j\Big),
+  \label{eq:akorn-ode}
+\end{equation}
+with antisymmetric natural frequencies $\Omega_i$, couplings $J_{ij}$ (a convolution or attention) and
+a conditional stimulus $c_i$. We call $c_i+\sum_jJ_{ij}x_j$ the \emph{drive}. The discrete update with
+learned step size $\gamma>0$ is
+\begin{equation}
+  x_i \leftarrow \Ret\Big(x_i + \gamma\Big[\Omega_i x_i + \Proj_{x_i}\Big(c_i + \sum_j J_{ij}x_j\Big)\Big]\Big).
+  \label{eq:akorn-step}
+\end{equation}
+For $\Omega=0$ and symmetric couplings $J_{ij}=J_{ji}^\top$,
+\begin{equation}
+  E(x) = -\tfrac12\textstyle\sum_{i,j} x_i^\top J_{ij} x_j - \sum_i c_i^\top x_i
+  \label{eq:akorn-energy}
+\end{equation}
+is a Lyapunov function of \eqref{eq:akorn-ode}. A network stacks $L$ blocks of $T$ steps, passing a
+norm-based readout of each block as the next stimulus; it is trained by backpropagation through
+time, and on Sudoku clue cells start at $x=c$, the remaining cells start randomly, and test-time
+predictions are selected by energy-based voting over random initializations.
+
+\subsection{SFPRM}
+\label{sec:sfprm}
+
+SFPRM \citep{sfprm} keeps the state on $\mathcal S:=(\Sph^{d-1})^T$; the input $x\in\mathcal S$ is
+the token-wise normalized embedding. One iteration reads
+\begin{align}
+  \tilde z_i &= F_\theta(z_i;x) := f_\theta\big(\Slerp_\lambda(z_i,x)\big), \label{eq:sfprm-inject}\\
+  z_{i+1} &= \Slerp_{\eta_i}(z_i,\tilde z_i), \label{eq:sfprm-damp}
+\end{align}
+(geodesic injection and geodesic damping), and the solver halts when
+$\max_t 1-\ip{z_{i,t}}{\tilde z_{i,t}}<\tau_c$. The damping $\eta_i$ starts at $1$ and is decayed by a
+patience rule. The weight-tied network $f_\theta$ is a stack of $D$ nGPT layers, each consisting of
+\begin{align}
+  h &\leftarrow \Norm\big(h + \alpha_A\odot(\Norm(\Attn(h)) - h)\big),\label{eq:ngpt-attn}\\
+  h &\leftarrow \Norm\big(h + \alpha_M\odot(\Norm(\MLP(h)) - h)\big),\label{eq:ngpt-mlp}
+\end{align}
+with per-coordinate eigen learning rates $\alpha_A,\alpha_M\in\R^d$. Multi-head attention with
+QK-normalization has the form of an AKOrN coupling with state-dependent weights,
+\begin{equation}
+  \begin{split}
+  \Attn(h)_t &= \textstyle\sum_{s=1}^T J_{ts}(h)\,h_s,\\
+  J_{ts}(h) &:= \textstyle\sum_{k=1}^{H} a^{k}_{ts}(h)\,W_O^{k} W_V^{k},
+  \end{split}
+  \label{eq:attn-as-coupling}
+\end{equation}
+where $a^k_{ts}(h)$ are the softmax weights of head $k$.
+
+% ===========================================================================
+\section{Every Spherical Update Is a Tangent Step}
+\label{sec:lemmas}
+
+\begin{lemma}[Renormalized residual updates]
+\label{lem:renorm}
+Let $z\in\Sph^{n-1}$ and $w\in\R^n$ with $1+\ip{w}{z}>0$. Then
+\begin{equation}
+  \Ret(z+w) = \Ret\Big(z + \frac{1}{1+\ip{w}{z}}\,\Proj_z w\Big).
+\end{equation}
+\end{lemma}
+\begin{proof}
+By \eqref{eq:proj}, $z+w=(1+\ip{w}{z})\,z+\Proj_z w$, and $\Ret(\beta y)=\Ret(y)$ for $\beta>0$.
+\end{proof}
+
+\begin{lemma}[Slerp is a tangent step]
+\label{lem:slerp}
+Let $u,v\in\Sph^{n-1}$, $\theta=\angle(u,v)\in(0,\pi)$ and $\eta\in[0,1]$. Then
+$\Slerp_\eta(u,v)=\Exp_u(\eta\Log_u v)$, and if $\eta\theta<\pi/2$,
+\begin{equation}
+  \Slerp_\eta(u,v) = \Ret\big(u + \gamma_\eta(\theta)\,\Proj_u v\big),
+  \quad
+  \gamma_\eta(\theta) := \frac{\tan(\eta\theta)}{\sin\theta}.
+  \label{eq:gamma-eta}
+\end{equation}
+As $\theta\to0$, $\gamma_\eta(\theta)\to\eta$; at $\eta=1$, $\gamma_1(\theta)=1/\cos\theta$.
+\end{lemma}
+\begin{proof}
+Let $e:=\Proj_uv/\sin\theta$, a unit tangent vector, so $v=\cos\theta\,u+\sin\theta\,e$. In
+\eqref{eq:slerp} the coefficient of $u$ is
+$[\sin((1-\eta)\theta)+\sin(\eta\theta)\cos\theta]/\sin\theta=\cos(\eta\theta)$ and that of $e$ is
+$\sin(\eta\theta)$, so $\Slerp_\eta(u,v)=\cos(\eta\theta)u+\sin(\eta\theta)e=\Exp_u(\eta\Log_uv)$. If
+$\eta\theta<\pi/2$ then $\cos(\eta\theta)>0$, and dividing by it gives
+$\Ret(u+\tan(\eta\theta)\,e)=\Ret(u+\gamma_\eta(\theta)\Proj_uv)$.
+\end{proof}
+
+\begin{remark}[Only the angle differs]
+\label{rem:angle}
+All these updates move the state along the great circle through $z$ in a tangent direction and differ
+only in the angle: $\Ret(z+\gamma\Proj_zh)$ rotates by $\arctan(\gamma\norm{\Proj_zh})<\pi/2$,
+$\Slerp_\eta(z,v)$ by $\eta\angle(z,v)$, and $\Ret(z+w)$ by
+$\operatorname{atan2}(\norm{\Proj_zw},1+\ip{w}{z})$. The positivity conditions exclude exactly the
+rotations by $\pi/2$ or more, which the AKOrN form cannot produce with $\gamma>0$.
+\end{remark}
+
+% ===========================================================================
+\section{SFPRM Is an Operator-Split AKOrN}
+\label{sec:correspondence}
+
+\begin{definition}[Generalized AKOrN step]
+\label{def:gen-akorn}
+Given a step size $\gamma>0$ (possibly state-dependent), an antisymmetric $\Omega$ and a drive
+$D:\mathcal S\to(\R^d)^T$, define token-wise on $\mathcal S$
+\begin{equation}
+  \mathcal A_{\gamma,\Omega,D}(z) := \Ret\big(z + \gamma\,[\,\Omega z + \Proj_z D(z)\,]\big).
+\end{equation}
+AKOrN's update \eqref{eq:akorn-step} is the case $D(x)=c+Jx$ with constant $\gamma$, applied to
+oscillators of dimension $N$.
+\end{definition}
+
+\subsection{One Iteration Is Exactly One AKOrN Step}
+
+\begin{theorem}[Exact outer equivalence]
+\label{thm:outer}
+Let $\theta_{i,t}:=\angle(z_{i,t},\tilde z_{i,t})$ and assume $\eta_i\theta_{i,t}<\pi/2$ for all $t$.
+Then the SFPRM iteration \eqref{eq:sfprm-inject}--\eqref{eq:sfprm-damp} satisfies
+\begin{equation}
+  z_{i+1,t} = \Ret\big(z_{i,t} + \gamma_{i,t}\,\Proj_{z_{i,t}} F_\theta(z_i;x)_t\big),
+\end{equation}
+with $\gamma_{i,t}=\tan(\eta_i\theta_{i,t})/\sin\theta_{i,t}$ ($\gamma_{i,t}:=\eta_i$ if
+$\theta_{i,t}=0$). That is, $z_{i+1}=\mathcal A_{\gamma_i,0,F_\theta(\cdot;x)}(z_i)$: an AKOrN step
+with $\Omega=0$, one oscillator per token ($N=d$), drive $c+Jz:=F_\theta(z;x)$, and an
+angle-dependent step size.
+\end{theorem}
+\begin{proof}
+Apply \cref{lem:slerp} token-wise to \eqref{eq:sfprm-damp} with $u=z_{i,t}$, $v=\tilde z_{i,t}$.
+\end{proof}
+
+\begin{corollary}[Fixed points]
+\label{cor:fixed}
+For any positive step size, the fixed points of $\mathcal A_{\gamma,0,F_\theta}$ are the states with
+$F_\theta(z;x)_t=\pm z_t$ for all $t$. The fixed points of SFPRM are those with $F_\theta(z;x)=z$; the
+antipodal solutions are excluded because $\Slerp$ is undefined there. The step size (SFPRM's $\eta_i$
+or AKOrN's $\gamma$) never changes the solution set.
+\end{corollary}
+
+\subsection{Inside the Iteration, Every Operation Is an AKOrN Step}
+
+\begin{proposition}[Geodesic injection is the stimulus step]
+\label{prop:injection}
+Let $\theta^x_t:=\angle(z_t,x_t)$ and assume $\lambda\theta^x_t<\pi/2$ (automatic for $\lambda\le1/2$).
+Then $\Slerp_\lambda(z,x)_t=\Ret\big(z_t+\gamma_\lambda(\theta^x_t)\,\Proj_{z_t}x_t\big)$: an AKOrN
+step with stimulus $c=x$, no coupling, and $\Omega=0$.
+\end{proposition}
+\begin{proof}
+\cref{lem:slerp} with $u=z_t$, $v=x_t$, $\eta=\lambda$.
+\end{proof}
+
+\begin{proposition}[Injection is a Riemannian gradient step]
+\label{prop:injection-gradient}
+For $\theta^x_t\in(0,\pi)$, $\Slerp_\lambda(z,x)_t=\Exp_{z_t}\big(-\lambda\grad_{z_t}\Phi_x\big)$ with
+$\Phi_x(z):=\tfrac12\sum_t\angle(z_t,x_t)^2$.
+\end{proposition}
+\begin{proof}
+On the sphere, $\grad_z\tfrac12\angle(z,x)^2=-\Log_zx$ for $\angle(z,x)\in(0,\pi)$; combine with
+\cref{lem:slerp}.
+\end{proof}
+
+Thus SFPRM's stimulus is the gradient of a geodesic-distance potential, whereas AKOrN's stimulus term
+$\Proj_xc$ is the Riemannian gradient of the linear potential $-\ip{c}{x}$ in
+\eqref{eq:akorn-energy}. The anchor angle $\angle(z_t,x_t)$ analysed by \citet{sfprm} is the square
+root of twice this potential, token by token.
+
+\begin{proposition}[nGPT attention sub-layer is the coupling step]
+\label{prop:attention}
+Let $A_t:=\Attn(h)_t\neq0$, $\hat A_t:=A_t/\norm{A_t}$, and $\alpha_A=a\mathbf 1$ with
+$1+a(\ip{\hat A_t}{h_t}-1)>0$ (automatic for $a<1/2$). Then \eqref{eq:ngpt-attn} equals
+\begin{equation}
+  h_t \leftarrow \Ret\Big(h_t + \gamma^A_t\,\Proj_{h_t}\sum_s J_{ts}(h)\,h_s\Big),
+\end{equation}
+with $\gamma^A_t = a\,/\,\big(\norm{A_t}\,(1 + a(\ip{\hat A_t}{h_t}-1))\big)$: an AKOrN step with
+attention coupling, $c=0$ and $\Omega=0$.
+\end{proposition}
+
+For per-coordinate $\alpha_A\in\R^d$ the same holds with a diagonally preconditioned coupling and an
+additional self-drive $-\diag(\alpha_A)h_t$, whose tangent part is
+$-\grad\tfrac12h^\top\diag(\alpha_A)h$ and vanishes when $\alpha_A$ is constant
+(\cref{app:proofs}). The MLP sub-layer \eqref{eq:ngpt-mlp} is the same step with $\sum_sJ_{ts}h_s$
+replaced by the token-wise nonlinear drive $\MLP(h)_t$ (\cref{prop:mlp}). AKOrN has no counterpart
+inside a Kuramoto layer; its nonlinearity sits in the readout between blocks, which produces the next
+stimulus, so the MLP sub-layer acts as a state-dependent stimulus.
+
+\begin{theorem}[SFPRM iteration as operator-split AKOrN]
+\label{thm:splitting}
+Under the positivity conditions of \cref{thm:outer,prop:injection,prop:attention}, one SFPRM
+iteration is the composition
+\begin{equation}
+  \tilde z_i = \big(\mathcal M_D\circ\mathcal C_D\circ\cdots\circ\mathcal M_1\circ\mathcal C_1\circ\mathcal I\big)(z_i),
+\end{equation}
+followed by $z_{i+1}=\mathcal A_{\gamma_i,0,F_\theta(\cdot;x)}(z_i)$, where $\mathcal I$ is the
+stimulus step (\cref{prop:injection}), $\mathcal C_\ell$ the coupling step of layer $\ell$
+(\cref{prop:attention}) and $\mathcal M_\ell$ its self-drive step. Each factor is a generalized AKOrN
+step with $\Omega=0$ and $N=d$.
+\end{theorem}
+\begin{proof}
+Combine \cref{prop:injection,prop:attention,prop:mlp} for $F_\theta$ and \cref{thm:outer} for the
+damping step.
+\end{proof}
+
+AKOrN instead evaluates stimulus and coupling in one Euler step with the summed drive $c+Jx$. The
+next result shows that the two agree to first order.
+
+\subsection{Collapse to a Single AKOrN Euler Step}
+\label{sec:collapse}
+
+\begin{theorem}[First-order collapse]
+\label{thm:trotter}
+Use scalar eigen learning rates and let $\lambda=\varepsilon\kappa_0$,
+$\alpha^\ell_A=\varepsilon\kappa^\ell_A$, $\alpha^\ell_M=\varepsilon\kappa^\ell_M$, and fix
+$\eta\in(0,1]$. Let $z_t\neq\pm x_t$ and all attention and MLP outputs be nonzero. Then, as
+$\varepsilon\to0$,
+\begin{equation}
+  z_{i+1} = \Ret\big(z + \eta\varepsilon\,\Proj_z V(z)\big) + O(\varepsilon^2),
+\end{equation}
+where $V_t(z)=c_t+(Jz)_t+m_t(z)$ with stimulus, coupling and self-drive
+\begin{align}
+  c_t &= \kappa_0\,\tfrac{\theta^x_t}{\sin\theta^x_t}\,x_t,\\
+  (Jz)_t &= \textstyle\sum_{\ell=1}^D \frac{\kappa^\ell_A}{\norm{\Attn^\ell(z)_t}}\sum_s J^\ell_{ts}(z)\,z_s,\\
+  m_t(z) &= \textstyle\sum_{\ell=1}^D \kappa^\ell_M\,\MLP^\ell(z)_t/\norm{\MLP^\ell(z)_t}.
+\end{align}
+This is AKOrN's update \eqref{eq:akorn-step} with $\gamma=\eta\varepsilon$, $\Omega=0$, $N=d$,
+stimulus $c$, attention coupling $J$, and an additional nonlinear self-drive $m$.
+\end{theorem}
+
+The proof (\cref{app:proofs}) is a Lie--Trotter argument \citep{trotter1959}: every intermediate state
+is $z+O(\varepsilon)$, so evaluating all drives at $z$ costs $O(\varepsilon^2)$.
+
+\begin{remark}[Scope]
+\label{rem:scope}
+Trained SFPRM models do not operate in the small-step regime: the reported injection fractions are
+$\lambda\approx0.47$--$0.58$ (or $\lambda$ fixed at $0.1$ on Sudoku), and $\eta_i$ starts at $1$
+\citep{sfprm}. \Cref{thm:trotter} is therefore structural: it identifies \emph{which} AKOrN terms SFPRM
+contains. \Cref{thm:outer,thm:splitting} are exact for any step sizes satisfying the positivity
+conditions.
+% TODO: Verify the quoted lambda values against the final version of the SFPRM paper.
+\end{remark}
+
+\subsection{Linearization and the Damping Window}
+\label{sec:linearization}
+
+\begin{proposition}[Jacobian at a fixed point]
+\label{prop:linearization}
+Let $z^\star$ be a fixed point of $\mathcal A_{\gamma,\Omega,D}$ with $D$ differentiable and $\gamma$
+smooth and positive near $z^\star$. Let $\mu_t:=\ip{D(z^\star)_t}{z^\star_t}$, $J_D$ the Euclidean
+Jacobian of $D$ at $z^\star$, $\Proj$ the token-wise projection at $z^\star$, and
+$\operatorname{M}_\mu:=\diag(\mu_1\Id_d,\dots,\mu_T\Id_d)$. On $\tang_{z^\star}\mathcal S$,
+\begin{equation}
+  \mathrm{d}\mathcal A_{\gamma,\Omega,D}(z^\star) = \Id + \gamma\big(\Proj J_D \Proj - \operatorname{M}_\mu + \Proj\Omega\Proj\big).
+\end{equation}
+\end{proposition}
+
+\begin{corollary}[SFPRM's damping window is the AKOrN window]
+\label{cor:window}
+For SFPRM, $\Omega=0$, $D=F_\theta$ and $F_\theta(z^\star;x)=z^\star$, so $\mu_t=1$ and
+$\Proj J_F\Proj$ restricted to the tangent space is the tangent Jacobian $J$ of $F_\theta$. Since
+$\gamma_\eta(\theta)\to\eta$ as $\theta\to0$, both the $\Slerp$ step and its AKOrN form
+(\cref{thm:outer}) linearize to $(1-\eta)\Id+\eta J$. The window
+\begin{equation}
+  \eta<\min_{\zeta\in\sigma(J)} 2(1-\operatorname{Re}\zeta)/|\zeta-1|^2
+\end{equation}
+of \citet{sfprm} therefore applies verbatim to the AKOrN form with $\gamma$ in place of $\eta$.
+\end{corollary}
+
+Since $\Proj\Omega\Proj$ is skew-symmetric on the tangent space, a natural frequency adds a rotational
+component to $\mathrm d\mathcal A$ and pushes eigenvalues off the real axis. Modes with $\zeta-1$ close
+to imaginary narrow the damping window and slow down halting \citep{sfprm}, so any oscillatory
+extension must make the rotation end in locking (\cref{sec:oscillatory}).
+
+% ===========================================================================
+\section{Where the Models Differ}
+\label{sec:differences}
+
+\begin{table*}[t]
+  \caption{Differences between AKOrN and SFPRM beyond the shared update geometry.}
+  \label{tab:differences}
+  \vskip 0.1in
+  \begin{center}
+  \begin{small}
+  \begin{tabular}{@{}p{0.16\linewidth}p{0.38\linewidth}p{0.4\linewidth}@{}}
+    \toprule
+    & AKOrN & SFPRM \\
+    \midrule
+    Oscillator size & $N\in\{2,4\}$, many per position & $N=d$, one per token \\
+    Natural frequency & $\Omega\neq0$ (learned global $\omega$) & $\Omega=0$ \\
+    Drive & one coupling $J$ plus stimulus $c$, summed in one Euler step & deep nGPT block; injection, coupling and self-drive as sequential steps; eigen-LR preconditioning \\
+    Stimulus & linear potential $-\ip{c}{x}$, applied every step & geodesic potential $\tfrac12\angle(z,x)^2$ (\cref{prop:injection-gradient}), once per iteration \\
+    Step size & constant learned $\gamma$ & angle-dependent $\gamma_\eta(\theta)$; $\eta$ decayed by patience \\
+    Energy & Lyapunov for symmetric $J$, $\Omega=0$ & none in general ($F_\theta$ is not a gradient field); restored by the energy model of \cref{sec:energy} \\
+    Outer structure & $L$ blocks $\times$ $T$ steps, readout between blocks & one block looped to a fixed point, chordal halting \\
+    Readout & $\norm{Wx}+b$ per group, then MLP & linear $s_z h_\phi(z)$ with unnormalized rows \\
+    Initialization & clue cells at $x=c$, others random & random unit-norm \\
+    Training / inference & BPTT over $T$; larger $T$ and energy voting at test time & deep supervision with truncated BPTT; damped solve until halting \\
+    \bottomrule
+  \end{tabular}
+  \end{small}
+  \end{center}
+  \vskip -0.1in
+\end{table*}
+
+The equivalence holds at the level of the update rule; \cref{tab:differences} lists the remaining
+differences. The most consequential is the energy. In the small-step regime of \cref{thm:trotter} the
+drive is a Riemannian gradient field exactly when its coupling part is: the stimulus is
+$-\grad\Phi_x$ by \cref{prop:injection-gradient}, so
+\begin{equation}
+  E(z) = \kappa_0\Phi_x(z) - \tfrac12\textstyle\sum_{t,s}z_t^\top \bar J_{ts}\, z_s
+\end{equation}
+would be a Lyapunov function for a symmetric, state-independent $\bar J$ and no self-drive. Softmax
+attention is neither symmetric nor state-independent, so AKOrN's energy does not carry over; an
+energy-based attention block is required to recover it, which is what \cref{sec:energy} builds.
+
+\paragraph{SFPRM's theory in oscillator terms.} (i)~The obstruction to fixed-point existence cited by
+\citet{sfprm} (``rotating a circle moves every point'') is the $\Omega\neq0$ case; injection, the
+stimulus step of \cref{prop:injection}, pins the oscillators and restores existence. (ii)~Global
+convergence under strong injection is the strong-stimulus regime of a driven oscillator network, in
+which all oscillators lock to a unique state. (iii)~The anchor angle $\angle(z_t,x_t)$ is the phase lag
+of oscillator $t$ relative to its stimulus.
+
+% ===========================================================================
+\section{An Oscillatory Extension of SFPRM}
+\label{sec:oscillatory}
+
+The correspondence suggests a family that contains SFPRM as the case $\Omega=0$, $N=d$.
+
+\begin{definition}[Oscillatory SFPRM]
+\label{def:osc}
+Partition each token into $M=d/N$ groups, each an oscillator on $\Sph^{N-1}$, and let $\Omega$ be
+antisymmetric and block diagonal, with frequencies $\omega_{m,k}$ for the $N/2$ planes of oscillator
+$m$. Replace \eqref{eq:sfprm-damp} group-wise by
+\begin{equation}
+  z_{i+1} = \Exp_{z_i}\big(\eta_i\big[\Omega z_i + \Log_{z_i}\Ret(\tilde z_i)\big]\big),
+  \label{eq:osc-sfprm}
+\end{equation}
+where $\tilde z_i=F_\theta(z_i;x)$ and $\Ret(\tilde z_i)$ normalizes each group of the proposal. By
+\cref{lem:slerp}, $\Omega=0$ and $N=d$ recover \eqref{eq:sfprm-damp}.
+\end{definition}
+
+The fixed points satisfy $\Omega z+\Log_z\Ret(\tilde z)=0$ group-wise: the proposal must sit at an
+angle $\norm{\Omega z}$ behind the iterate (phase-lag locking). This condition does not depend on
+$\eta_i$, so the patience rule remains valid. At a locked state
+$1-\ip{z}{\tilde z}=1-\cos\norm{\Omega z}\neq0$, so the chordal residual never fires; the halting
+residual should be the tangent speed $\max_{t,m}\norm{\Omega z+\Log_z\Ret(\tilde z)}$.
+
+% NOTE: Proposition (absorption) is not in the source report; it was derived in follow-up analysis
+% of the report and is included because it qualifies the extension. Remove if not wanted.
+\begin{proposition}[A constant $\Omega$ is absorbed by the block]
+\label{prop:absorb}
+Fix the grouping and assume $\norm{\Omega z+\Log_z\Ret(\tilde z)}<\pi$ group-wise. With
+$F'_\theta(z;x):=\Exp_z\big(\Omega z+\Log_z\Ret(F_\theta(z;x))\big)$, the update
+\eqref{eq:osc-sfprm} equals $\Slerp_{\eta_i}\big(z_i,F'_\theta(z_i;x)\big)$ for every
+$\eta_i\in(0,1]$.
+\end{proposition}
+\begin{proof}
+$\Log_z\Exp_z(v)=v$ for tangent $v$ with $\norm{v}<\pi$, so $\Log_zF'_\theta=\Omega z+\Log_z\Ret(F_\theta)$;
+apply $\Slerp_\eta(z,v)=\Exp_z(\eta\Log_zv)$ from \cref{lem:slerp}.
+\end{proof}
+
+A constant natural frequency is therefore a reparametrization of the block rather than a new solver.
+What cannot be absorbed is a change of the state space (the group size $N$) or anything that varies
+across iterations, such as an annealed frequency.
+
+\begin{proposition}[Locking condition for a frozen drive]
+\label{prop:adler}
+Let $N$ be even and $\Omega$ antisymmetric with rotation planes $k=1,\dots,N/2$ and frequencies
+$\omega_k>0$. For a fixed drive $h\in\R^N$ with plane components $h_k$, the step
+$x\mapsto\Ret(x+\gamma[\Omega x+\Proj_x h])$ has a fixed point on $\Sph^{N-1}$ if and only if
+\begin{equation}
+  \textstyle\sum_{k=1}^{N/2}\norm{h_k}^2/\omega_k^2\;\ge\;1.
+  \label{eq:adler}
+\end{equation}
+For $N=2$ this is the Adler condition $\norm{h}\ge\omega$ \citep{adler1946locking}.
+\end{proposition}
+
+In a network the drive depends on the state, so \eqref{eq:adler} is a mean-field condition per
+oscillator. It nevertheless gives a reading of the halting rule: an oscillator is locked when its
+drive $\norm{h_k}$ outweighs its frequency $\omega_k$. Near the boundary of \eqref{eq:adler} the
+relaxation rate tends to zero (for $N=2$ it equals $\sqrt{\norm{h}^2-\omega^2}$), so the number of
+iterations to halt grows. Truncated-BPTT gradients degrade there as well, which motivates a margin
+penalty on \eqref{eq:adler} at the final state. Whether the extension improves trained reasoners is
+untested.
+
+
+\input{energy}
+
+% ===========================================================================
+\section{Numerical Verification}
+\label{sec:numerics}
+
+
+
+We checked every identity in double precision on random instances with unit states and inputs, random
+weights, and multi-head attention with QK-normalization for \cref{prop:attention}
+(\cref{tab:numerics}; setup in \cref{app:numerics}). The exact identities hold to machine precision.
+The error of \cref{thm:trotter} falls by a factor of $100$ for every factor-$10$ decrease of
+$\varepsilon$, as predicted for $O(\varepsilon^2)$. The Jacobian of \cref{prop:linearization} matches
+central finite differences to $10^{-10}$, the accuracy of the differencing.
+The energy statements of \cref{sec:energy} were checked in the same way (\cref{app:energy-numerics}).
+The closed-form gradient of \cref{prop:energy-gradient} matches automatic differentiation of
+\eqref{eq:energy}, the coupling is exactly symmetric, and at a stationary point the Jacobian of
+$F_E$ equals $\Id-\operatorname{Hess}E$ with a symmetric Hessian and a purely real spectrum,
+whereas a random SFPRM map at a fixed point has a Jacobian with relative asymmetry $0.20$ and
+$84\%$ of its eigenvalues off the real axis. The energy never increased in $4{,}000$ gradient
+steps at $\eta\in\{0.5,1,1.9\}/\hat L$, with $\hat L$ the largest Hessian eigenvalue found along
+descent trajectories, the descent inequality of \cref{thm:lyapunov}(i) held at every step, and
+at $\eta=3/\hat L$, outside the window, $54\%$ of the steps increased the energy; the implicit gradient
+\eqref{eq:implicit} matches finite differences, conjugate gradient needs $11$ Hessian-vector
+products where the Neumann series of truncated BPTT needs $81$ at condition number $6.5$, and the
+equilibrium-propagation estimate \eqref{eq:ep} converges with the predicted $O(\beta^2)$ error.
+
+% ===========================================================================
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+The correspondence places SFPRM inside the oscillator family as its zero-frequency, single-oscillator,
+operator-split member, and places AKOrN's Euler step inside SFPRM's analysis: the existence result,
+the damping window and the halting test transfer to the AKOrN form, while the energy and the locking
+picture describe what SFPRM's injection does. Several limitations apply. First, the equivalence is a
+statement about update rules; readouts, initialization and training differ (\cref{tab:differences}),
+so it makes no claim that the two models learn the same functions. Second, the single-step collapse
+holds only for small step sizes, which trained SFPRM models do not use (\cref{rem:scope}). Third, the
+oscillatory extension and the locking-margin penalty are proposals: we report no experiments on
+trained models, and \cref{prop:absorb} shows that a constant frequency alone cannot add expressivity.
+Fourth, the verification uses random instances rather than trained weights. Fifth, the energy-based
+SFPRM trades expressivity for guarantees: its attention is a conservative field with tied value
+matrices and its MLP a tied-weight memory. The pilot studies of \cref{sec:energy-pilot,sec:energy-memory}
+are small and single-seeded, on small Sudoku grids where test grids can coincide with training
+grids; they show that the codebook variant can match SFPRM and that its energy can rank solutions,
+but not that this holds at scale. The learned energies are stiff, so halting remains slower than in
+SFPRM, and the $\beta$ schedule voids the descent guarantee during its first iterations. Testing the non-absorbable oscillatory variants and the energy model on
+reasoning benchmarks at scale, with conjugate-gradient implicit training and energy voting, is the
+natural next step.
+
+% ===========================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+We showed that every update in SFPRM is an AKOrN Euler step with zero natural frequency: exactly at
+the level of one iteration, exactly for injection and attention inside it, and to first order for the
+iteration as a single step. The two forms share their fixed points and linearization, so SFPRM's
+damping window applies to the AKOrN form. The correspondence reads SFPRM's guarantees as oscillator
+locking, identifies the absence of an energy function as the main structural difference, and yields
+an oscillatory extension with an explicit locking condition, in which a constant frequency reduces to
+a reparametrization of the block. Closing the structural gap from the other side, an energy-based
+SFPRM makes the recurrent map a gradient step on an explicit energy and thereby gains a Lyapunov
+function, a halting bound, a real spectrum at halted states, energy-based voting and equilibrium
+propagation. With a codebook memory tied to the readout and an annealed concentration, the learned
+energy ranks solutions well enough that energy voting matches the oracle in our pilot.
+
+% ===========================================================================
+% Acknowledgements are omitted in the blind submission.
+
+\section*{Impact Statement}
+
+This paper presents work whose goal is to advance the field of Machine Learning. There are many
+potential societal consequences of our work, none which we feel must be specifically highlighted here.
+
+\bibliography{references}
+\bibliographystyle{icml2026}
+
+% ===========================================================================
+\newpage
+\appendix
+\onecolumn
+\input{appendix}
+\input{appendix_energy}
+
+\end{document}

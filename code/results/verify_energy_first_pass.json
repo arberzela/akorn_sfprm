@@ -1,0 +1,60 @@
+{
+ "drive_identity": 4.440892098500626e-16,
+ "drive_identity_hidden": 4.440892098500626e-16,
+ "coupling_symmetry": 0.0,
+ "coupling_drive": 8.326672684688674e-17,
+ "stationary_gradnorm": 9.641579502558558e-15,
+ "stationary_iters": 765,
+ "jacobian_equals_I_minus_Hess": 4.0245584642661925e-16,
+ "jacobian_asymmetry": 8.153200337090993e-17,
+ "jacobian_max_imag": 0.0,
+ "hessian_min_eig": 0.21389744048491877,
+ "hessian_max_eig": 1.90318344300452,
+ "jacobian_vs_finite_diff": 7.585810473699495e-11,
+ "sfprm_fixed_point_resid": 0.0,
+ "sfprm_jacobian_asymmetry": 0.19702523929708854,
+ "sfprm_complex_fraction": 0.8444444444444444,
+ "sfprm_max_imag": 0.18819361590705075,
+ "L_estimate": 2.2259386289075245,
+ "descent": {
+  "eta=0.5/L": {
+   "increase_frac": 0.0,
+   "max_violation_of_bound": -2.078458322607446e-05
+  },
+  "eta=1.0/L": {
+   "increase_frac": 0.0,
+   "max_violation_of_bound": -6.980602762496346e-08
+  },
+  "eta=1.9/L": {
+   "increase_frac": 0.589,
+   "max_violation_of_bound": 1.4304619308187285
+  },
+  "eta=3.0/L": {
+   "increase_frac": 0.5475,
+   "max_violation_of_bound": -0.5238349611815583
+  }
+ },
+ "implicit": {
+  "condition_number": 6.497407425158828,
+  "cg_iters_1e-6": 11,
+  "neumann_iters_1e-6": 81,
+  "cg_iters_1e-3": 7,
+  "neumann_iters_1e-3": 40,
+  "adjoint_vs_finite_diff": 1.7419907645076219e-09
+ },
+ "equilibrium_propagation": {
+  "beta=0.1": {
+   "one_sided_rel_err": 2.4810370934138812,
+   "centered_rel_err": 0.0503385535790811
+  },
+  "beta=0.01": {
+   "one_sided_rel_err": 0.3393380146747175,
+   "centered_rel_err": 0.001046323264467713
+  },
+  "beta=0.001": {
+   "one_sided_rel_err": 0.03419071194577398,
+   "centered_rel_err": 1.0618796524741683e-05
+  }
+ },
+ "reference_grad": 1.0334988364890663
+}

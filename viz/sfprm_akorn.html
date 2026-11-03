@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SFPRM–AKOrN Correspondence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;600&family=STIX+Two+Text:ital@0;1&display=swap">
+<style>
+/* Layout: one reading column (~68ch) with figures that widen to 960px; each section = prose + live figure + readout. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --ink: #161a22; --ink-2: #4b5263; --muted: #7b8292; --rule: #dde1e8;
+  --accent: #3346a8;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --good: #0ca30c; --bad: #d03b3b;
+  --heat-lo: #f3f6fb; --heat-hi: #0d366b;
+  --f-text: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --f-ui: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --surface: #1a1e26; --ink: #eceef2; --ink-2: #b9bfcc; --muted: #8a91a0; --rule: #2c323d;
+    --accent: #9aa8ff; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --heat-lo: #1a1e26; --heat-hi: #9ec5f4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --surface: #1a1e26; --ink: #eceef2; --ink-2: #b9bfcc; --muted: #8a91a0; --rule: #2c323d;
+  --accent: #9aa8ff; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --heat-lo: #1a1e26; --heat-hi: #9ec5f4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--f-text); padding-inline: 16px; padding-block: 0 64px; }
+main { max-width: 960px; margin: 0 auto; }
+.prose { max-width: 68ch; }
+header { padding-block: 48px 8px; border-bottom: 1px solid var(--rule); margin-bottom: 8px; }
+.eyebrow { font: 600 12px/1.2 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 10px 0 14px; text-wrap: balance; }
+h2 { font-weight: 600; font-size: 26px; line-height: 1.2; margin: 56px 0 10px; text-wrap: balance; }
+h3 { font: 600 15px/1.3 var(--f-ui); letter-spacing: .02em; margin: 28px 0 6px; color: var(--ink-2); }
+p { margin: 0 0 14px; }
+.lede { font-size: 19px; color: var(--ink-2); }
+.m { font-family: var(--f-math); font-style: italic; white-space: nowrap; }
+.m .u { font-style: normal; }
+.eq { font-family: var(--f-math); font-size: 19px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 16px; margin: 8px 0 16px; overflow-x: auto; }
+.eq .tag { font: 600 12px/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; font-style: normal; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.pair > * { min-width: 0; }
+figure { margin: 18px 0 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; }
+figcaption { font: 14px/1.45 var(--f-ui); color: var(--ink-2); margin-top: 10px; max-width: 80ch; }
+.fig-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .fig-grid { grid-template-columns: 1fr; } }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+.controls { display: grid; gap: 12px; font: 14px/1.3 var(--f-ui); }
+.ctl label { display: flex; justify-content: space-between; color: var(--ink-2); margin-bottom: 4px; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+input[type=checkbox] { accent-color: var(--accent); }
+.readout { font: 14px/1.5 var(--f-ui); border-top: 1px solid var(--rule); padding-top: 10px; display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-variant-numeric: tabular-nums; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; text-align: right; }
+.note { font: 13px/1.45 var(--f-ui); color: var(--muted); }
+.warn { font: 13px/1.45 var(--f-ui); color: var(--bad); min-height: 1.45em; }
+button { font: 600 14px/1 var(--f-ui); color: var(--surface); background: var(--accent); border: 0; border-radius: 5px; padding: 9px 14px; cursor: pointer; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 13px/1.3 var(--f-ui); color: var(--ink-2); margin-top: 8px; }
+.sw { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.sw.dash { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 8px) !important; height: 2px; }
+.pipeline { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; font: 14px/1.35 var(--f-ui); margin: 14px 0; }
+.stage { flex: 1 1 150px; min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; position: relative; }
+.stage b { display: block; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+.stage .akorn { color: var(--ink-2); }
+.stage .m { white-space: normal; }
+.stage.c1 { border-top: 3px solid var(--s1); } .stage.c2 { border-top: 3px solid var(--s2); } .stage.c3 { border-top: 3px solid var(--s3); } .stage.c4 { border-top: 3px solid var(--ink); }
+.tablewrap { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font: 14px/1.45 var(--f-ui); min-width: 560px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+td.k { color: var(--ink-2); white-space: nowrap; }
+td .badge { font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap; }
+.torus-wrap { position: relative; }
+canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+.status { font: 13px/1.5 var(--f-ui); display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 4px 10px; font-variant-numeric: tabular-nums; }
+.st-ok { color: var(--good); } .st-bad { color: var(--bad); } .st-run { color: var(--muted); }
+.tip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); color: var(--ink); font: 13px/1.35 var(--f-ui); padding: 6px 8px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.svgtext { font-family: var(--f-ui); font-size: 12px; fill: var(--ink-2); }
+.svgmath { font-family: var(--f-math); font-style: italic; font-size: 15px; fill: var(--ink); }
+footer { margin-top: 56px; border-top: 1px solid var(--rule); padding-top: 14px; font: 13px/1.5 var(--f-ui); color: var(--muted); }
+.radio { display: flex; gap: 16px; flex-wrap: wrap; font: 14px/1.3 var(--f-ui); color: var(--ink-2); }
+.radio label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+input[type=radio] { accent-color: var(--accent); }
+button:disabled { opacity: .6; cursor: progress; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Fixed-point reasoning on the sphere</div>
+  <h1>SFPRM is an AKOrN with zero natural frequency</h1>
+  <p class="lede prose">Every operation in an SFPRM iteration (geodesic injection, nGPT sub-layers, geodesic damping) moves a unit vector along a great circle toward a tangent direction. That is exactly the Kuramoto update used by AKOrN. This page starts with the basic concepts, then shows the identity, how one iteration splits into AKOrN steps, and an earlier proposal built on small oscillators with random restarts. The last section shows the new method: an energy-based SFPRM whose iterations are gradient steps on an explicit energy with a codebook memory, with toy demos and the measured results.</p>
+</header>
+
+<section id="basics">
+  <h2>Basics, interactively</h2>
+  <p class="prose">Four ideas carry the rest of the page: splitting a vector into radial and tangential parts, oscillators that synchronize, an oscillator that locks to a drive, and damping as a way to tame rotating modes. Each figure matches a subsection of Section 2 in the LaTeX note.</p>
+
+  <h3>1 · Radial and tangential parts, and why normalization only sees the tangent</h3>
+  <p class="prose">Any update <span class="m">v</span> at a point <span class="m">z</span> splits into <span class="m">⟨v,z⟩z</span> (radial) and <span class="m">P<sub>z</sub>v</span> (tangential). After normalizing, only the direction of <span class="m">z + v</span> survives, so the radial part just rescales the tangential step (Lemma A). The normalization step and the exponential map move along the same great circle, by <span class="m">arctan‖P<sub>z</sub>v‖</span> and <span class="m">‖P<sub>z</sub>v‖</span> respectively.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bProj" viewBox="-160 -170 440 300" role="img" aria-label="A vector at z split into radial and tangential parts, and its normalization"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="vDir">Direction of v <output id="vDirv"></output></label><input id="vDir" type="range" min="0" max="359" value="20"></div>
+        <div class="ctl"><label for="vLen">Length of v <output id="vLenv"></output></label><input id="vLen" type="range" min="0" max="250" value="110"></div>
+        <dl class="readout" id="bProjRead"></dl>
+        <div class="warn" id="bProjWarn"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--ink-2)"></span>update v</span>
+      <span><span class="sw" style="background:var(--s3)"></span>radial part ⟨v,z⟩z</span>
+      <span><span class="sw" style="background:var(--s2)"></span>tangential part P<sub>z</sub>v</span>
+      <span><span class="sw" style="background:var(--s1)"></span>Exp<sub>z</sub>(P<sub>z</sub>v)</span>
+    </div>
+    <figcaption>The orange ring is Π(z + v). The orange dot on the tangent line is z + P<sub>z</sub>v / (1 + ⟨v,z⟩); it lies on the same ray, which is Lemma A. When 1 + ⟨v,z⟩ ≤ 0 the update lands in the far hemisphere and no tangent step reproduces it.</figcaption>
+  </figure>
+
+  <h3>2 · The Kuramoto model: coupling against frequency spread</h3>
+  <p class="prose">Forty phase oscillators with natural frequencies drawn from a normal distribution of width <span class="m">σ</span>, all coupled with strength <span class="m">K</span>: <span class="m">θ̇<sub>i</sub> = ω<sub>i</sub> + (K/n) Σ<sub>j</sub> sin(θ<sub>j</sub> − θ<sub>i</sub>)</span>. Below a critical coupling (about <span class="m">1.6σ</span> for this distribution) the phases stay spread out. Above it, a synchronized cluster forms and the order parameter <span class="m">r</span> rises toward 1.</p>
+  <figure>
+    <div class="fig-grid">
+      <div><canvas id="bKura" width="560" height="560" aria-label="Kuramoto oscillators on a circle"></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="kK">Coupling K <output id="kKv"></output></label><input id="kK" type="range" min="0" max="300" value="160"></div>
+        <div class="ctl"><label for="kS">Frequency spread σ <output id="kSv"></output></label><input id="kS" type="range" min="0" max="150" value="60"></div>
+        <div class="btns"><button id="kReset" type="button" class="ghost">Random phases</button></div>
+        <svg id="bKuraR" viewBox="0 0 300 120" role="img" aria-label="Order parameter over time"></svg>
+        <dl class="readout" id="bKuraRead"></dl>
+      </div>
+    </div>
+    <figcaption>Dots are oscillators on the unit circle; the orange arrow is the order parameter r·e<sup>iψ</sup>, the mean of all unit vectors. In AKOrN each dot becomes a unit vector in N dimensions, the coupling becomes a learned matrix J, and frequencies become rotation matrices Ω.</figcaption>
+  </figure>
+
+  <h3>3 · Locking to a drive (the Adler condition)</h3>
+  <p class="prose">A single oscillator with natural frequency <span class="m">ω</span> pulled by a fixed drive <span class="m">h</span>: <span class="m">θ̇ = ω − ‖h‖ sin(θ − φ<sub>h</sub>)</span>. If the drive beats the frequency, the oscillator locks at a constant lag behind <span class="m">h</span>, which is a fixed point. Otherwise it keeps slipping round. This is the stimulus term of AKOrN and the injection of SFPRM, and it is the condition the oscillatory extension of SFPRM has to satisfy to halt.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bAdler" viewBox="-150 -140 300 280" role="img" aria-label="Single oscillator locking to or slipping past a drive"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="aW">Natural frequency ω <output id="aWv"></output></label><input id="aW" type="range" min="0" max="200" value="80"></div>
+        <div class="ctl"><label for="aH">Drive strength ‖h‖ <output id="aHv"></output></label><input id="aH" type="range" min="0" max="200" value="110"></div>
+        <dl class="readout" id="bAdlerRead"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>drive h</span>
+      <span><span class="sw" style="background:var(--s2)"></span>oscillator</span>
+    </div>
+    <figcaption>Near the boundary ‖h‖ ≈ ω the oscillator takes longer and longer to settle (relaxation rate √(‖h‖² − ω²)), which is why iterations-to-halt grow with difficulty.</figcaption>
+  </figure>
+
+  <h3>4 · Damping a fixed-point iteration</h3>
+  <p class="prose">Near a fixed point, the error follows the Jacobian: each eigenvalue <span class="m">ζ</span> multiplies its mode every step. Damping with step <span class="m">η</span> replaces <span class="m">ζ</span> by <span class="m">1 + η(ζ − 1)</span>, a point on the segment from 1 to <span class="m">ζ</span>. The mode decays if that point is inside the unit circle. Rotating modes (large imaginary part) need small η; modes with <span class="m">Re ζ ≥ 1</span> cannot be rescued.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bDamp" viewBox="-170 -150 340 300" role="img" aria-label="Complex plane with eigenvalue, damped eigenvalue and the unit circle"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="dRe">Re ζ <output id="dRev"></output></label><input id="dRe" type="range" min="-150" max="150" value="-13"></div>
+        <div class="ctl"><label for="dIm">Im ζ <output id="dImv"></output></label><input id="dIm" type="range" min="-150" max="150" value="103"></div>
+        <div class="ctl"><label for="dEta">Damping η <output id="dEtav"></output></label><input id="dEta" type="range" min="0" max="100" value="100"></div>
+        <dl class="readout" id="bDampRead"></dl>
+        <svg id="bDampErr" viewBox="0 0 300 130" role="img" aria-label="Error magnitude over iterations, damped versus undamped"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s2)"></span>eigenvalue ζ (undamped, ring)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>damped 1 + η(ζ − 1)</span>
+      <span><span class="sw" style="background:var(--good)"></span>stable window for η</span>
+    </div>
+    <figcaption>The default ζ ≈ −0.13 + 1.03i is the dominant mode that the GFPR paper measured at FPRM's halt on a Sudoku puzzle: an almost pure rotation, stable only for η &lt; 0.97. SFPRM's patience rule shrinks η until the damped point enters the circle.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The two update rules</h2>
+  <div class="pair">
+    <div class="eq"><span class="tag">AKOrN step (oscillators on S<sup>N−1</sup>)</span>
+      x<sub>i</sub> ← Π( x<sub>i</sub> + γ [ Ω<sub>i</sub>x<sub>i</sub> + P<sub>x<sub>i</sub></sub>( c<sub>i</sub> + Σ<sub>j</sub> J<sub>ij</sub>x<sub>j</sub> ) ] )
+    </div>
+    <div class="eq"><span class="tag">SFPRM iteration (tokens on S<sup>d−1</sup>)</span>
+      z̃ = f<sub>θ</sub>( Slerp<sub>λ</sub>(z, x) ),&nbsp;&nbsp; z ← Slerp<sub>η</sub>(z, z̃)
+    </div>
+  </div>
+  <p class="prose">Here <span class="m">Π(y) = y/‖y‖</span>, <span class="m">P<sub>z</sub>v = v − ⟨v,z⟩z</span> projects onto the tangent space, <span class="m">Ω</span> is antisymmetric (the natural frequency), <span class="m">J</span> the coupling and <span class="m">c</span> the stimulus. Two lemmas connect them:</p>
+  <div class="pair">
+    <div class="eq"><span class="tag">Lemma A · renormalized residual step</span>
+      Π(z + w) = Π( z + P<sub>z</sub>w / (1 + ⟨w,z⟩) )
+    </div>
+    <div class="eq"><span class="tag">Lemma B · Slerp</span>
+      Slerp<sub>η</sub>(u,v) = Exp<sub>u</sub>(η Log<sub>u</sub>v) = Π( u + <span style="white-space:nowrap">tan(ηθ)/sin θ</span> · P<sub>u</sub>v )
+    </div>
+  </div>
+  <p class="prose">Applied to the damping step, Lemma B gives the exact statement: one SFPRM iteration is <span class="m">z ← Π(z + γ P<sub>z</sub>F<sub>θ</sub>(z;x))</span> with <span class="m">γ = tan(ηθ)/sin θ</span>. That is an AKOrN step with <span class="m">Ω = 0</span>, one oscillator per token (<span class="m">N = d</span>), and the whole recurrent map as its drive.</p>
+</section>
+
+<section>
+  <h2>One step, two forms</h2>
+  <p class="prose">Everything happens in the plane spanned by the state <span class="m">z</span> and the proposal <span class="m">z̃</span>, so a circle shows the whole construction. Slerp rotates <span class="m">z</span> by <span class="m">ηθ</span>. The AKOrN form walks along the tangent line by <span class="m">γ P<sub>z</sub>z̃</span> and renormalizes. Both land on the same point. Only the step size differs between update rules; nGPT-style lerp-then-normalize lands elsewhere on the same arc, with its own <span class="m">γ</span>.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="circ" viewBox="-150 -150 440 290" role="img" aria-label="Unit circle showing Slerp and the AKOrN tangent step landing at the same point"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="th">Angle to proposal θ <output id="thv"></output></label><input id="th" type="range" min="2" max="178" value="70"></div>
+        <div class="ctl"><label for="eta">Damping η <output id="etav"></output></label><input id="eta" type="range" min="0" max="100" value="60"></div>
+        <label style="display:flex;gap:8px;align-items:center;color:var(--ink-2)"><input id="lerp" type="checkbox" checked> Show nGPT-style lerp, then normalize</label>
+        <dl class="readout" id="circRead"></dl>
+        <div class="warn" id="circWarn"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>Slerp<sub>η</sub>(z, z̃)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>AKOrN step Π(z + γ P<sub>z</sub>z̃)</span>
+      <span><span class="sw dash" style="color:var(--s3)"></span>lerp, then normalize</span>
+    </div>
+    <figcaption>The two markers on the circle coincide for every θ and η with ηθ &lt; 90°. Beyond that, no positive γ reaches the Slerp point: an AKOrN-form step always rotates by less than 90°. The difference readout is computed with the full formulas, not from the drawing.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Inside one iteration: operator-split AKOrN</h2>
+  <p class="prose">Lemma A applies to every nGPT sub-layer and Lemma B to the injection, so each stage of the recurrent map is its own AKOrN step, with its own drive.</p>
+  <div class="pipeline" aria-label="SFPRM iteration as a chain of AKOrN steps">
+    <div class="stage c1"><b>Injection</b><span class="m">Slerp<sub>λ</sub>(z, x)</span><div class="akorn">AKOrN stimulus step, <span class="m">c = x</span>. Also a Riemannian gradient step on ½∠(z,x)².</div></div>
+    <div class="stage c2"><b>Attention</b><span class="m">Norm(h + α<sub>A</sub>⊙(Norm(Attn h) − h))</span><div class="akorn">AKOrN coupling step, <span class="m">J<sub>ts</sub> = Σ<sub>k</sub>a<sup>k</sup><sub>ts</sub>W<sub>O</sub>W<sub>V</sub></span>.</div></div>
+    <div class="stage c3"><b>MLP</b><span class="m">Norm(h + α<sub>M</sub>⊙(Norm(MLP h) − h))</span><div class="akorn">AKOrN step with a nonlinear self-drive.</div></div>
+    <div class="stage c4"><b>Damping</b><span class="m">Slerp<sub>η</sub>(z, z̃)</span><div class="akorn">AKOrN step whose drive is the whole proposal <span class="m">F<sub>θ</sub>(z;x)</span>.</div></div>
+  </div>
+  <p class="prose">AKOrN sums stimulus and coupling into one Euler step. SFPRM applies them one after another. When the step sizes are small (<span class="m">λ, α = O(ε)</span>), the sequence collapses to a single AKOrN step with drive <span class="m">c + Jz + m(z)</span>, with an error of order <span class="m">ε²</span>. The figure below runs a toy SFPRM (3 tokens on S², one random nGPT layer) and draws both paths in the tangent plane at <span class="m">z</span>. In this gnomonic view every great circle is a straight line, so each AKOrN step from <span class="m">z</span> is a straight arrow and the single collapsed step is the vector sum of the three drives.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="gno" viewBox="0 0 460 320" role="img" aria-label="Split SFPRM path versus single collapsed AKOrN step in the tangent plane"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="eps">Step scale ε <output id="epsv"></output></label><input id="eps" type="range" min="0" max="100" value="70"></div>
+        <div class="ctl"><label for="eta2">Damping η <output id="eta2v"></output></label><input id="eta2" type="range" min="10" max="100" value="100"></div>
+        <dl class="readout" id="gnoRead"></dl>
+        <svg id="errplot" viewBox="0 0 300 190" role="img" aria-label="Log-log plot of split versus collapsed error against epsilon"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>injection (stimulus)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>attention (coupling)</span>
+      <span><span class="sw" style="background:var(--s3)"></span>MLP (self-drive)</span>
+      <span><span class="sw" style="background:var(--ink)"></span>damping → next state</span>
+      <span><span class="sw dash" style="color:var(--ink-2)"></span>single AKOrN step, drives summed</span>
+    </div>
+    <figcaption>Solid: the actual SFPRM stages for token 1. Dashed: the three drives evaluated at <span class="m">z</span> and added head to tail, then scaled by η. The view is rescaled by 1/ε so the picture keeps its size. As ε shrinks the two endpoints meet; the log-log inset shows the gap falling with slope 2.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Dictionary</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Ingredient</th><th>AKOrN</th><th>SFPRM</th><th>Relation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Update</td><td>Π(x + γ[Ωx + P<sub>x</sub>(c + Jx)])</td><td>Slerp<sub>η</sub>(z, F<sub>θ</sub>(z;x))</td><td><span class="badge">exact</span> with Ω = 0, γ = tan(ηθ)/sin θ</td></tr>
+      <tr><td class="k">Oscillator size</td><td>N = 2 or 4, many per position</td><td>N = d, one per token</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Natural frequency</td><td>Ω ≠ 0 (learned global ω)</td><td>Ω = 0</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Stimulus</td><td>c, linear potential −⟨c,x⟩</td><td>Slerp<sub>λ</sub>(z,x), potential ½∠(z,x)²</td><td><span class="badge">exact</span> stimulus step</td></tr>
+      <tr><td class="k">Coupling</td><td>Σ<sub>j</sub>J<sub>ij</sub>x<sub>j</sub> (conv or attention)</td><td>nGPT attention sub-layer</td><td><span class="badge">exact</span> coupling step</td></tr>
+      <tr><td class="k">Combination</td><td>summed in one Euler step</td><td>sequential stages</td><td><span class="badge">O(ε²)</span> Lie–Trotter</td></tr>
+      <tr><td class="k">Fixed points</td><td>P<sub>z</sub>(c + Jz) = 0</td><td>F<sub>θ</sub>(z;x) = z</td><td><span class="badge">exact</span> up to antipodes</td></tr>
+      <tr><td class="k">Linearization</td><td>I + γ(J<sub>T</sub> − I)</td><td>(1 − η)I + ηJ</td><td><span class="badge">exact</span> same damping window</td></tr>
+      <tr><td class="k">Energy</td><td>Lyapunov for symmetric J, Ω = 0</td><td>none (F<sub>θ</sub> is not a gradient field); the energy-based SFPRM below has one</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Halting</td><td>fixed T, energy voting</td><td>chordal residual &lt; τ<sub>c</sub></td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Anchor angle</td><td>phase lag to stimulus</td><td>∠(z<sub>t</sub>, x<sub>t</sub>), predicts correctness</td><td><span class="badge">same quantity</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="prose note">A constant Ω adds nothing new: oscillatory SFPRM with block F equals vanilla SFPRM with block F′(z) = Exp<sub>z</sub>(Ωz + Log<sub>z</sub>F(z)), for every η. What cannot be folded into the block is a change of state space or anything that varies across iterations, which is what the proposal below uses.</p>
+</section>
+
+<section>
+  <h2>Earlier proposal: small oscillators with random restarts</h2>
+  <p class="prose">Split each token into <span class="m">M = d/N</span> small oscillators on <span class="m">S<sup>N−1</sup></span>, keep the nGPT block unchanged, and add EqR-style random initialization, path noise and restarts. The halt doubles as a certificate, since 99.7–100% of halted Sudoku puzzles are solved in the SFPRM experiments.</p>
+  <div class="eq"><span class="tag">Update, per oscillator group</span>
+    z ← Exp<sub>z</sub>( η<sub>i</sub> Log<sub>z</sub> Π(z̃) + β<sub>i</sub> ξ ),&nbsp;&nbsp; ξ ~ N(0, P<sub>z</sub>),&nbsp;&nbsp; β<sub>i</sub> = β<sub>0</sub>η<sub>i</sub>/η<sub>0</sub>,&nbsp;&nbsp; z<sub>0</sub> ~ Uniform(S<sup>N−1</sup>)
+  </div>
+  <p class="prose">With β₀ = 0 and N = d this is exactly SFPRM. Tying the noise to the damping means the patience rule anneals both together. Run B restarts, accept the first that halts, and fall back to the lowest residual or anchor angle.</p>
+
+  <h3>Why small oscillators: random starts are not random on a big sphere</h3>
+  <p class="prose">On S<sup>511</sup> a random state sits at 90° ± 2.5° from any fixed input vector, so every restart starts at the same anchor angle, which is the quantity injection acts on. Per group of size N the starting angle is spread out.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="hist" viewBox="0 0 460 318" role="img" aria-label="Histograms of the angle between a random initial state and the input"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="nsel">Oscillator dimension N <output id="nselv"></output></label><input id="nsel" type="range" min="0" max="7" value="0"></div>
+        <dl class="readout" id="histRead"></dl>
+        <p class="note">6,000 random unit vectors per panel. The top panel is fixed at N = d = 512.</p>
+      </div>
+    </div>
+    <figcaption>Prediction to test on the trained model: the spread between restart end states (the SFPRM uniqueness figure) grows as N shrinks, and accuracy gains more from extra restarts.</figcaption>
+  </figure>
+
+  <h3>The mechanism on a toy: two oscillators, four attractors</h3>
+  <p class="prose">Two N = 2 oscillators live on a torus. A toy potential has one narrow, deep well (the solution) and three broad, shallower wells (wrong attractors). Each restart runs the SFPRM solver: a gradient-step proposal, geodesic damping with the patience rule, tangent noise tied to η, and chordal halting. This is a toy, not a trained model; it shows the mechanics of breadth and noise, not their size on Sudoku.</p>
+  <figure>
+    <div class="fig-grid">
+      <div class="torus-wrap"><canvas id="torus" width="600" height="600" aria-label="Torus energy landscape with restart trajectories"></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="bsel">Restarts B <output id="bselv"></output></label><input id="bsel" type="range" min="1" max="16" value="8"></div>
+        <div class="ctl"><label for="beta">Path noise β₀ <output id="betav"></output></label><input id="beta" type="range" min="0" max="30" value="5"></div>
+        <div class="btns"><button id="rerun" type="button">New restarts</button><button id="pause" type="button" class="ghost">Pause</button></div>
+        <div class="status" id="tstatus"></div>
+        <p class="note" id="tsel"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span>Darker = lower energy</span>
+      <span><span class="sw" style="background:var(--good)"></span>✓ halted in the solution well</span>
+      <span><span class="sw" style="background:var(--bad)"></span>✗ halted in a wrong well</span>
+      <span><span class="sw" style="background:var(--muted)"></span>running</span>
+    </div>
+  </figure>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bplot" viewBox="0 0 460 260" role="img" aria-label="Success rate against number of restarts, with and without path noise"></svg>
+      <div class="controls">
+        <p class="note" style="margin:0">Each point is 150 toy trials. A trial selects the lowest-energy restart among those that halted. The noisy curve uses the β₀ set above.</p><p class="note" style="margin:0">In this toy, restarts do the work: one restart finds the narrow solution well about 15% of the time, sixteen restarts about 90%. Path noise does not help here, because the barriers around the wrong wells are too high to cross. EqR saw a similar small noise effect on Sudoku and a large one on Maze, so whether noise helps is an empirical question for the trained model.</p>
+        <button id="batch" type="button">Recompute with current β₀</button>
+        <dl class="readout" id="bread"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>random init only (β₀ = 0)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>random init + path noise</span>
+    </div>
+  </figure>
+</section>
+
+<section id="energy">
+  <h2>New method: an energy-based SFPRM with a codebook memory</h2>
+  <p class="prose">The dictionary has one row where the two models disagree: AKOrN can have an energy, SFPRM never does. The new method closes that gap from the SFPRM side. Each iteration takes one Riemannian gradient step on an explicit energy, so every step is an AKOrN step whose drive is <span class="m">−grad E</span>, and the halting residual becomes the size of that gradient.</p>
+  <div class="pair">
+    <div class="eq"><span class="tag">Energy (visible tokens z, hidden tokens u)</span>
+      E(w;x) = κ₀ Σ<sub>t</sub> ½∠(z<sub>t</sub>, x<sub>t</sub>)² + E<sub>attn</sub>(u, z) + E<sub>mem</sub>(u) + E<sub>ans</sub>(z)
+    </div>
+    <div class="eq"><span class="tag">Update and halting</span>
+      w ← Exp<sub>w</sub>( −η grad E(w;x) ),&nbsp;&nbsp; halt when max<sub>t</sub> ‖grad<sub>t</sub> E‖ &lt; τ
+    </div>
+  </div>
+  <div class="pipeline" aria-label="The terms of the energy and their roles">
+    <div class="stage c1"><b>Evidence</b><span class="m">½∠(z<sub>t</sub>, x<sub>t</sub>)²</span><div class="akorn">SFPRM's geodesic injection, unchanged. Keeps each token near its input.</div></div>
+    <div class="stage c2"><b>Constraints</b><span class="m">−(σ<sub>k</sub>/β) Σ<sub>t</sub> log Σ<sub>s</sub> e<sup>β⟨W<sub>Q</sub>u<sub>t</sub>, W<sub>K</sub>z<sub>s</sub>⟩</sup></span><div class="akorn">Energy attention. Heads with σ &gt; 0 attract, heads with σ &lt; 0 repel. The coupling is symmetric.</div></div>
+    <div class="stage c3"><b>Values</b><span class="m">−(1/β) Σ<sub>t</sub> log Σ<sub>k</sub> e<sup>β⟨ξ<sub>k</sub>, z<sub>t</sub>⟩</sup></span><div class="akorn">Hopfield memory with one prototype per answer. Its minima are the possible answers.</div></div>
+    <div class="stage c4"><b>Readout</b><span class="m">logits<sub>t</sub> = s Ξ z<sub>t</sub></span><div class="akorn">Tied to the same prototypes: the prediction is the prototype the token sits in.</div></div>
+  </div>
+  <p class="prose">The figures below build the intuition in four steps: what an energy does to the dynamics near a fixed point, what the memory term does to a single cell, a small Sudoku solved by descending an energy, and what the trained models show.</p>
+
+  <h3>1 · An energy removes rotation, but not stiffness</h3>
+  <p class="prose">Near a halted state the error <span class="m">e</span> evolves as <span class="m">e ← (I − ηM)e</span>. For a gradient step, <span class="m">M</span> is the Hessian of <span class="m">E</span>: symmetric, so its eigenvalues are real and the error shrinks without turning. A learned map like SFPRM's adds an antisymmetric part <span class="m">ωR</span>, which rotates the error. Rotation pushes the eigenvalues off the real axis and lets the energy rise along the way. The stiffness slider makes one mode steeper than the other, which is what the trained energy models turned out to be.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="rotPlane" viewBox="-160 -130 320 260" role="img" aria-label="Error trajectory near a fixed point over energy contours"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="rOm">Rotation ω <output id="rOmv"></output></label><input id="rOm" type="range" min="0" max="150" value="0"></div>
+        <div class="ctl"><label for="rKap">Stiffness h<sub>max</sub>/h<sub>min</sub> <output id="rKapv"></output></label><input id="rKap" type="range" min="1" max="40" value="4"></div>
+        <div class="ctl"><label for="rEta">Step η <output id="rEtav"></output></label><input id="rEta" type="range" min="2" max="200" value="80"></div>
+        <dl class="readout" id="rotRead"></dl>
+        <svg id="rotEig" viewBox="-115 -78 230 156" role="img" aria-label="Eigenvalues of the damped map in the complex plane"></svg>
+        <svg id="rotErr" viewBox="0 0 300 130" role="img" aria-label="Energy along the path, log scale"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s3)"></span>contours of ½eᵀHe</span>
+      <span><span class="sw" style="background:var(--s2)"></span>error path from e₀</span>
+      <span><span class="sw" style="background:var(--bad)"></span>step where ½eᵀHe rose</span>
+      <span><span class="sw" style="background:var(--s1)"></span>damped eigenvalue 1 − ηλ</span>
+    </div>
+    <figcaption>With ω = 0 the update is a gradient step: the path cuts across the contours and the energy falls at every step, as long as η stays below 2/h<sub>max</sub>. Raise ω and the path spirals, the eigenvalues become a complex pair and the energy can rise. Raise the stiffness instead: the eigenvalues stay real, but the step must shrink with h<sub>max</sub> and the slow mode then takes many steps. The “best η” readout shows the fastest any fixed step can do. The trained energy models are stiff (largest Hessian eigenvalue about 13), so they halt in 40–100 iterations against about 20 for SFPRM.</figcaption>
+  </figure>
+
+  <h3>2 · One cell: the memory term and its β knob</h3>
+  <p class="prose">With prototypes of equal norm, <span class="m">e<sup>β⟨ξ<sub>k</sub>, z⟩</sup></span> is a von Mises–Fisher density on the sphere, so the memory energy is minus the log of a mixture centred on the prototypes (green ring). Here a single cell lives on a circle with four digit prototypes. The blue arrow is the pull from the rest of the puzzle, standing in for injection and attention. At small β the mixture is almost flat and the pull decides where the cell goes. At large β each prototype digs its own well and the cell commits to the nearest one. Annealing β from small to large lets the constraints act first and commits late.</p>
+  <figure>
+    <div class="fig-grid">
+      <div>
+        <svg id="cellDial" viewBox="-150 -140 300 280" role="img" aria-label="A cell on a circle with four digit prototypes"></svg>
+        <svg id="cellCurve" viewBox="0 0 460 200" role="img" aria-label="Energy along the circle at the current beta"></svg>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label for="cB">Final concentration β <output id="cBv"></output></label><input id="cB" type="range" min="0" max="100" value="91"></div>
+        <div class="ctl"><label for="cPhi">Digit favoured by the constraints <output id="cPhiv"></output></label><input id="cPhi" type="range" min="0" max="359" value="200"></div>
+        <div class="ctl"><label for="cS">Pull from the constraints <output id="cSv"></output></label><input id="cS" type="range" min="0" max="100" value="35"></div>
+        <div class="ctl"><label for="cStart">Start angle <output id="cStartv"></output></label><input id="cStart" type="range" min="0" max="359" value="60"></div>
+        <div class="btns"><button id="cFix" type="button" class="ghost">Descend, fixed β</button><button id="cAnn" type="button">Descend, annealed β</button></div>
+        <svg id="cellBars" viewBox="0 0 220 74" role="img" aria-label="Soft assignment of the cell to the four digits"></svg>
+        <dl class="readout" id="cRead"></dl>
+        <p class="note" id="cMsg"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s3)"></span>memory density (vMF mixture)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>pull from the constraints</span>
+      <span><span class="sw" style="background:var(--s2)"></span>cell and its path</span>
+    </div>
+    <figcaption>In the default setting the constraints favour digit 3, but the cell starts closest to digit 2. With β fixed at its final value, the cell drops into the digit-2 well at once. With β annealed (×1/30 at the start, full after 70 steps), it first follows the pull toward 3 and commits only when the wells appear; watch the energy curve change during the run. In the trained model, fixing β from the start left training stuck at the clue-only plateau. The bars show the soft assignment softmax(β⟨ξ<sub>k</sub>, z⟩); a cell counts as committed when its largest bar exceeds 0.9, a certificate that needs no labels.</figcaption>
+  </figure>
+
+  <h3>3 · A 4×4 Sudoku solved by descending one energy</h3>
+  <p class="prose">The same energy at puzzle scale, with weights set by hand rather than trained. Each of the 16 cells is a unit vector in four dimensions, with digit prototypes <span class="m">e₁…e₄</span>. The evidence term pins the clues. One repulsive attention head over each cell's row, column and box pushes peers apart. The memory pulls every cell toward a digit, with β annealed. The update is the plain gradient step <span class="m">z ← Exp<sub>z</sub>(−η grad E)</span>. The bars in each cell show its soft assignment at the current β, and a digit turns solid once the cell commits.</p>
+  <figure>
+    <div class="fig-grid">
+      <div>
+        <svg id="sud" viewBox="0 0 330 330" role="img" aria-label="A 4 by 4 Sudoku grid whose cells evolve under gradient descent"></svg>
+        <svg id="sudPlot" viewBox="0 0 330 120" role="img" aria-label="Energy over iterations"></svg>
+      </div>
+      <div class="controls">
+        <div class="radio" role="radiogroup" aria-label="Concentration schedule">
+          <label><input type="radio" name="sched" id="schA" checked> annealed β</label>
+          <label><input type="radio" name="sched" id="schF"> fixed β</label>
+        </div>
+        <div class="btns"><button id="sudRun" type="button">Solve from a random start</button><button id="sudNew" type="button" class="ghost">Next puzzle</button></div>
+        <dl class="readout" id="sudRead"></dl>
+        <p class="note" id="sudMsg"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--rule)"></span>clue cell</span>
+      <span><span class="sw" style="background:var(--s2)"></span>leading digit in a cell's soft assignment</span>
+      <span><span class="sw" style="background:var(--good)"></span>correct after halting</span>
+      <span><span class="sw" style="background:var(--bad)"></span>wrong after halting</span>
+    </div>
+    <figcaption>A single start often ends in a stable but wrong board: a local minimum of the energy. The grey band on the energy plot is the annealing window. The energy (measured at the final β) can rise there, which is why descent is only guaranteed once the schedule ends. Weights: repulsion 1.5 with logit scale 4, memory 1 with final β = 12, β annealed from 12/20 over 60 iterations, step 0.2, 260 iterations.</figcaption>
+  </figure>
+
+  <h3>4 · Restarts, and why the energy can choose between them</h3>
+  <p class="prose">Restarting from new random states finds the solution more often. The hard part is choosing which halted state to trust. In SFPRM every halted state has a residual near zero, so the residual cannot rank them, and the anchor angle turned out to rank them badly. With an energy the choice is natural: a wrong board violates a constraint or sits off the prototypes, so it ends higher. Picking the lowest-energy restart then works whenever any restart found the answer.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="sudE" viewBox="0 0 460 170" role="img" aria-label="Final energies of the restarts on the current puzzle"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="sB">Restarts B <output id="sBv"></output></label><input id="sB" type="range" min="1" max="32" value="16"></div>
+        <div class="btns"><button id="sudRestart" type="button">Run B restarts on this puzzle</button></div>
+        <dl class="readout" id="sudERead"></dl>
+      </div>
+    </div>
+    <figcaption>Each dot is one restart of the puzzle shown above, placed at its final energy. The ring marks the lowest-energy restart, the one energy selection returns. The schedule is the one chosen above.</figcaption>
+  </figure>
+  <figure>
+    <div class="fig-grid">
+      <svg id="sudBatch" viewBox="0 0 460 260" role="img" aria-label="Fraction of puzzles solved against the number of restarts"></svg>
+      <div class="controls">
+        <p class="note" style="margin:0">24 puzzles × 16 restarts per schedule, computed in your browser. A puzzle counts as solved when the chosen restart decodes to the solution.</p>
+        <button id="sudBatchBtn" type="button">Recompute with new random starts</button>
+        <dl class="readout" id="sudBatchRead"></dl>
+        <p class="note" style="margin:0">In this toy the lowest-energy curve lies on the oracle curve: the energy never prefers a wrong board over a right one. That holds because the answers are the deepest minima. Weight the repulsion several times more than the memory and it stops holding. In the trained model, tying the readout to the prototypes in the energy is what made the energy rank answers; before that change, energy selection lowered accuracy.</p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s2)"></span>annealed β, lowest energy</span>
+      <span><span class="sw dash" style="color:var(--s2)"></span>annealed β, majority vote</span>
+      <span><span class="sw dash" style="color:var(--ink-2)"></span>annealed β, oracle (any restart correct), drawn on top</span>
+      <span><span class="sw" style="background:var(--s1)"></span>fixed β, lowest energy</span>
+    </div>
+  </figure>
+
+  <h3>5 · What the trained models show</h3>
+  <p class="prose">The same picture appears in the trained models: SFPRM against the energy model with the codebook readout on Sudoku, 500 out-of-distribution test puzzles with fewer clues than in training. First, the spectrum of the Jacobian at halted states, damped by a step <span class="m">η</span> of your choice. Every eigenvalue of the energy model is real, as the theory requires, while 95% of SFPRM's form complex pairs at the state shown. The energy model's eigenvalues spread far along the real axis, so it needs a small step, which is the stiffness from figure 1.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="realEig" viewBox="-170 -150 340 300" role="img" aria-label="Measured eigenvalues of the two trained models in the complex plane"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="rE">Step η <output id="rEv"></output></label><input id="rE" type="range" min="1" max="100" value="10"></div>
+        <div class="btns"><button id="rE1" type="button" class="ghost">SFPRM's step, η = 1</button><button id="rE01" type="button" class="ghost">Energy model's step, η = 0.1</button></div>
+        <dl class="readout" id="realEigRead"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>SFPRM, 1,008 eigenvalues</span>
+      <span><span class="sw" style="background:var(--s2)"></span>energy model (codebook), 2,016 eigenvalues</span>
+    </div>
+    <figcaption>One halted 4×4 out-of-distribution state per model, Jacobian computed exactly on the tangent space, each eigenvalue ζ shown as 1 + η(ζ − 1). A mode decays when its point is inside the unit circle. At η = 1, SFPRM's operating point, every SFPRM mode decays, but most rotate. The energy model needs η below about 0.15, where all its modes are real and inside the circle but the slowest ones shrink slowly. Drag η to 1 to see most of its modes leave the chart. The slowest modes are nearly flat directions of the energy; they barely contribute to the gradient, so the halting test (gradient size below τ) fires long before they shrink 1000×, and the measured halt comes after 40–100 iterations rather than the hundreds the readout suggests.</figcaption>
+  </figure>
+  <p class="prose">Second, accuracy against the number of restarts. For SFPRM only rules without an energy are available. For the energy model with the codebook readout, the lowest-energy restart tracks the oracle: from 75% to 99% out of distribution on 4×4 (oracle 99%) and from 10% to 88% on 6×6 (oracle 90%), with 64 restarts. The first energy model, without the codebook readout, shows what happens when the energy does not rank answers: selection makes things worse.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="realB" viewBox="0 0 460 270" role="img" aria-label="Measured accuracy against the number of restarts"></svg>
+      <div class="controls">
+        <div class="radio" role="radiogroup" aria-label="Board size">
+          <label><input type="radio" name="rsize" id="r4" checked> 4×4</label>
+          <label><input type="radio" name="rsize" id="r6"> 6×6</label>
+        </div>
+        <dl class="readout" id="realBRead"></dl>
+        <div class="legend" id="realBLegend" style="display:grid;gap:4px"></div>
+      </div>
+    </div>
+    <figcaption>Out-of-distribution board accuracy over 500 test puzzles, 64 restarts per puzzle, rules applied to the first B. The oracle counts a puzzle as solved if any of the B restarts is correct, so it is the ceiling for every selection rule. The 6×6 energy model shown is the variant trained with the extra ranking loss; on 4×4 that loss did not improve selection and cost single-restart accuracy. A single run, single seed per model.</figcaption>
+  </figure>
+</section>
+
+<footer>
+  AKOrN: Miyato, Löwe, Geiger, Welling, ICLR 2025 · nGPT: Loshchilov et al., ICLR 2025 · FPRM: Movahedi et al., arXiv:2606.18206 · EqR: Huang, Geng, Kolter, arXiv:2605.21488 · Energy Transformer: Hoover et al., NeurIPS 2023 · Modern Hopfield networks: Ramsauer et al., ICLR 2021 · SFPRM: under review. Proofs and numerical checks are in the accompanying LaTeX note.
+</footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+"use strict";
+// ---------- helpers ----------
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r) { let u = 0; while (u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); }
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+const nrm = (a) => Math.sqrt(dot(a, a));
+const add = (a, b) => a.map((v, i) => v + b[i]);
+const sub = (a, b) => a.map((v, i) => v - b[i]);
+const scl = (a, s) => a.map((v) => v * s);
+const unit = (a) => scl(a, 1 / nrm(a));
+const proj = (z, v) => sub(v, scl(z, dot(v, z)));
+const matvec = (M, v) => M.map((row) => dot(row, v));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+function slerp(u, v, eta) { const th = Math.acos(clamp(dot(u, v), -1, 1)); if (th < 1e-12) return u.slice(); const s = Math.sin(th); return add(scl(u, Math.sin((1 - eta) * th) / s), scl(v, Math.sin(eta * th) / s)); }
+const fmt = (x, d = 3) => Number.isFinite(x) ? x.toFixed(d) : "∞";
+const sci = (x) => x === 0 ? "0" : x.toExponential(1).replace("e", "×10^").replace("^-", "^−");
+const deg = (r) => r * 180 / Math.PI;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tip = $("tip");
+function showTip(evt, html) { tip.innerHTML = html; tip.hidden = false; tip.style.left = (evt.clientX + 12) + "px"; tip.style.top = (evt.clientY + 12) + "px"; }
+function hideTip() { tip.hidden = true; }
+
+// ---------- 1. circle demo ----------
+(function circleDemo() {
+  const svg = $("circ"), R = 100;
+  const P = (phi, r = R) => [r * Math.sin(phi), -r * Math.cos(phi)];   // angle measured clockwise from z (top)
+  const g = {};
+  g.circle = el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  g.tan = el("line", { x1: -140, y1: -R, x2: 285, y2: -R, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 4" }, svg);
+  el("text", { x: -138, y: -R - 6, class: "svgtext" }, svg).textContent = "tangent line at z";
+  g.thArc = el("path", { fill: "none", stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+  g.zvec = el("line", { x1: 0, y1: 0, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  g.ztvec = el("line", { x1: 0, y1: 0, stroke: "var(--ink-2)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, svg);
+  g.chord = el("line", { stroke: "var(--s3)", "stroke-width": 1.5, "stroke-dasharray": "5 3" }, svg);
+  g.lerpRay = el("line", { x1: 0, y1: 0, stroke: "var(--s3)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
+  g.lerpPt = el("circle", { r: 3.5, fill: "var(--s3)" }, svg);
+  g.lerpOn = el("circle", { r: 6, fill: "none", stroke: "var(--s3)", "stroke-width": 2 }, svg);
+  g.slerpArc = el("path", { fill: "none", stroke: "var(--s1)", "stroke-width": 4, "stroke-linecap": "round" }, svg);
+  g.pz = el("line", { stroke: "var(--s2)", "stroke-width": 1.5 }, svg);
+  g.gpz = el("line", { stroke: "var(--s2)", "stroke-width": 3, "stroke-linecap": "round" }, svg);
+  g.ray = el("line", { x1: 0, y1: 0, stroke: "var(--s2)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, svg);
+  g.tp = el("circle", { r: 4, fill: "var(--s2)" }, svg);
+  g.land = el("circle", { r: 7, fill: "var(--surface)", stroke: "var(--s1)", "stroke-width": 2.5 }, svg);
+  g.land2 = el("circle", { r: 3, fill: "var(--s2)" }, svg);
+  el("circle", { cx: 0, cy: 0, r: 2.5, fill: "var(--ink)" }, svg);
+  g.zl = el("text", { class: "svgmath" }, svg); g.zl.textContent = "z";
+  g.ztl = el("text", { class: "svgmath" }, svg); g.ztl.textContent = "z̃";
+  g.thl = el("text", { class: "svgmath" }, svg); g.thl.textContent = "θ";
+  g.tpl = el("text", { class: "svgtext" }, svg);
+  g.landl = el("text", { class: "svgtext" }, svg);
+  const arc = (a0, a1, r) => { const p0 = P(a0, r), p1 = P(a1, r); const large = (a1 - a0) > Math.PI ? 1 : 0; return `M${p0[0]},${p0[1]} A${r},${r} 0 ${large} 1 ${p1[0]},${p1[1]}`; };
+  function update() {
+    const th = +$("th").value * Math.PI / 180, eta = +$("eta").value / 100, showL = $("lerp").checked;
+    $("thv").textContent = Math.round(deg(th)) + "°"; $("etav").textContent = eta.toFixed(2);
+    const z = [0, 1], zt = [Math.sin(th), Math.cos(th)];
+    const S = (v) => [R * v[0], -R * v[1]];
+    const pz = S(z), pzt = S(zt);
+    g.zvec.setAttribute("x2", pz[0]); g.zvec.setAttribute("y2", pz[1]);
+    g.ztvec.setAttribute("x2", pzt[0]); g.ztvec.setAttribute("y2", pzt[1]);
+    g.zl.setAttribute("x", -14); g.zl.setAttribute("y", -R - 8);
+    g.ztl.setAttribute("x", pzt[0] + 8); g.ztl.setAttribute("y", pzt[1] + 14);
+    g.thArc.setAttribute("d", arc(0, th, 34));
+    const mid = P(th / 2, 46); g.thl.setAttribute("x", mid[0] - 4); g.thl.setAttribute("y", mid[1] + 5);
+    // Slerp
+    const zs = slerp(z, zt, eta);
+    g.slerpArc.setAttribute("d", eta * th > 1e-4 ? arc(0, eta * th, R) : "");
+    const ps = S(zs); g.land.setAttribute("cx", ps[0]); g.land.setAttribute("cy", ps[1]);
+    // AKOrN tangent construction
+    const pv = proj(z, zt); // = (sin th, 0)
+    g.pz.setAttribute("x1", pz[0]); g.pz.setAttribute("y1", pz[1]); g.pz.setAttribute("x2", pz[0] + R * pv[0]); g.pz.setAttribute("y2", pz[1]);
+    const ok = eta * th < Math.PI / 2 - 1e-3;
+    const gam = ok ? Math.tan(eta * th) / Math.sin(th) : Infinity;
+    const tx = ok ? R * gam * pv[0] : Infinity;
+    const txc = Math.min(tx, 280);
+    g.gpz.setAttribute("x1", pz[0]); g.gpz.setAttribute("y1", pz[1]); g.gpz.setAttribute("x2", txc); g.gpz.setAttribute("y2", -R);
+    g.tp.setAttribute("cx", txc); g.tp.setAttribute("cy", -R); g.tp.style.display = tx <= 280 ? "" : "none";
+    g.ray.setAttribute("x2", txc); g.ray.setAttribute("y2", -R); g.ray.style.display = ok ? "" : "none";
+    g.tpl.setAttribute("x", Math.min(txc, 200) + 6); g.tpl.setAttribute("y", -R - 10);
+    g.tpl.textContent = tx <= 280 ? "z + γ P_z z̃" : (ok ? "z + γ P_z z̃ (off chart)" : "");
+    let akorn = null;
+    if (ok) { akorn = unit(add(z, scl(pv, gam))); const pa = S(akorn); g.land2.setAttribute("cx", pa[0]); g.land2.setAttribute("cy", pa[1]); g.land2.style.display = ""; } else g.land2.style.display = "none";
+    const lp = P(eta * th, R + 18); g.landl.setAttribute("x", lp[0] + (lp[0] > 0 ? 4 : -60)); g.landl.setAttribute("y", lp[1]); g.landl.textContent = "next state";
+    // lerp
+    const lin = add(scl(z, 1 - eta), scl(zt, eta)); const ln = nrm(lin);
+    [g.chord, g.lerpRay, g.lerpPt, g.lerpOn].forEach((e) => e.style.display = showL && ln > 1e-6 ? "" : "none");
+    let lerpAng = NaN, gl = NaN;
+    if (ln > 1e-6) {
+      const pl = S(lin), pon = S(scl(lin, 1 / ln));
+      g.chord.setAttribute("x1", pz[0]); g.chord.setAttribute("y1", pz[1]); g.chord.setAttribute("x2", pzt[0]); g.chord.setAttribute("y2", pzt[1]);
+      g.lerpPt.setAttribute("cx", pl[0]); g.lerpPt.setAttribute("cy", pl[1]);
+      g.lerpRay.setAttribute("x2", pon[0]); g.lerpRay.setAttribute("y2", pon[1]);
+      g.lerpOn.setAttribute("cx", pon[0]); g.lerpOn.setAttribute("cy", pon[1]);
+      lerpAng = Math.atan2(eta * Math.sin(th), 1 - eta + eta * Math.cos(th));
+      const a = 1 - eta + eta * Math.cos(th); gl = a > 0 ? eta / a : Infinity;
+    }
+    const diff = akorn ? Math.max(Math.abs(akorn[0] - zs[0]), Math.abs(akorn[1] - zs[1])) : NaN;
+    $("circRead").innerHTML =
+      `<dt>Slerp rotation ηθ</dt><dd>${deg(eta * th).toFixed(1)}°</dd>` +
+      `<dt>γ = tan(ηθ)/sin θ</dt><dd>${ok ? fmt(gam) : "none"}</dd>` +
+      `<dt>|Slerp − AKOrN form|</dt><dd>${ok ? sci(diff) : "n/a"}</dd>` +
+      (showL ? `<dt>lerp rotation</dt><dd>${deg(lerpAng).toFixed(1)}°</dd><dt>lerp γ = η/(1−η+η cos θ)</dt><dd>${fmt(gl)}</dd>` : "");
+    $("circWarn").textContent = ok ? "" : "ηθ ≥ 90°: Slerp rotates further than any AKOrN-form step can.";
+  }
+  ["th", "eta", "lerp"].forEach((id) => $(id).addEventListener("input", update));
+  update();
+})();
+
+// ---------- 2. operator splitting toy (3 tokens on S^2) ----------
+(function splitDemo() {
+  const r = mulberry32(11), d = 3, T = 3, H = 2;
+  const randM = (a, b, s) => Array.from({ length: a }, () => Array.from({ length: b }, () => gauss(r) * s));
+  const x = Array.from({ length: T }, () => unit([gauss(r), gauss(r), gauss(r)]));
+  const z = Array.from({ length: T }, () => unit([gauss(r), gauss(r), gauss(r)]));
+  const Wq = [], Wk = [], Wv = [], Wo = [];
+  for (let h = 0; h < H; h++) { Wq.push(randM(d, d, 0.8)); Wk.push(randM(d, d, 0.8)); Wv.push(randM(d, d, 0.8)); Wo.push(randM(d, d, 0.8)); }
+  const W1 = randM(6, d, 0.9), W2 = randM(d, 6, 0.6);
+  function attn(hs) {
+    const out = hs.map(() => [0, 0, 0]);
+    for (let k = 0; k < H; k++) {
+      const q = hs.map((h) => unit(matvec(Wq[k], h))), kk = hs.map((h) => unit(matvec(Wk[k], h))), v = hs.map((h) => matvec(Wo[k], matvec(Wv[k], h)));
+      for (let t = 0; t < T; t++) {
+        const s = kk.map((kv) => 3 * dot(q[t], kv)); const m = Math.max(...s); const e = s.map((u) => Math.exp(u - m)); const Z = e.reduce((a, b) => a + b, 0);
+        for (let j = 0; j < T; j++) out[t] = add(out[t], scl(v[j], e[j] / Z));
+      }
+    }
+    return out;
+  }
+  const mlp = (h) => matvec(W2, matvec(W1, h).map(Math.tanh));
+  const sublayer = (h, F, a) => unit(add(h, scl(sub(unit(F), h), a)));
+  function split(eps, eta) {
+    let h = z.map((zt, t) => slerp(zt, x[t], eps)); const p1 = h[0];
+    const A = attn(h); h = h.map((ht, t) => sublayer(ht, A[t], eps)); const p2 = h[0];
+    h = h.map((ht) => sublayer(ht, mlp(ht), eps)); const p3 = h[0];
+    return { p1, p2, p3, zn: slerp(z[0], p3, eta) };
+  }
+  function collapsed(eps, eta) {
+    const z0 = z[0], th = Math.acos(clamp(dot(z0, x[0]), -1, 1));
+    const c = scl(proj(z0, x[0]), th / Math.sin(th));
+    const a = proj(z0, unit(attn(z)[0]));
+    const m = proj(z0, unit(mlp(z0)));
+    const V = add(add(c, a), m);
+    return { c, a, m, V, zn: unit(add(z0, scl(V, eta * eps))) };
+  }
+  const z0 = z[0]; const e1 = unit(proj(z0, x[0])); const e2 = [z0[1] * e1[2] - z0[2] * e1[1], z0[2] * e1[0] - z0[0] * e1[2], z0[0] * e1[1] - z0[1] * e1[0]];
+  const gno = (y) => { const s = dot(y, z0); return [dot(y, e1) / s - 0, dot(y, e2) / s]; };
+  const tan2 = (v) => [dot(v, e1), dot(v, e2)];
+  const epsOf = (v) => Math.pow(10, -2.5 + 2.4 * v / 100);
+  const svg = $("gno");
+  const defs = el("defs", {}, svg);
+  ["s1", "s2", "s3", "ink", "ink-2"].forEach((c) => { const mk = el("marker", { id: "ah-" + c, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs); el("path", { d: "M0,0 L10,5 L0,10 z", fill: `var(--${c})` }, mk); });
+  const g = el("g", {}, svg);
+  function draw() {
+    const eps = epsOf(+$("eps").value), eta = +$("eta2").value / 100;
+    $("epsv").textContent = eps < 0.1 ? eps.toFixed(3) : eps.toFixed(2); $("eta2v").textContent = eta.toFixed(2);
+    const S = split(eps, eta), C = collapsed(eps, eta);
+    const pts = { O: [0, 0], P1: scl(gno(S.p1), 1 / eps), P2: scl(gno(S.p2), 1 / eps), P3: scl(gno(S.p3), 1 / eps), Zn: scl(gno(S.zn), 1 / eps),
+      C1: tan2(C.c), C2: tan2(add(C.c, C.a)), C3: tan2(C.V), Zc: scl(gno(C.zn), 1 / eps) };
+    const all = Object.values(pts); let xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const pad = 0.12 * Math.max(x1 - x0, y1 - y0, 0.1); x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    const s = Math.min(420 / (x1 - x0), 280 / (y1 - y0));
+    const ox = 20 + (420 - s * (x1 - x0)) / 2 - s * x0, oy = 20 + (280 - s * (y1 - y0)) / 2 + s * y1;
+    const M = (p) => [ox + s * p[0], oy - s * p[1]];
+    g.innerHTML = "";
+    const arrow = (a, b, col, dash, w) => { const A = M(a), B = M(b); if (Math.hypot(B[0] - A[0], B[1] - A[1]) < 2) return; el("line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: `var(--${col})`, "stroke-width": w || 2, "stroke-dasharray": dash ? "6 4" : "none", "marker-end": `url(#ah-${col})` }, g); };
+    // axes cross at z
+    const Oz = M([0, 0]);
+    el("line", { x1: 10, y1: Oz[1], x2: 450, y2: Oz[1], stroke: "var(--rule)" }, g); el("line", { x1: Oz[0], y1: 10, x2: Oz[0], y2: 310, stroke: "var(--rule)" }, g);
+    arrow(pts.O, pts.C1, "s1", true, 1.5); arrow(pts.C1, pts.C2, "s2", true, 1.5); arrow(pts.C2, pts.C3, "s3", true, 1.5);
+    arrow(pts.O, pts.P1, "s1", false, 2.5); arrow(pts.P1, pts.P2, "s2", false, 2.5); arrow(pts.P2, pts.P3, "s3", false, 2.5);
+    arrow(pts.O, pts.Zn, "ink", false, 2.5);
+    const zc = M(pts.Zc); el("circle", { cx: zc[0], cy: zc[1], r: 8, fill: "none", stroke: "var(--ink-2)", "stroke-width": 1.5, "stroke-dasharray": "3 2" }, g);
+    const zn = M(pts.Zn); el("circle", { cx: zn[0], cy: zn[1], r: 4, fill: "var(--ink)" }, g);
+    el("circle", { cx: Oz[0], cy: Oz[1], r: 4, fill: "var(--ink)" }, g);
+    const lab = (p, t, dx, dy, cls) => { const q = M(p); el("text", { x: q[0] + dx, y: q[1] + dy, class: cls || "svgtext" }, g).textContent = t; };
+    lab(pts.O, "z", -14, -8, "svgmath"); lab(pts.P3, "z̃", 8, -6, "svgmath"); lab(pts.Zn, "next state", 10, 16); lab(pts.C3, "Σ drives", 8, 4);
+    const err = nrm(sub(S.zn, C.zn));
+    $("gnoRead").innerHTML = `<dt>|split − single step|</dt><dd>${sci(err)}</dd><dt>error / ε²</dt><dd>${fmt(err / (eps * eps), 3)}</dd><dt>λ = α_A = α_M</dt><dd>${eps < 0.1 ? eps.toFixed(3) : eps.toFixed(2)}</dd>`;
+    drawErr(eta, eps);
+  }
+  const ep = $("errplot");
+  function drawErr(eta, epsNow) {
+    ep.innerHTML = "";
+    const xs = [], ys = [];
+    for (let i = 0; i <= 24; i++) { const e = Math.pow(10, -2.5 + 2.4 * i / 24); xs.push(e); ys.push(nrm(sub(split(e, eta).zn, collapsed(e, eta).zn))); }
+    const lx0 = -2.5, lx1 = -0.1, ly = ys.map(Math.log10), ly0 = Math.floor(Math.min(...ly)), ly1 = Math.ceil(Math.max(...ly));
+    const X = (e) => 44 + 240 * (Math.log10(e) - lx0) / (lx1 - lx0), Y = (v) => 160 - 140 * (Math.log10(v) - ly0) / (ly1 - ly0);
+    for (let k = ly0; k <= ly1; k += 2) { el("line", { x1: 44, x2: 284, y1: Y(Math.pow(10, k)), y2: Y(Math.pow(10, k)), stroke: "var(--rule)" }, ep); const tl = el("text", { x: 40, y: Y(Math.pow(10, k)) + 4, "text-anchor": "end", class: "svgtext" }, ep); tl.innerHTML = `10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; }
+    [-2, -1].forEach((k) => { el("text", { x: X(Math.pow(10, k)), y: 178, "text-anchor": "middle", class: "svgtext" }, ep).innerHTML = `ε = 10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; });
+    // slope-2 guide through the middle point
+    const i0 = 12, c = ys[i0] / (xs[i0] * xs[i0]);
+    el("line", { x1: X(xs[0]), y1: Y(c * xs[0] * xs[0]), x2: X(xs[24]), y2: Y(c * xs[24] * xs[24]), stroke: "var(--muted)", "stroke-dasharray": "4 4" }, ep);
+    el("text", { x: X(xs[3]), y: Y(c * xs[3] * xs[3]) - 8, class: "svgtext" }, ep).textContent = "slope 2";
+    el("polyline", { points: xs.map((e, i) => `${X(e)},${Y(ys[i])}`).join(" "), fill: "none", stroke: "var(--s1)", "stroke-width": 2 }, ep);
+    const yn = nrm(sub(split(epsNow, eta).zn, collapsed(epsNow, eta).zn));
+    el("circle", { cx: X(epsNow), cy: Y(yn), r: 5, fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }, ep);
+    el("text", { x: 44, y: 12, class: "svgtext" }, ep).textContent = "|split − single step| vs ε (log-log)";
+  }
+  ["eps", "eta2"].forEach((id) => $(id).addEventListener("input", draw));
+  draw();
+})();
+
+// ---------- 3. concentration of measure ----------
+(function histDemo() {
+  const Ns = [2, 3, 4, 8, 16, 32, 64, 128], NB = 36, K = 6000;
+  function sample(N, seed) { const r = mulberry32(seed); const out = new Float64Array(K); for (let i = 0; i < K; i++) { let s = 0, v0 = 0; for (let j = 0; j < N; j++) { const g = gauss(r); s += g * g; if (j === 0) v0 = g; } out[i] = Math.acos(clamp(v0 / Math.sqrt(s), -1, 1)) * 180 / Math.PI; } return out; }
+  const cache = {}; const get = (N) => cache[N] || (cache[N] = sample(N, 1000 + N));
+  const big = get(512);
+  const stats = (a) => { let m = 0; for (const v of a) m += v; m /= a.length; let s = 0; for (const v of a) s += (v - m) * (v - m); return [m, Math.sqrt(s / a.length)]; };
+  const svg = $("hist");
+  function panel(a, y0, h, title) {
+    const counts = new Array(NB).fill(0); for (const v of a) counts[Math.min(NB - 1, Math.floor(v / 5))]++;
+    const frac = counts.map((c) => c / a.length), ymax = 0.5;
+    const X = (deg) => 44 + 400 * deg / 180, Y = (f) => y0 + h - h * Math.min(f, ymax) / ymax;
+    [0, 0.25, 0.5].forEach((f) => { el("line", { x1: 44, x2: 444, y1: Y(f), y2: Y(f), stroke: "var(--rule)" }, svg); el("text", { x: 40, y: Y(f) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = Math.round(f * 100) + "%"; });
+    frac.forEach((f, i) => { if (f <= 0) return; const x = X(i * 5) + 1, w = 400 / NB - 2, yt = Y(f), hh = y0 + h - yt; el("rect", { x, y: yt, width: w, height: Math.max(hh, 1), rx: Math.min(2, w / 2), fill: "var(--s1)" }, svg).addEventListener("mousemove", (e) => showTip(e, `${i * 5}–${i * 5 + 5}°: ${(f * 100).toFixed(1)}% of starts`)); });
+    svg.lastChild && null;
+    if (frac.some((f) => f > ymax)) el("text", { x: X(90) + 8, y: y0 + 10, class: "svgtext" }, svg).textContent = "peak " + Math.round(Math.max(...frac) * 100) + "% (clipped)";
+    el("text", { x: 44, y: y0 - 6, class: "svgtext", style: "font-weight:600;fill:var(--ink)" }, svg).textContent = title;
+  }
+  function draw() {
+    const N = Ns[+$("nsel").value]; $("nselv").textContent = N;
+    svg.innerHTML = "";
+    panel(big, 18, 100, "One sphere per token, N = d = 512");
+    panel(get(N), 160, 100, `Small oscillators, N = ${N}`);
+    [0, 45, 90, 135, 180].forEach((dg) => el("text", { x: 44 + 400 * dg / 180, y: 288, "text-anchor": "middle", class: "svgtext" }, svg).textContent = dg + "°");
+    el("text", { x: 244, y: 310, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "angle between random start and input";
+    svg.querySelectorAll("rect").forEach((rc) => rc.addEventListener("mouseleave", hideTip));
+    const [m1, s1] = stats(big), [m2, s2] = stats(get(N));
+    $("histRead").innerHTML = `<dt>spread, N = 512</dt><dd>${s1.toFixed(1)}°</dd><dt>spread, N = ${N}</dt><dd>${s2.toFixed(1)}°</dd><dt>ratio</dt><dd>${(s2 / s1).toFixed(1)}×</dd>`;
+  }
+  $("nsel").addEventListener("input", draw); draw();
+})();
+
+// ---------- 4. torus toy: restarts + path noise ----------
+const WELLS = [[1.9, -1.2, 1.0, 6.0], [-1.5, 1.4, 0.75, 2.0], [-2.0, -1.8, 0.7, 2.5], [0.6, 2.0, 0.65, 3.0]];
+const wrapA = (a) => { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; };
+function energy(t1, t2) { let e = 0; for (const [m1, m2, a, k] of WELLS) e -= a * Math.exp(k * (Math.cos(t1 - m1) + Math.cos(t2 - m2) - 2)); return e; }
+function gradE(t1, t2) { let g1 = 0, g2 = 0; for (const [m1, m2, a, k] of WELLS) { const f = a * Math.exp(k * (Math.cos(t1 - m1) + Math.cos(t2 - m2) - 2)); g1 += f * k * Math.sin(t1 - m1); g2 += f * k * Math.sin(t2 - m2); } return [g1, g2]; }
+const SOLVER = { g: 0.15, tau: 1e-5, P: 10, dec: 0.9, Tmax: 1500 };
+function newRun(r) { return { t1: (r() * 2 - 1) * Math.PI, t2: (r() * 2 - 1) * Math.PI, eta: 1, best: Infinity, pat: SOLVER.P, halted: false, stalled: false, it: 0, trail: [] }; }
+function stepRun(p, beta0, r) {
+  if (p.halted || p.stalled) return;
+  const [g1, g2] = gradE(p.t1, p.t2); const d1 = -SOLVER.g * g1, d2 = -SOLVER.g * g2;   // proposal z̃ = z − g∇E (AKOrN Euler step)
+  const res = Math.max(1 - Math.cos(d1), 1 - Math.cos(d2));                              // chordal residual
+  if (res < SOLVER.tau) { p.halted = true; return; }
+  if (res < p.best) { p.best = res; p.pat = SOLVER.P; } else p.pat--;
+  if (p.pat <= 0) { p.eta *= SOLVER.dec; p.pat = SOLVER.P; }
+  const b = beta0 * p.eta;
+  p.t1 = wrapA(p.t1 + p.eta * d1 + b * gauss(r)); p.t2 = wrapA(p.t2 + p.eta * d2 + b * gauss(r));   // Exp_z(η Log z̃ + βξ) on each circle
+  p.it++; if (p.it >= SOLVER.Tmax || p.eta < 1e-4) p.stalled = true;
+}
+const inSolution = (p) => Math.hypot(wrapA(p.t1 - WELLS[0][0]), wrapA(p.t2 - WELLS[0][1])) < 0.6;
+function select(runs) { let best = -1, be = Infinity; runs.forEach((p, i) => { if (p.halted) { const e = energy(p.t1, p.t2); if (e < be) { be = e; best = i; } } }); if (best < 0) runs.forEach((p, i) => { const e = energy(p.t1, p.t2); if (e < be) { be = e; best = i; } }); return best; }
+
+(function torusDemo() {
+  const cv = $("torus"), ctx = cv.getContext("2d"), W = cv.width;
+  let heat = null, runs = [], paused = false, seed = 1, rng = mulberry32(1);
+  const toPx = (t1, t2) => [(t1 + Math.PI) / (2 * Math.PI) * W, (1 - (t2 + Math.PI) / (2 * Math.PI)) * W];
+  function hex(c) { c = c.replace("#", ""); if (c.length === 3) c = c.split("").map((x) => x + x).join(""); return [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16)); }
+  function buildHeat() {
+    const lo = hex(css("--heat-lo") || "#f3f6fb"), hi = hex(css("--heat-hi") || "#0d366b");
+    const n = 150, E = new Float64Array(n * n); let mn = Infinity, mx = -Infinity;
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const t1 = -Math.PI + 2 * Math.PI * (i + .5) / n, t2 = Math.PI - 2 * Math.PI * (j + .5) / n; const e = energy(t1, t2); E[j * n + i] = e; mn = Math.min(mn, e); mx = Math.max(mx, e); }
+    const off = document.createElement("canvas"); off.width = off.height = n; const oc = off.getContext("2d"); const img = oc.createImageData(n, n);
+    for (let k = 0; k < n * n; k++) { const t = Math.pow((mx - E[k]) / (mx - mn), 0.6); for (let c = 0; c < 3; c++) img.data[4 * k + c] = lo[c] + (hi[c] - lo[c]) * t; img.data[4 * k + 3] = 255; }
+    oc.putImageData(img, 0, 0); heat = off;
+  }
+  function reset() { rng = mulberry32(seed++); const B = +$("bsel").value; runs = Array.from({ length: B }, () => newRun(rng)); runs.forEach((p) => p.trail.push([p.t1, p.t2])); }
+  function render() {
+    ctx.imageSmoothingEnabled = true; ctx.drawImage(heat, 0, 0, W, W);
+    ctx.font = "600 22px " + (css("--f-ui") || "sans-serif");
+    WELLS.forEach(([m1, m2], i) => { const [x, y] = toPx(m1, m2); ctx.fillStyle = css("--surface"); ctx.globalAlpha = 0.85; const label = i === 0 ? "solution" : "wrong"; const w = ctx.measureText(label).width; ctx.fillRect(x + 10, y - 30, w + 10, 28); ctx.globalAlpha = 1; ctx.fillStyle = css("--ink"); ctx.fillText(label, x + 15, y - 9); });
+    const sel = runs.every((p) => p.halted || p.stalled) ? select(runs) : -1;
+    runs.forEach((p, i) => {
+      const col = p.halted ? (inSolution(p) ? css("--good") : css("--bad")) : css("--muted");
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.85; ctx.beginPath();
+      p.trail.forEach(([a, b], k) => { const [x, y] = toPx(a, b); if (k === 0) ctx.moveTo(x, y); else { const [pa, pb] = p.trail[k - 1]; if (Math.abs(a - pa) > Math.PI || Math.abs(b - pb) > Math.PI) ctx.moveTo(x, y); else ctx.lineTo(x, y); } });
+      ctx.stroke(); ctx.globalAlpha = 1;
+      const [x, y] = toPx(p.t1, p.t2); ctx.fillStyle = col; ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, 8, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+      if (i === sel) { ctx.strokeStyle = css("--ink"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, 16, 0, 2 * Math.PI); ctx.stroke(); }
+    });
+    const st = runs.map((p, i) => { const tag = p.halted ? (inSolution(p) ? `<span class="st-ok">✓ halted t=${p.it}</span>` : `<span class="st-bad">✗ halted t=${p.it}</span>`) : (p.stalled ? `<span class="st-bad">✗ no halt</span>` : `<span class="st-run">running ${p.it}</span>`); return `<div>#${i + 1} ${tag}</div>`; }).join("");
+    $("tstatus").innerHTML = st;
+    if (sel >= 0) { const ok = runs[sel].halted && inSolution(runs[sel]); const nOk = runs.filter((p) => p.halted && inSolution(p)).length; $("tsel").innerHTML = `Selected restart #${sel + 1} (lowest energy among halted): ${ok ? '<span class="st-ok">✓ solution</span>' : '<span class="st-bad">✗ wrong attractor</span>'}. ${nOk} of ${runs.length} restarts reached the solution well.`; }
+    else $("tsel").textContent = "Selection runs once every restart has halted or stalled.";
+  }
+  function tick() {
+    if (!paused) {
+      const beta0 = +$("beta").value / 100;
+      for (let k = 0; k < 6; k++) runs.forEach((p) => { if (!p.halted && !p.stalled) { stepRun(p, beta0, rng); if (p.it % 2 === 0) p.trail.push([p.t1, p.t2]); } });
+      render();
+    }
+    if (runs.some((p) => !p.halted && !p.stalled)) requestAnimationFrame(tick); else render();
+  }
+  function start() { reset(); if (reduceMotion) { const beta0 = +$("beta").value / 100; while (runs.some((p) => !p.halted && !p.stalled)) runs.forEach((p) => { stepRun(p, beta0, rng); if (p.it % 3 === 0) p.trail.push([p.t1, p.t2]); }); render(); } else { render(); requestAnimationFrame(tick); } }
+  buildHeat();
+  $("bsel").addEventListener("input", () => { $("bselv").textContent = $("bsel").value; start(); });
+  $("beta").addEventListener("input", () => { $("betav").textContent = (+$("beta").value / 100).toFixed(2); });
+  $("rerun").addEventListener("click", start);
+  $("pause").addEventListener("click", () => { paused = !paused; $("pause").textContent = paused ? "Resume" : "Pause"; if (!paused) requestAnimationFrame(tick); });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { buildHeat(); render(); });
+  new MutationObserver(() => { buildHeat(); render(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  $("bselv").textContent = $("bsel").value; $("betav").textContent = (+$("beta").value / 100).toFixed(2);
+  start();
+})();
+
+(function batchDemo() {
+  const Bs = [1, 2, 4, 8, 16], TRIALS = 150;
+  function experiment(beta0, seedBase) {
+    const wins = Bs.map(() => 0); let single = 0;
+    for (let tr = 0; tr < TRIALS; tr++) {
+      const r = mulberry32(seedBase + tr); const runs = Array.from({ length: 16 }, () => newRun(r));
+      for (const p of runs) while (!p.halted && !p.stalled) stepRun(p, beta0, r);
+      single += runs.filter((p) => p.halted && inSolution(p)).length / 16;
+      Bs.forEach((B, bi) => { const sub = runs.slice(0, B); const s = select(sub); if (s >= 0 && sub[s].halted && inSolution(sub[s])) wins[bi]++; });
+    }
+    return { rates: wins.map((w) => w / TRIALS), single: single / TRIALS };
+  }
+  const svg = $("bplot");
+  function draw(A, Bn, betaN) {
+    svg.innerHTML = "";
+    const X = (i) => 60 + 330 * i / (Bs.length - 1), Y = (v) => 220 - 190 * v;
+    [0, 0.25, 0.5, 0.75, 1].forEach((v) => { el("line", { x1: 60, x2: 390, y1: Y(v), y2: Y(v), stroke: "var(--rule)" }, svg); el("text", { x: 54, y: Y(v) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = Math.round(v * 100) + "%"; });
+    Bs.forEach((B, i) => el("text", { x: X(i), y: 240, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "B = " + B);
+    el("text", { x: 60, y: 14, class: "svgtext" }, svg).textContent = "trials whose selected restart is the solution";
+    [[A.rates, "s1", "no noise"], [Bn.rates, "s2", `β₀ = ${betaN.toFixed(2)}`]].forEach(([rates, col, name]) => {
+      el("polyline", { points: rates.map((v, i) => `${X(i)},${Y(v)}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": 2 }, svg);
+      rates.forEach((v, i) => { const c = el("circle", { cx: X(i), cy: Y(v), r: 4.5, fill: `var(--${col})`, stroke: "var(--surface)", "stroke-width": 2 }, svg); const hit = el("circle", { cx: X(i), cy: Y(v), r: 12, fill: "transparent" }, svg); hit.addEventListener("mousemove", (e) => showTip(e, `${name}, B = ${Bs[i]}: ${(v * 100).toFixed(0)}%`)); hit.addEventListener("mouseleave", hideTip); });
+      const last = rates[rates.length - 1]; el("text", { x: 398, y: Y(last) + 4, class: "svgtext" }, svg).textContent = name;
+    });
+    $("bread").innerHTML = `<dt>single restart, no noise</dt><dd>${(A.single * 100).toFixed(0)}%</dd><dt>single restart, β₀ = ${betaN.toFixed(2)}</dt><dd>${(Bn.single * 100).toFixed(0)}%</dd><dt>B = 16, no noise</dt><dd>${(A.rates[4] * 100).toFixed(0)}%</dd><dt>B = 16, β₀ = ${betaN.toFixed(2)}</dt><dd>${(Bn.rates[4] * 100).toFixed(0)}%</dd>`;
+  }
+  let base = null;
+  function run() { const b = +$("beta").value / 100; $("batch").textContent = "Computing…"; $("batch").disabled = true; setTimeout(() => { if (!base) base = experiment(0, 50000); const nz = experiment(b, 90000); draw(base, nz, b); $("batch").textContent = "Recompute with current β₀"; $("batch").disabled = false; }, 30); }
+  $("batch").addEventListener("click", run);
+  run();
+})();
+
+// ================= Basics =================
+(function basicsProj() {
+  const svg = $("bProj"), R = 100;
+  el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  el("line", { x1: -155, y1: -R, x2: 275, y2: -R, stroke: "var(--muted)", "stroke-dasharray": "2 4" }, svg);
+  el("text", { x: -152, y: -R - 6, class: "svgtext" }, svg).textContent = "tangent line at z";
+  el("line", { x1: 0, y1: 0, x2: 0, y2: -R, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  el("circle", { cx: 0, cy: 0, r: 2.5, fill: "var(--ink)" }, svg);
+  el("text", { x: -16, y: -R + 16, class: "svgmath" }, svg).textContent = "z";
+  const ray = el("line", { x1: 0, y1: 0, stroke: "var(--s2)", "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+  const rad = el("line", { stroke: "var(--s3)", "stroke-width": 2.5 }, svg);
+  const tan = el("line", { stroke: "var(--s2)", "stroke-width": 2.5 }, svg);
+  const vv = el("line", { stroke: "var(--ink-2)", "stroke-width": 2 }, svg);
+  const vtip = el("circle", { r: 3, fill: "var(--ink-2)" }, svg);
+  const tp = el("circle", { r: 4, fill: "var(--s2)" }, svg);
+  const land = el("circle", { r: 7, fill: "none", stroke: "var(--s2)", "stroke-width": 2.5 }, svg);
+  const expPt = el("circle", { r: 5, fill: "var(--s1)" }, svg);
+  const vl = el("text", { class: "svgmath" }, svg); vl.textContent = "v";
+  function upd() {
+    const phi = +$("vDir").value * Math.PI / 180, L = +$("vLen").value / 100;
+    $("vDirv").textContent = $("vDir").value + "°"; $("vLenv").textContent = L.toFixed(2);
+    const v = [L * Math.cos(phi), L * Math.sin(phi)];      // math coords, z = (0,1)
+    const S = (p) => [R * p[0], -R * p[1]];
+    const z = [0, 1], zv = add(z, v), r = v[1], t = v[0];
+    const pz = S(z), pzv = S(zv);
+    vv.setAttribute("x1", pz[0]); vv.setAttribute("y1", pz[1]); vv.setAttribute("x2", pzv[0]); vv.setAttribute("y2", pzv[1]);
+    vtip.setAttribute("cx", pzv[0]); vtip.setAttribute("cy", pzv[1]);
+    vl.setAttribute("x", pzv[0] + 6); vl.setAttribute("y", pzv[1] - 4);
+    const pr = S([0, 1 + r]); rad.setAttribute("x1", pz[0]); rad.setAttribute("y1", pz[1]); rad.setAttribute("x2", pr[0]); rad.setAttribute("y2", pr[1]);
+    const pt = S([t, 1]); tan.setAttribute("x1", pz[0]); tan.setAttribute("y1", pz[1]); tan.setAttribute("x2", pt[0]); tan.setAttribute("y2", pt[1]);
+    const a = 1 + r, ok = a > 1e-6, n = nrm(zv);
+    if (n > 1e-9) { const pl = S(scl(zv, 1 / n)); land.setAttribute("cx", pl[0]); land.setAttribute("cy", pl[1]); land.style.display = ""; } else land.style.display = "none";
+    if (ok) { const x = t / a; const pp = S([x, 1]); tp.setAttribute("cx", Math.max(-155, Math.min(275, pp[0]))); tp.setAttribute("cy", pp[1]); tp.style.display = Math.abs(R * x) < 275 ? "" : "none"; }
+    else tp.style.display = "none";
+    const far = ok ? S([t / a, 1]) : pzv; ray.setAttribute("x2", ok ? Math.max(-155, Math.min(275, far[0])) : pzv[0]); ray.setAttribute("y2", ok ? far[1] : pzv[1]);
+    const ang = Math.abs(t);           // Exp_z(P_z v) rotates by |t|
+    const pe = S([Math.sign(t) * Math.sin(ang), Math.cos(ang)]); expPt.setAttribute("cx", pe[0]); expPt.setAttribute("cy", pe[1]); expPt.style.display = Math.abs(t) > 1e-6 ? "" : "none";
+    const rot = Math.atan2(Math.abs(t), a);
+    $("bProjRead").innerHTML = `<dt>radial ⟨v,z⟩</dt><dd>${r.toFixed(2)}</dd><dt>tangential ‖P<sub>z</sub>v‖</dt><dd>${Math.abs(t).toFixed(2)}</dd>` +
+      `<dt>rotation of Π(z+v)</dt><dd>${deg(rot).toFixed(1)}°</dd><dt>effective step 1/(1+⟨v,z⟩)</dt><dd>${ok ? (1 / a).toFixed(2) : "none"}</dd>` +
+      `<dt>Exp vs Π(z+P<sub>z</sub>v)</dt><dd>${deg(Math.abs(t)).toFixed(0)}° vs ${deg(Math.atan(Math.abs(t))).toFixed(0)}°</dd>`;
+    $("bProjWarn").textContent = ok ? "" : "1 + ⟨v,z⟩ ≤ 0: z + v points into the far hemisphere.";
+  }
+  ["vDir", "vLen"].forEach((id) => $(id).addEventListener("input", upd)); upd();
+})();
+
+(function basicsKuramoto() {
+  const cv = $("bKura"), ctx = cv.getContext("2d"), W = cv.width, n = 40;
+  let th = [], z0 = [], rHist = [], rng = mulberry32(3);
+  function reset() { th = Array.from({ length: n }, () => rng() * 2 * Math.PI); z0 = Array.from({ length: n }, () => gauss(rng)); rHist = []; }
+  const order = () => { let c = 0, s = 0; for (const t of th) { c += Math.cos(t); s += Math.sin(t); } return [Math.hypot(c, s) / n, Math.atan2(s, c)]; };
+  function step(dt) {
+    const K = +$("kK").value / 100, sig = +$("kS").value / 100, [r, psi] = order();
+    th = th.map((t, i) => t + dt * (sig * z0[i] + K * r * Math.sin(psi - t)));   // mean-field form of the all-to-all model
+  }
+  function draw() {
+    const K = +$("kK").value / 100, sig = +$("kS").value / 100;
+    $("kKv").textContent = K.toFixed(2); $("kSv").textContent = sig.toFixed(2);
+    ctx.clearRect(0, 0, W, W); const c = W / 2, R = W * 0.38;
+    ctx.strokeStyle = css("--rule"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(c, c, R, 0, 2 * Math.PI); ctx.stroke();
+    th.forEach((t) => { ctx.fillStyle = css("--ink-2"); ctx.beginPath(); ctx.arc(c + R * Math.cos(t), c - R * Math.sin(t), 9, 0, 2 * Math.PI); ctx.fill(); });
+    const [r, psi] = order(); ctx.strokeStyle = css("--s2"); ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(c + R * r * Math.cos(psi), c - R * r * Math.sin(psi)); ctx.stroke();
+    ctx.fillStyle = css("--s2"); ctx.beginPath(); ctx.arc(c + R * r * Math.cos(psi), c - R * r * Math.sin(psi), 8, 0, 2 * Math.PI); ctx.fill();
+    rHist.push(r); if (rHist.length > 300) rHist.shift();
+    const s = $("bKuraR"); s.innerHTML = "";
+    [0, 0.5, 1].forEach((v) => { el("line", { x1: 30, x2: 296, y1: 100 - 85 * v, y2: 100 - 85 * v, stroke: "var(--rule)" }, s); el("text", { x: 26, y: 104 - 85 * v, "text-anchor": "end", class: "svgtext" }, s).textContent = v; });
+    el("polyline", { points: rHist.map((v, i) => `${30 + 266 * i / 299},${100 - 85 * v}`).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, s);
+    el("text", { x: 30, y: 116, class: "svgtext" }, s).textContent = "order parameter r over time";
+    const Kc = sig * Math.sqrt(8 / Math.PI);
+    $("bKuraRead").innerHTML = `<dt>order parameter r</dt><dd>${r.toFixed(2)}</dd><dt>critical coupling K<sub>c</sub> ≈ 1.6σ</dt><dd>${Kc.toFixed(2)}</dd><dt>regime</dt><dd>${K > Kc ? "synchronizing" : "incoherent"}</dd>`;
+  }
+  function loop() { for (let k = 0; k < 3; k++) step(0.05); draw(); requestAnimationFrame(loop); }
+  reset();
+  ["kK", "kS"].forEach((id) => $(id).addEventListener("input", () => { if (reduceMotion) { for (let k = 0; k < 600; k++) step(0.05); } draw(); }));
+  $("kReset").addEventListener("click", () => { reset(); if (reduceMotion) for (let k = 0; k < 600; k++) step(0.05); draw(); });
+  if (reduceMotion) { for (let k = 0; k < 600; k++) step(0.05); draw(); } else loop();
+})();
+
+(function basicsAdler() {
+  const svg = $("bAdler"), R = 100;
+  el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  const hv = el("line", { x1: 0, y1: 0, x2: 0, y2: -R, stroke: "var(--s1)", "stroke-width": 3 }, svg);
+  el("text", { x: 6, y: -R - 8, class: "svgmath" }, svg).textContent = "h";
+  const trail = el("path", { fill: "none", stroke: "var(--s2)", "stroke-width": 2, opacity: 0.45 }, svg);
+  const lagArc = el("path", { fill: "none", stroke: "var(--muted)", "stroke-dasharray": "3 3" }, svg);
+  const dot = el("circle", { r: 9, fill: "var(--s2)", stroke: "var(--surface)", "stroke-width": 2 }, svg);
+  let th = 2.5, hist = [];
+  const P = (a, r = R) => [r * Math.sin(a), -r * Math.cos(a)];    // angle clockwise from h (top)
+  function stepA(dt) { const w = +$("aW").value / 100, h = +$("aH").value / 100; th = th + dt * (w - h * Math.sin(th)); th = Math.atan2(Math.sin(th), Math.cos(th)); }
+  function draw() {
+    const w = +$("aW").value / 100, h = +$("aH").value / 100; $("aWv").textContent = w.toFixed(2); $("aHv").textContent = h.toFixed(2);
+    hv.setAttribute("y2", -R * Math.min(1.25, 0.35 + h / 2));
+    const p = P(th); dot.setAttribute("cx", p[0]); dot.setAttribute("cy", p[1]);
+    hist.push(p); if (hist.length > 60) hist.shift();
+    trail.setAttribute("d", hist.map((q, i) => (i ? "L" : "M") + q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" "));
+    const locked = h >= w;
+    if (locked && w > 0) { const lag = Math.asin(w / h); const a = P(0, 60), b = P(lag, 60); lagArc.setAttribute("d", `M${a[0]},${a[1]} A60,60 0 0 1 ${b[0]},${b[1]}`); } else lagArc.setAttribute("d", "");
+    const lagTxt = locked ? (w > 0 ? deg(Math.asin(w / h)).toFixed(0) + "°" : "0°") : "none";
+    $("bAdlerRead").innerHTML = `<dt>state</dt><dd style="color:var(${locked ? "--good" : "--bad"})">${locked ? "✓ locked (fixed point)" : "✗ drifting"}</dd>` +
+      `<dt>lag behind h</dt><dd>${lagTxt}</dd>` +
+      (locked ? `<dt>relaxation rate √(‖h‖²−ω²)</dt><dd>${Math.sqrt(h * h - w * w).toFixed(2)}</dd>` : `<dt>slip period 2π/√(ω²−‖h‖²)</dt><dd>${(2 * Math.PI / Math.sqrt(w * w - h * h)).toFixed(1)}</dd>`);
+  }
+  function loop() { for (let k = 0; k < 2; k++) stepA(0.04); draw(); requestAnimationFrame(loop); }
+  ["aW", "aH"].forEach((id) => $(id).addEventListener("input", () => { hist = []; if (reduceMotion) { for (let k = 0; k < 2000; k++) stepA(0.04); } draw(); }));
+  if (reduceMotion) { for (let k = 0; k < 2000; k++) stepA(0.04); draw(); } else loop();
+})();
+
+(function basicsDamping() {
+  const svg = $("bDamp"), S = 80;
+  const M = (re, im) => [S * re, -S * im];
+  el("line", { x1: -165, x2: 165, y1: 0, y2: 0, stroke: "var(--rule)" }, svg); el("line", { x1: 0, x2: 0, y1: -145, y2: 145, stroke: "var(--rule)" }, svg);
+  el("text", { x: 160, y: -6, "text-anchor": "end", class: "svgtext" }, svg).textContent = "Re"; el("text", { x: 6, y: -136, class: "svgtext" }, svg).textContent = "Im";
+  el("circle", { cx: 0, cy: 0, r: S, fill: "var(--surface)", stroke: "var(--ink-2)", "stroke-width": 1.5 }, svg);
+  el("text", { x: -S * 0.95, y: S + 22, class: "svgtext" }, svg).textContent = "unit circle";
+  const one = M(1, 0); el("circle", { cx: one[0], cy: one[1], r: 4, fill: "var(--ink)" }, svg); el("text", { x: one[0] + 6, y: one[1] + 16, class: "svgtext" }, svg).textContent = "1";
+  const seg = el("line", { x1: one[0], y1: one[1], stroke: "var(--muted)", "stroke-dasharray": "4 3" }, svg);
+  const win = el("line", { x1: one[0], y1: one[1], stroke: "var(--good)", "stroke-width": 5, "stroke-linecap": "round", opacity: 0.6 }, svg);
+  const dp = el("circle", { r: 6, fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }, svg);
+  const zp = el("circle", { r: 9, fill: "none", stroke: "var(--s2)", "stroke-width": 3 }, svg);
+  const zl = el("text", { class: "svgmath" }, svg); zl.textContent = "ζ";
+  function upd() {
+    const re = +$("dRe").value / 100, im = +$("dIm").value / 100, eta = +$("dEta").value / 100;
+    $("dRev").textContent = re.toFixed(2); $("dImv").textContent = im.toFixed(2); $("dEtav").textContent = eta.toFixed(2);
+    const z = M(re, im); zp.setAttribute("cx", z[0]); zp.setAttribute("cy", z[1]); zl.setAttribute("x", z[0] + 9); zl.setAttribute("y", z[1] - 6);
+    seg.setAttribute("x2", z[0]); seg.setAttribute("y2", z[1]);
+    const dre = 1 + eta * (re - 1), dim = eta * im, d = M(dre, dim); dp.setAttribute("cx", d[0]); dp.setAttribute("cy", d[1]);
+    const dz2 = (re - 1) ** 2 + im * im, emax = re < 1 && dz2 > 0 ? 2 * (1 - re) / dz2 : 0, eopt = re < 1 && dz2 > 0 ? (1 - re) / dz2 : 0;
+    const e1 = Math.min(1, emax), w = M(1 + e1 * (re - 1), e1 * im); win.setAttribute("x2", w[0]); win.setAttribute("y2", w[1]); win.style.display = emax > 0 ? "" : "none";
+    const mz = Math.hypot(re, im), md = Math.hypot(dre, dim);
+    const cOpt = re < 1 ? Math.sqrt(Math.max(0, 1 - (1 - re) ** 2 / dz2)) : NaN;
+    $("bDampRead").innerHTML = `<dt>|ζ| (undamped)</dt><dd>${mz.toFixed(3)}</dd><dt>|1 + η(ζ − 1)|</dt><dd style="color:var(${md < 1 ? "--good" : "--bad"})">${md.toFixed(3)} ${md < 1 ? "✓ decays" : "✗ grows"}</dd>` +
+      `<dt>stable for η &lt;</dt><dd>${re < 1 ? emax.toFixed(3) : "no η works"}</dd><dt>best η*, factor per step</dt><dd>${re < 1 ? eopt.toFixed(3) + ", " + cOpt.toFixed(3) : "n/a"}</dd>`;
+    const s = $("bDampErr"); s.innerHTML = ""; const K = 40, lo = -4, hi = 2;
+    const Y = (v) => 110 - 95 * (Math.max(lo, Math.min(hi, Math.log10(v))) - lo) / (hi - lo), X = (k) => 34 + 260 * k / K;
+    [-4, -2, 0, 2].forEach((k) => { el("line", { x1: 34, x2: 294, y1: Y(Math.pow(10, k)), y2: Y(Math.pow(10, k)), stroke: "var(--rule)" }, s); el("text", { x: 30, y: Y(Math.pow(10, k)) + 4, "text-anchor": "end", class: "svgtext" }, s).innerHTML = `10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; });
+    [[mz, "s2"], [md, "s1"]].forEach(([m, col]) => el("polyline", { points: Array.from({ length: K + 1 }, (_, k) => `${X(k)},${Y(Math.max(1e-6, Math.pow(m, k)))}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": 2 }, s));
+    el("text", { x: 34, y: 126, class: "svgtext" }, s).textContent = "error size over 40 iterations (log scale)";
+  }
+  ["dRe", "dIm", "dEta"].forEach((id) => $(id).addEventListener("input", upd)); upd();
+})();
+
+</script>
+<script id="vizdata" type="application/json">{"puzzles":[["2004000110000300","2134342112434312"],["0000003400230301","3412123441232341"],["0104000200400300","2134341212434321"],["0000201030000420","4132231432411423"],["2000130000020040","2413132441323241"],["0010030220010000","4213134224313124"],["2040010030040002","2341412332141432"],["0013000402013000","2413132442313142"],["0103000402400000","4123231432411432"],["2003000002003021","2143431212343421"],["0402020020100000","1432324123144123"],["0000040140033040","1324243142133142"],["0230000140002000","1234342143122143"],["2000040002100040","2134342142131342"],["3000140000020001","3214142341322341"],["0003000013404000","2413312413424231"],["0214000000001030","3214412323411432"],["0003401004001000","2143431234211234"],["4000020320003100","4312124324313124"],["0040402101000010","1243432121343412"],["0120400004300002","3124421324311342"],["0004430030020100","1234432134122143"],["0240103000030000","3241143241232314"],["2400000040013002","2413132442313142"],["0014000004030300","3214413214232341"],["0100300100240003","4132324113242413"],["4030000400001002","4231312424131342"],["2140040000000010","2143342112344312"],["2001403000033000","2341413214233214"],["1000000443010040","1432321443212143"],["0000000404101302","4231312424131342"],["4000030010300040","4123231414323241"],["0000420003042003","3142423113242413"],["0040020300011000","3142421324311324"],["0420200000100004","3421214343121234"],["1004201000000042","1324241342313142"],["0100200100000043","3124243143121243"],["0130002000403400","2134432112433412"],["0120000404000200","4123231414323241"],["1003000031000201","1423231431424231"]],"eig_sfprm":[[-0.41,0.274],[-0.41,-0.274],[0.335,0.596],[0.335,-0.596],[-0.026,0.463],[-0.026,-0.463],[0.069,0.512],[0.069,-0.512],[0.368,0.539],[0.368,-0.539],[0.536,0.481],[0.536,-0.481],[0.19,0.509],[0.19,-0.509],[0.286,0.498],[0.286,-0.498],[-0.168,0.0],[0.178,0.462],[0.178,-0.462],[0.371,0.461],[0.371,-0.461],[0.36,0.46],[0.36,-0.46],[0.413,0.391],[0.413,-0.391],[0.03,0.284],[0.03,-0.284],[0.131,0.361],[0.131,-0.361],[0.274,0.4],[0.274,-0.4],[-0.066,0.0],[-0.013,0.189],[-0.013,-0.189],[0.277,0.37],[0.277,-0.37],[0.368,0.363],[0.368,-0.363],[-0.026,0.0],[0.625,0.107],[0.625,-0.107],[0.344,0.364],[0.344,-0.364],[0.493,0.29],[0.493,-0.29],[0.401,0.333],[0.401,-0.333],[0.103,0.26],[0.103,-0.26],[0.04,0.17],[0.04,-0.17],[0.367,0.319],[0.367,-0.319],[0.266,0.321],[0.266,-0.321],[0.088,0.214],[0.088,-0.214],[0.479,0.258],[0.479,-0.258],[0.231,0.298],[0.231,-0.298],[0.284,0.31],[0.284,-0.31],[0.079,0.181],[0.079,-0.181],[0.179,0.265],[0.179,-0.265],[0.574,0.0],[0.433,0.266],[0.433,-0.266],[0.418,0.271],[0.418,-0.271],[0.56,0.11],[0.56,-0.11],[0.206,0.272],[0.206,-0.272],[0.509,0.182],[0.509,-0.182],[0.319,0.289],[0.319,-0.289],[0.029,0.0],[0.532,0.132],[0.532,-0.132],[0.439,0.241],[0.439,-0.241],[0.353,0.276],[0.353,-0.276],[0.555,0.0],[0.446,0.227],[0.446,-0.227],[0.28,0.272],[0.28,-0.272],[0.548,0.068],[0.548,-0.068],[0.156,0.198],[0.156,-0.198],[0.093,0.076],[0.093,-0.076],[0.332,0.254],[0.332,-0.254],[0.463,0.197],[0.463,-0.197],[0.407,0.226],[0.407,-0.226],[0.118,0.106],[0.118,-0.106],[0.37,0.237],[0.37,-0.237],[0.097,0.038],[0.097,-0.038],[0.096,0.0],[0.494,0.153],[0.494,-0.153],[0.221,0.21],[0.221,-0.21],[0.394,0.224],[0.394,-0.224],[0.498,0.14],[0.498,-0.14],[0.522,0.092],[0.522,-0.092],[0.296,0.233],[0.296,-0.233],[0.114,0.0],[0.418,0.201],[0.418,-0.201],[0.528,0.052],[0.528,-0.052],[0.342,0.227],[0.342,-0.227],[0.161,0.139],[0.161,-0.139],[0.529,0.0],[0.449,0.166],[0.449,-0.166],[0.52,0.038],[0.52,-0.038],[0.422,0.184],[0.422,-0.184],[0.519,0.013],[0.519,-0.013],[0.273,0.211],[0.273,-0.211],[0.476,0.127],[0.476,-0.127],[0.506,0.074],[0.506,-0.074],[0.293,0.21],[0.293,-0.21],[0.335,0.211],[0.335,-0.211],[0.473,0.12],[0.473,-0.12],[0.402,0.181],[0.402,-0.181],[0.262,0.195],[0.262,-0.195],[0.341,0.203],[0.341,-0.203],[0.488,0.081],[0.488,-0.081],[0.49,0.075],[0.49,-0.075],[0.503,0.017],[0.503,-0.017],[0.165,0.143],[0.165,-0.143],[0.224,0.184],[0.224,-0.184],[0.257,0.182],[0.257,-0.182],[0.128,0.037],[0.128,-0.037],[0.229,0.169],[0.229,-0.169],[0.217,0.16],[0.217,-0.16],[0.134,0.0],[0.128,0.019],[0.128,-0.019],[0.368,0.188],[0.368,-0.188],[0.142,0.073],[0.142,-0.073],[0.429,0.151],[0.429,-0.151],[0.493,0.028],[0.493,-0.028],[0.453,0.121],[0.453,-0.121],[0.194,0.132],[0.194,-0.132],[0.491,0.034],[0.491,-0.034],[0.329,0.179],[0.329,-0.179],[0.465,0.093],[0.465,-0.093],[0.478,0.058],[0.478,-0.058],[0.48,0.0],[0.403,0.153],[0.403,-0.153],[0.424,0.138],[0.424,-0.138],[0.376,0.165],[0.376,-0.165],[0.154,0.074],[0.154,-0.074],[0.448,0.102],[0.448,-0.102],[0.39,0.154],[0.39,-0.154],[0.473,0.048],[0.473,-0.048],[0.364,0.163],[0.364,-0.163],[0.428,0.123],[0.428,-0.123],[0.417,0.132],[0.417,-0.132],[0.149,0.051],[0.149,-0.051],[0.149,0.034],[0.149,-0.034],[0.197,0.123],[0.197,-0.123],[0.183,0.103],[0.183,-0.103],[0.176,0.089],[0.176,-0.089],[0.218,0.136],[0.218,-0.136],[0.219,0.127],[0.219,-0.127],[0.289,0.165],[0.289,-0.165],[0.277,0.158],[0.277,-0.158],[0.256,0.148],[0.256,-0.148],[0.321,0.164],[0.321,-0.164],[0.345,0.159],[0.345,-0.159],[0.474,0.011],[0.474,-0.011],[0.447,0.082],[0.447,-0.082],[0.32,0.158],[0.32,-0.158],[0.358,0.152],[0.358,-0.152],[0.47,0.019],[0.47,-0.019],[0.467,0.0],[0.455,0.061],[0.455,-0.061],[0.434,0.097],[0.434,-0.097],[0.434,0.093],[0.434,-0.093],[0.385,0.138],[0.385,-0.138],[0.378,0.14],[0.378,-0.14],[0.333,0.154],[0.333,-0.154],[0.458,0.043],[0.458,-0.043],[0.459,0.023],[0.459,-0.023],[0.155,0.022],[0.155,-0.022],[0.164,0.0],[0.201,0.109],[0.201,-0.109],[0.162,0.01],[0.162,-0.01],[0.238,0.133],[0.238,-0.133],[0.294,0.148],[0.294,-0.148],[0.343,0.143],[0.343,-0.143],[0.409,0.115],[0.409,-0.115],[0.395,0.122],[0.395,-0.122],[0.365,0.136],[0.365,-0.136],[0.459,0.0],[0.441,0.075],[0.441,-0.075],[0.444,0.06],[0.444,-0.06],[0.405,0.107],[0.405,-0.107],[0.451,0.036],[0.451,-0.036],[0.429,0.077],[0.429,-0.077],[0.451,0.017],[0.451,-0.017],[0.416,0.091],[0.416,-0.091],[0.412,0.094],[0.412,-0.094],[0.19,0.08],[0.19,-0.08],[0.175,0.042],[0.175,-0.042],[0.172,0.012],[0.172,-0.012],[0.243,0.121],[0.243,-0.121],[0.256,0.124],[0.256,-0.124],[0.27,0.131],[0.27,-0.131],[0.302,0.141],[0.302,-0.141],[0.288,0.135],[0.288,-0.135],[0.323,0.139],[0.323,-0.139],[0.321,0.135],[0.321,-0.135],[0.386,0.114],[0.386,-0.114],[0.211,0.086],[0.211,-0.086],[0.301,0.132],[0.301,-0.132],[0.376,0.116],[0.376,-0.116],[0.183,0.034],[0.183,-0.034],[0.444,0.021],[0.444,-0.021],[0.427,0.068],[0.427,-0.068],[0.193,0.044],[0.193,-0.044],[0.436,0.044],[0.436,-0.044],[0.421,0.071],[0.421,-0.071],[0.394,0.097],[0.394,-0.097],[0.435,0.035],[0.435,-0.035],[0.196,0.064],[0.196,-0.064],[0.218,0.092],[0.218,-0.092],[0.187,0.002],[0.187,-0.002],[0.228,0.095],[0.228,-0.095],[0.238,0.103],[0.238,-0.103],[0.292,0.126],[0.292,-0.126],[0.315,0.128],[0.315,-0.128],[0.329,0.128],[0.329,-0.128],[0.275,0.118],[0.275,-0.118],[0.356,0.118],[0.356,-0.118],[0.344,0.12],[0.344,-0.12],[0.385,0.098],[0.385,-0.098],[0.437,0.0],[0.411,0.074],[0.411,-0.074],[0.212,0.071],[0.212,-0.071],[0.423,0.058],[0.423,-0.058],[0.396,0.087],[0.396,-0.087],[0.425,0.044],[0.425,-0.044],[0.432,0.017],[0.432,-0.017],[0.265,0.111],[0.265,-0.111],[0.433,0.004],[0.433,-0.004],[0.359,0.107],[0.359,-0.107],[0.42,0.042],[0.42,-0.042],[0.193,0.018],[0.193,-0.018],[0.195,0.0],[0.221,0.08],[0.221,-0.08],[0.199,0.028],[0.199,-0.028],[0.206,0.048],[0.206,-0.048],[0.216,0.064],[0.216,-0.064],[0.247,0.099],[0.247,-0.099],[0.428,0.0],[0.288,0.114],[0.288,-0.114],[0.314,0.117],[0.314,-0.117],[0.236,0.086],[0.236,-0.086],[0.268,0.107],[0.268,-0.107],[0.37,0.098],[0.37,-0.098],[0.302,0.113],[0.302,-0.113],[0.404,0.067],[0.404,-0.067],[0.326,0.11],[0.326,-0.11],[0.377,0.088],[0.377,-0.088],[0.421,0.023],[0.421,-0.023],[0.261,0.102],[0.261,-0.102],[0.409,0.052],[0.409,-0.052],[0.415,0.042],[0.415,-0.042],[0.344,0.104],[0.344,-0.104],[0.385,0.078],[0.385,-0.078],[0.414,0.031],[0.414,-0.031],[0.416,0.02],[0.416,-0.02],[0.415,0.007],[0.415,-0.007],[0.39,0.07],[0.39,-0.07],[0.386,0.072],[0.386,-0.072],[0.249,0.089],[0.249,-0.089],[0.224,0.066],[0.224,-0.066],[0.348,0.1],[0.348,-0.1],[0.305,0.107],[0.305,-0.107],[0.203,0.028],[0.203,-0.028],[0.327,0.104],[0.327,-0.104],[0.356,0.093],[0.356,-0.093],[0.269,0.097],[0.269,-0.097],[0.346,0.097],[0.346,-0.097],[0.203,0.013],[0.203,-0.013],[0.297,0.103],[0.297,-0.103],[0.204,0.006],[0.204,-0.006],[0.213,0.041],[0.213,-0.041],[0.361,0.086],[0.361,-0.086],[0.257,0.089],[0.257,-0.089],[0.317,0.099],[0.317,-0.099],[0.241,0.07],[0.241,-0.07],[0.412,0.0],[0.21,0.0],[0.212,0.017],[0.212,-0.017],[0.369,0.077],[0.369,-0.077],[0.389,0.059],[0.389,-0.059],[0.407,0.0],[0.396,0.048],[0.396,-0.048],[0.386,0.06],[0.386,-0.06],[0.366,0.075],[0.366,-0.075],[0.391,0.052],[0.391,-0.052],[0.39,0.051],[0.39,-0.051],[0.37,0.067],[0.37,-0.067],[0.401,0.035],[0.401,-0.035],[0.379,0.057],[0.379,-0.057],[0.311,0.096],[0.311,-0.096],[0.333,0.093],[0.333,-0.093],[0.29,0.092],[0.29,-0.092],[0.268,0.087],[0.268,-0.087],[0.251,0.077],[0.251,-0.077],[0.227,0.051],[0.227,-0.051],[0.226,0.049],[0.226,-0.049],[0.221,0.039],[0.221,-0.039],[0.214,0.0],[0.259,0.081],[0.259,-0.081],[0.407,0.01],[0.407,-0.01],[0.22,0.03],[0.22,-0.03],[0.219,0.025],[0.219,-0.025],[0.326,0.089],[0.326,-0.089],[0.238,0.06],[0.238,-0.06],[0.248,0.07],[0.248,-0.07],[0.224,0.038],[0.224,-0.038],[0.361,0.072],[0.361,-0.072],[0.344,0.081],[0.344,-0.081],[0.271,0.081],[0.271,-0.081],[0.402,0.014],[0.402,-0.014],[0.392,0.036],[0.392,-0.036],[0.4,0.01],[0.4,-0.01],[0.233,0.051],[0.233,-0.051],[0.392,0.031],[0.392,-0.031],[0.395,0.025],[0.395,-0.025],[0.382,0.045],[0.382,-0.045],[0.245,0.063],[0.245,-0.063],[0.219,0.0],[0.285,0.085],[0.285,-0.085],[0.301,0.088],[0.301,-0.088],[0.323,0.087],[0.323,-0.087],[0.221,0.006],[0.221,-0.006],[0.379,0.044],[0.379,-0.044],[0.387,0.03],[0.387,-0.03],[0.251,0.065],[0.251,-0.065],[0.275,0.08],[0.275,-0.08],[0.331,0.083],[0.331,-0.083],[0.305,0.085],[0.305,-0.085],[0.372,0.054],[0.372,-0.054],[0.356,0.066],[0.356,-0.066],[0.367,0.056],[0.367,-0.056],[0.223,0.009],[0.223,-0.009],[0.228,0.026],[0.228,-0.026],[0.231,0.03],[0.231,-0.03],[0.314,0.08],[0.314,-0.08],[0.391,0.0],[0.34,0.075],[0.34,-0.075],[0.362,0.059],[0.362,-0.059],[0.35,0.067],[0.35,-0.067],[0.371,0.049],[0.371,-0.049],[0.378,0.038],[0.378,-0.038],[0.379,0.033],[0.379,-0.033],[0.228,0.017],[0.228,-0.017],[0.266,0.07],[0.266,-0.07],[0.285,0.077],[0.285,-0.077],[0.227,0.0],[0.389,0.014],[0.389,-0.014],[0.259,0.063],[0.259,-0.063],[0.345,0.066],[0.345,-0.066],[0.343,0.066],[0.343,-0.066],[0.301,0.078],[0.301,-0.078],[0.361,0.047],[0.361,-0.047],[0.236,0.03],[0.236,-0.03],[0.24,0.037],[0.24,-0.037],[0.258,0.06],[0.258,-0.06],[0.244,0.043],[0.244,-0.043],[0.252,0.053],[0.252,-0.053],[0.233,0.015],[0.233,-0.015],[0.384,0.0],[0.232,0.0],[0.377,0.026],[0.377,-0.026],[0.27,0.065],[0.27,-0.065],[0.291,0.073],[0.291,-0.073],[0.278,0.068],[0.278,-0.068],[0.325,0.073],[0.325,-0.073],[0.248,0.043],[0.248,-0.043],[0.378,0.012],[0.378,-0.012],[0.298,0.072],[0.298,-0.072],[0.333,0.068],[0.333,-0.068],[0.235,0.0],[0.379,0.0],[0.314,0.07],[0.314,-0.07],[0.337,0.064],[0.337,-0.064],[0.359,0.044],[0.359,-0.044],[0.327,0.067],[0.327,-0.067],[0.354,0.05],[0.354,-0.05],[0.262,0.056],[0.262,-0.056],[0.285,0.067],[0.285,-0.067],[0.269,0.058],[0.269,-0.058],[0.238,0.016],[0.238,-0.016],[0.279,0.064],[0.279,-0.064],[0.371,0.022],[0.371,-0.022],[0.347,0.053],[0.347,-0.053],[0.375,0.001],[0.375,-0.001],[0.307,0.068],[0.307,-0.068],[0.242,0.023],[0.242,-0.023],[0.247,0.033],[0.247,-0.033],[0.263,0.05],[0.263,-0.05],[0.239,0.006],[0.239,-0.006],[0.374,0.009],[0.374,-0.009],[0.326,0.062],[0.326,-0.062],[0.369,0.02],[0.369,-0.02],[0.254,0.038],[0.254,-0.038],[0.305,0.064],[0.305,-0.064],[0.24,0.0],[0.345,0.05],[0.345,-0.05],[0.242,0.011],[0.242,-0.011],[0.364,0.028],[0.364,-0.028],[0.36,0.034],[0.36,-0.034],[0.349,0.044],[0.349,-0.044],[0.245,0.018],[0.245,-0.018],[0.25,0.028],[0.25,-0.028],[0.258,0.042],[0.258,-0.042],[0.316,0.061],[0.316,-0.061],[0.263,0.044],[0.263,-0.044],[0.333,0.055],[0.333,-0.055],[0.352,0.041],[0.352,-0.041],[0.291,0.058],[0.291,-0.058],[0.368,0.012],[0.368,-0.012],[0.338,0.049],[0.338,-0.049],[0.361,0.023],[0.361,-0.023],[0.297,0.058],[0.297,-0.058],[0.303,0.059],[0.303,-0.059],[0.329,0.051],[0.329,-0.051],[0.275,0.05],[0.275,-0.05],[0.27,0.047],[0.27,-0.047],[0.248,0.021],[0.248,-0.021],[0.249,0.0],[0.26,0.038],[0.26,-0.038],[0.366,0.001],[0.366,-0.001],[0.361,0.018],[0.361,-0.018],[0.248,0.005],[0.248,-0.005],[0.259,0.032],[0.259,-0.032],[0.308,0.057],[0.308,-0.057],[0.254,0.022],[0.254,-0.022],[0.313,0.055],[0.313,-0.055],[0.349,0.03],[0.349,-0.03],[0.344,0.036],[0.344,-0.036],[0.353,0.023],[0.353,-0.023],[0.334,0.042],[0.334,-0.042],[0.342,0.034],[0.342,-0.034],[0.278,0.046],[0.278,-0.046],[0.326,0.044],[0.326,-0.044],[0.332,0.039],[0.332,-0.039],[0.36,0.002],[0.36,-0.002],[0.251,0.01],[0.251,-0.01],[0.259,0.028],[0.259,-0.028],[0.254,0.0],[0.286,0.05],[0.286,-0.05],[0.268,0.037],[0.268,-0.037],[0.318,0.051],[0.318,-0.051],[0.293,0.051],[0.293,-0.051],[0.255,0.009],[0.255,-0.009],[0.26,0.022],[0.26,-0.022],[0.321,0.047],[0.321,-0.047],[0.264,0.028],[0.264,-0.028],[0.28,0.044],[0.28,-0.044],[0.344,0.024],[0.344,-0.024],[0.292,0.047],[0.292,-0.047],[0.354,0.014],[0.354,-0.014],[0.356,0.008],[0.356,-0.008],[0.275,0.037],[0.275,-0.037],[0.285,0.043],[0.285,-0.043],[0.307,0.048],[0.307,-0.048],[0.336,0.031],[0.336,-0.031],[0.353,0.0],[0.311,0.045],[0.311,-0.045],[0.347,0.016],[0.347,-0.016],[0.304,0.045],[0.304,-0.045],[0.35,0.008],[0.35,-0.008],[0.349,0.006],[0.349,-0.006],[0.259,0.0],[0.302,0.045],[0.302,-0.045],[0.292,0.042],[0.292,-0.042],[0.327,0.036],[0.327,-0.036],[0.337,0.026],[0.337,-0.026],[0.34,0.023],[0.34,-0.023],[0.272,0.028],[0.272,-0.028],[0.267,0.023],[0.267,-0.023],[0.263,0.013],[0.263,-0.013],[0.262,0.01],[0.262,-0.01],[0.34,0.016],[0.34,-0.016],[0.342,0.01],[0.342,-0.01],[0.343,0.004],[0.343,-0.004],[0.261,0.0],[0.275,0.027],[0.275,-0.027],[0.31,0.04],[0.31,-0.04],[0.292,0.037],[0.292,-0.037],[0.264,0.004],[0.264,-0.004],[0.319,0.035],[0.319,-0.035],[0.267,0.013],[0.267,-0.013],[0.315,0.036],[0.315,-0.036],[0.331,0.025],[0.331,-0.025],[0.285,0.033],[0.285,-0.033],[0.279,0.029],[0.279,-0.029],[0.339,0.0],[0.295,0.037],[0.295,-0.037],[0.324,0.029],[0.324,-0.029],[0.328,0.025],[0.328,-0.025],[0.335,0.018],[0.335,-0.018],[0.3,0.036],[0.3,-0.036],[0.304,0.036],[0.304,-0.036],[0.273,0.019],[0.273,-0.019],[0.334,0.013],[0.334,-0.013],[0.331,0.016],[0.331,-0.016],[0.268,0.002],[0.268,-0.002],[0.27,0.009],[0.27,-0.009],[0.271,0.006],[0.271,-0.006],[0.297,0.032],[0.297,-0.032],[0.273,0.011],[0.273,-0.011],[0.317,0.029],[0.317,-0.029],[0.319,0.027],[0.319,-0.027],[0.28,0.021],[0.28,-0.021],[0.334,0.004],[0.334,-0.004],[0.291,0.028],[0.291,-0.028],[0.285,0.023],[0.285,-0.023],[0.277,0.014],[0.277,-0.014],[0.31,0.028],[0.31,-0.028],[0.331,0.002],[0.331,-0.002],[0.322,0.019],[0.322,-0.019],[0.29,0.024],[0.29,-0.024],[0.328,0.01],[0.328,-0.01],[0.302,0.028],[0.302,-0.028],[0.319,0.019],[0.319,-0.019],[0.325,0.012],[0.325,-0.012],[0.298,0.026],[0.298,-0.026],[0.325,0.01],[0.325,-0.01],[0.312,0.023],[0.312,-0.023],[0.283,0.013],[0.283,-0.013],[0.298,0.023],[0.298,-0.023],[0.306,0.022],[0.306,-0.022],[0.275,0.0],[0.287,0.018],[0.287,-0.018],[0.281,0.008],[0.281,-0.008],[0.301,0.022],[0.301,-0.022],[0.314,0.016],[0.314,-0.016],[0.315,0.012],[0.315,-0.012],[0.28,0.0],[0.291,0.018],[0.291,-0.018],[0.318,0.008],[0.318,-0.008],[0.283,0.005],[0.283,-0.005],[0.318,0.004],[0.318,-0.004],[0.3,0.016],[0.3,-0.016],[0.292,0.015],[0.292,-0.015],[0.284,0.0],[0.288,0.011],[0.288,-0.011],[0.306,0.014],[0.306,-0.014],[0.316,0.002],[0.316,-0.002],[0.303,0.012],[0.303,-0.012],[0.289,0.0],[0.292,0.005],[0.292,-0.005],[0.297,0.009],[0.297,-0.009],[0.31,0.0],[0.3,0.008],[0.3,-0.008],[0.293,0.0],[0.308,0.0],[0.295,0.0],[0.297,0.0],[0.309,0.0],[0.302,0.0],[0.303,0.004],[0.303,-0.004]],"eig_energy":[[-12.522,0.0],[-12.057,0.0],[-11.135,0.0],[-10.909,0.0],[-10.613,0.0],[-10.554,0.0],[-10.391,0.0],[-10.099,0.0],[-9.962,0.0],[-9.764,0.0],[-9.669,0.0],[-9.525,0.0],[-9.23,0.0],[-9.019,0.0],[-8.965,0.0],[-8.605,0.0],[-8.504,0.0],[-8.147,0.0],[-8.056,0.0],[-7.991,0.0],[-7.745,0.0],[-7.726,0.0],[-7.533,0.0],[-7.417,0.0],[-7.329,0.0],[-7.225,0.0],[-7.134,0.0],[-6.832,0.0],[-6.799,0.0],[-6.721,0.0],[-6.646,0.0],[-6.546,0.0],[-6.509,0.0],[-6.399,0.0],[-6.321,0.0],[-6.25,0.0],[-6.137,0.0],[-6.055,0.0],[-6.001,0.0],[-5.914,0.0],[-5.857,0.0],[-5.755,0.0],[-5.691,0.0],[-5.638,0.0],[-5.568,0.0],[-5.432,0.0],[-5.359,0.0],[-5.332,0.0],[-5.226,0.0],[-5.127,0.0],[-5.1,0.0],[-5.014,0.0],[-4.998,0.0],[-4.885,0.0],[-4.859,0.0],[-4.836,0.0],[-4.776,0.0],[-4.694,0.0],[-4.65,0.0],[-4.587,0.0],[-4.497,0.0],[-4.442,0.0],[-4.388,0.0],[-4.366,0.0],[-4.273,0.0],[0.929,0.0],[-4.234,0.0],[-4.186,0.0],[-4.128,0.0],[-4.038,0.0],[0.722,0.0],[-3.994,0.0],[-3.935,0.0],[-3.927,0.0],[0.615,0.0],[-3.893,0.0],[-3.859,0.0],[-3.819,0.0],[-3.791,0.0],[-3.773,0.0],[-3.72,0.0],[-3.724,0.0],[-3.701,0.0],[0.393,0.0],[-3.623,0.0],[-3.616,0.0],[-3.597,0.0],[-3.56,0.0],[-3.556,0.0],[0.273,0.0],[-3.527,0.0],[-3.484,0.0],[-3.462,0.0],[-3.438,0.0],[0.19,0.0],[0.092,0.0],[-3.394,0.0],[-3.376,0.0],[-3.364,0.0],[-3.339,0.0],[0.033,0.0],[-3.325,0.0],[-3.294,0.0],[-0.005,0.0],[-3.281,0.0],[-3.265,0.0],[-3.252,0.0],[-3.233,0.0],[-3.222,0.0],[-3.207,0.0],[-3.188,0.0],[-3.178,0.0],[-3.157,0.0],[-3.133,0.0],[-0.085,0.0],[-3.121,0.0],[-0.106,0.0],[-3.098,0.0],[-3.094,0.0],[-3.087,0.0],[-0.145,0.0],[-3.072,0.0],[-0.159,0.0],[-3.053,0.0],[-0.206,0.0],[-0.23,0.0],[-3.013,0.0],[-3.003,0.0],[-2.996,0.0],[-0.247,0.0],[-2.985,0.0],[-2.974,0.0],[-2.966,0.0],[-2.955,0.0],[-2.95,0.0],[-0.26,0.0],[-0.278,0.0],[-2.941,0.0],[-0.286,0.0],[-2.924,0.0],[-2.916,0.0],[-0.298,0.0],[-0.306,0.0],[-2.91,0.0],[-2.895,0.0],[-2.889,0.0],[-2.874,0.0],[-0.319,0.0],[-2.867,0.0],[-0.326,0.0],[-0.336,0.0],[-0.342,0.0],[-0.346,0.0],[-2.858,0.0],[-2.852,0.0],[-2.848,0.0],[-2.842,0.0],[-0.354,0.0],[-0.358,0.0],[-2.832,0.0],[-2.827,0.0],[-2.825,0.0],[-0.364,0.0],[-0.366,0.0],[-0.371,0.0],[-0.379,0.0],[-0.384,0.0],[-2.815,0.0],[-2.81,0.0],[-2.807,0.0],[-2.799,0.0],[-0.388,0.0],[-2.795,0.0],[-0.395,0.0],[-2.791,0.0],[-0.403,0.0],[-0.41,0.0],[-0.415,0.0],[-2.785,0.0],[-2.777,0.0],[-2.772,0.0],[-2.769,0.0],[-0.418,0.0],[-2.766,0.0],[-2.761,0.0],[-0.427,0.0],[-0.43,0.0],[-0.432,0.0],[-2.759,0.0],[-2.754,0.0],[-2.752,0.0],[-2.747,0.0],[-2.743,0.0],[-0.441,0.0],[-2.739,0.0],[-0.447,0.0],[-0.452,0.0],[-2.735,0.0],[-2.73,0.0],[-2.726,0.0],[-2.725,0.0],[-0.454,0.0],[-0.457,0.0],[-2.721,0.0],[-2.717,0.0],[-2.716,0.0],[-2.713,0.0],[-2.712,0.0],[-2.707,0.0],[-0.462,0.0],[-0.47,0.0],[-0.472,0.0],[-0.475,0.0],[-0.477,0.0],[-0.484,0.0],[-0.487,0.0],[-0.489,0.0],[-0.492,0.0],[-0.496,0.0],[-0.497,0.0],[-0.502,0.0],[-0.503,0.0],[-0.505,0.0],[-0.507,0.0],[-0.509,0.0],[-0.51,0.0],[-0.514,0.0],[-0.519,0.0],[-0.523,0.0],[-0.522,0.0],[-0.534,0.0],[-0.536,0.0],[-0.528,0.0],[-2.703,0.0],[-2.7,0.0],[-0.542,0.0],[-0.542,0.0],[-2.697,0.0],[-2.695,0.0],[-2.692,0.0],[-0.546,0.0],[-0.549,0.0],[-0.552,0.0],[-0.555,0.0],[-2.688,0.0],[-2.687,0.0],[-2.685,0.0],[-2.683,0.0],[-2.682,0.0],[-2.676,0.0],[-2.673,0.0],[-2.673,0.0],[-2.672,0.0],[-2.668,0.0],[-2.665,0.0],[-2.664,0.0],[-2.663,0.0],[-2.66,0.0],[-2.656,0.0],[-2.654,0.0],[-2.658,0.0],[-2.651,0.0],[-2.646,0.0],[-2.646,0.0],[-2.644,0.0],[-2.642,0.0],[-2.639,0.0],[-2.636,0.0],[-2.635,0.0],[-2.63,0.0],[-2.631,0.0],[-2.626,0.0],[-2.627,0.0],[-2.625,0.0],[-2.622,0.0],[-2.621,0.0],[-2.613,0.0],[-2.61,0.0],[-2.604,0.0],[-2.616,0.0],[-2.602,0.0],[-2.601,0.0],[-2.606,0.0],[-2.611,0.0],[-2.619,0.0],[-2.618,0.0],[-2.617,0.0],[-0.557,0.0],[-0.557,0.0],[-0.562,0.0],[-0.563,0.0],[-0.564,0.0],[-0.567,0.0],[-0.568,0.0],[-0.569,0.0],[-0.571,0.0],[-0.572,0.0],[-0.575,0.0],[-0.577,0.0],[-0.579,0.0],[-0.582,0.0],[-0.584,0.0],[-0.585,0.0],[-0.586,0.0],[-0.588,0.0],[-0.592,0.0],[-0.591,0.0],[-0.596,0.0],[-0.598,0.0],[-0.6,0.0],[-0.605,0.0],[-0.601,0.0],[-0.603,0.0],[-0.602,0.0],[-2.599,0.0],[-2.596,0.0],[-2.595,0.0],[-2.594,0.0],[-2.594,0.0],[-2.592,0.0],[-2.59,0.0],[-2.588,0.0],[-2.588,0.0],[-2.585,0.0],[-2.584,0.0],[-2.581,0.0],[-2.579,0.0],[-2.577,0.0],[-2.575,0.0],[-2.574,0.0],[-2.569,0.0],[-2.572,0.0],[-2.571,0.0],[-2.568,0.0],[-2.55,0.0],[-2.561,0.0],[-2.565,0.0],[-2.563,0.0],[-2.548,0.0],[-2.552,0.0],[-2.563,0.0],[-2.55,0.0],[-2.553,0.0],[-2.556,0.0],[-2.558,0.0],[-2.558,0.0],[-0.615,0.0],[-0.614,0.0],[-0.612,0.0],[-0.608,0.0],[-0.608,0.0],[-0.609,0.0],[-0.61,0.0],[-0.619,0.0],[-0.622,0.0],[-0.624,0.0],[-0.623,0.0],[-0.625,0.0],[-0.638,0.0],[-0.627,0.0],[-0.629,0.0],[-0.63,0.0],[-0.633,0.0],[-0.635,0.0],[-0.634,0.0],[-0.637,0.0],[-2.542,0.0],[-2.545,0.0],[-2.547,0.0],[-2.547,0.0],[-2.54,0.0],[-2.536,0.0],[-2.539,0.0],[-2.535,0.0],[-2.539,0.0],[-2.517,0.0],[-2.529,0.0],[-2.527,0.0],[-2.531,0.0],[-2.523,0.0],[-2.518,0.0],[-2.524,0.0],[-2.52,0.0],[-2.519,0.0],[-2.521,0.0],[-2.526,0.0],[-2.53,0.0],[-2.533,0.0],[-0.646,0.0],[-0.643,0.0],[-0.64,0.0],[-0.658,0.0],[-0.64,0.0],[-0.65,0.0],[-0.649,0.0],[-0.651,0.0],[-0.644,0.0],[-0.658,0.0],[-0.657,0.0],[-0.656,0.0],[-0.655,0.0],[-0.653,0.0],[-2.489,0.0],[-2.49,0.0],[-2.492,0.0],[-2.494,0.0],[-2.514,0.0],[-2.497,0.0],[-2.502,0.0],[-2.505,0.0],[-2.507,0.0],[-2.512,0.0],[-2.513,0.0],[-2.498,0.0],[-2.499,0.0],[-2.513,0.0],[-2.509,0.0],[-2.509,0.0],[-2.508,0.0],[-2.501,0.0],[-2.501,0.0],[-0.661,0.0],[-0.678,0.0],[-0.663,0.0],[-0.669,0.0],[-0.677,0.0],[-0.67,0.0],[-0.663,0.0],[-0.667,0.0],[-0.666,0.0],[-0.674,0.0],[-0.675,0.0],[-0.673,0.0],[-2.472,0.0],[-2.475,0.0],[-2.476,0.0],[-2.476,0.0],[-2.478,0.0],[-2.484,0.0],[-2.487,0.0],[-2.481,0.0],[-2.488,0.0],[-2.482,0.0],[-2.482,0.0],[-2.479,0.0],[-2.485,0.0],[-2.49,0.0],[-0.68,0.0],[-0.682,0.0],[-0.691,0.0],[-0.685,0.0],[-0.689,0.0],[-0.681,0.0],[-0.676,0.0],[-0.69,0.0],[-0.688,0.0],[-0.686,0.0],[-0.686,0.0],[-2.456,0.0],[-2.457,0.0],[-2.458,0.0],[-2.46,0.0],[-2.467,0.0],[-2.469,0.0],[-2.462,0.0],[-2.468,0.0],[-2.465,0.0],[-2.464,0.0],[-2.47,0.0],[-2.472,0.0],[-2.463,0.0],[-2.464,0.0],[-0.698,0.0],[-0.693,0.0],[-0.701,0.0],[-0.705,0.0],[-0.696,0.0],[-0.704,0.0],[-0.694,0.0],[-0.695,0.0],[-0.704,0.0],[-0.701,0.0],[-2.441,0.0],[-2.444,0.0],[-2.446,0.0],[-2.446,0.0],[-2.448,0.0],[-2.455,0.0],[-2.45,0.0],[-2.451,0.0],[-2.453,0.0],[-2.451,0.0],[-0.717,0.0],[-0.709,0.0],[-0.716,0.0],[-0.713,0.0],[-0.713,0.0],[-0.711,0.0],[-0.707,0.0],[-0.707,0.0],[-0.71,0.0],[-2.432,0.0],[-2.432,0.0],[-2.433,0.0],[-2.436,0.0],[-2.437,0.0],[-2.438,0.0],[-2.434,0.0],[-2.44,0.0],[-2.442,0.0],[-0.72,0.0],[-0.719,0.0],[-0.727,0.0],[-0.725,0.0],[-0.722,0.0],[-0.723,0.0],[-0.724,0.0],[-2.421,0.0],[-2.418,0.0],[-2.419,0.0],[-2.418,0.0],[-2.419,0.0],[-2.429,0.0],[-2.424,0.0],[-2.425,0.0],[-2.426,0.0],[-2.423,0.0],[-2.427,0.0],[-0.738,0.0],[-0.736,0.0],[-0.728,0.0],[-0.733,0.0],[-0.73,0.0],[-0.735,0.0],[-0.733,0.0],[-0.731,0.0],[-0.726,0.0],[-2.407,0.0],[-2.409,0.0],[-2.412,0.0],[-2.413,0.0],[-2.415,0.0],[-2.41,0.0],[-2.415,0.0],[-2.411,0.0],[-2.41,0.0],[-0.744,0.0],[-0.74,0.0],[-0.743,0.0],[-0.744,0.0],[-0.738,0.0],[-2.394,0.0],[-2.394,0.0],[-2.396,0.0],[-2.399,0.0],[-2.4,0.0],[-2.397,0.0],[-2.405,0.0],[-2.403,0.0],[-2.402,0.0],[-2.401,0.0],[-2.407,0.0],[-2.403,0.0],[-0.76,0.0],[-0.75,0.0],[-0.748,0.0],[-0.747,0.0],[-0.748,0.0],[-0.753,0.0],[-0.752,0.0],[-0.759,0.0],[-0.757,0.0],[-0.755,0.0],[-2.381,0.0],[-2.39,0.0],[-2.384,0.0],[-2.382,0.0],[-2.389,0.0],[-2.392,0.0],[-2.393,0.0],[-2.385,0.0],[-2.386,0.0],[-2.387,0.0],[-2.382,0.0],[-2.381,0.0],[-0.76,0.0],[-0.765,0.0],[-0.764,0.0],[-0.764,0.0],[-0.766,0.0],[-0.768,0.0],[-0.769,0.0],[-0.771,0.0],[-0.771,0.0],[-0.773,0.0],[-0.775,0.0],[-0.775,0.0],[-2.364,0.0],[-2.367,0.0],[-2.371,0.0],[-2.37,0.0],[-2.373,0.0],[-2.379,0.0],[-2.377,0.0],[-2.374,0.0],[-2.378,0.0],[-2.376,0.0],[-2.366,0.0],[-2.371,0.0],[-2.375,0.0],[-0.778,0.0],[-0.777,0.0],[-0.78,0.0],[-0.78,0.0],[-0.782,0.0],[-0.784,0.0],[-0.784,0.0],[-0.786,0.0],[-0.787,0.0],[-0.79,0.0],[-0.79,0.0],[-0.791,0.0],[-0.793,0.0],[-0.794,0.0],[-0.797,0.0],[-0.797,0.0],[-0.798,0.0],[-0.796,0.0],[-2.362,0.0],[-2.363,0.0],[-2.365,0.0],[-2.36,0.0],[-2.358,0.0],[-2.355,0.0],[-2.356,0.0],[-2.357,0.0],[-2.353,0.0],[-2.35,0.0],[-2.352,0.0],[-2.352,0.0],[-2.351,0.0],[-2.346,0.0],[-2.347,0.0],[-2.349,0.0],[-2.348,0.0],[-0.799,0.0],[-0.8,0.0],[-0.803,0.0],[-0.802,0.0],[-0.804,0.0],[-0.806,0.0],[-0.807,0.0],[-0.823,0.0],[-0.821,0.0],[-0.821,0.0],[-0.808,0.0],[-0.819,0.0],[-0.818,0.0],[-0.817,0.0],[-0.809,0.0],[-0.81,0.0],[-0.813,0.0],[-0.815,0.0],[-0.812,0.0],[-0.811,0.0],[-0.816,0.0],[-0.812,0.0],[-2.346,0.0],[-2.344,0.0],[-2.343,0.0],[-2.342,0.0],[-2.342,0.0],[-2.339,0.0],[-2.34,0.0],[-2.338,0.0],[-2.337,0.0],[-2.335,0.0],[-2.334,0.0],[-2.335,0.0],[-2.332,0.0],[-2.332,0.0],[-2.308,0.0],[-2.307,0.0],[-2.309,0.0],[-2.33,0.0],[-2.331,0.0],[-2.31,0.0],[-2.311,0.0],[-2.328,0.0],[-2.327,0.0],[-2.312,0.0],[-2.326,0.0],[-2.313,0.0],[-2.314,0.0],[-2.324,0.0],[-2.325,0.0],[-2.319,0.0],[-2.315,0.0],[-2.321,0.0],[-2.32,0.0],[-2.323,0.0],[-2.316,0.0],[-2.317,0.0],[-2.317,0.0],[-0.824,0.0],[-0.825,0.0],[-0.827,0.0],[-0.828,0.0],[-0.823,0.0],[-2.3,0.0],[-2.301,0.0],[-2.302,0.0],[-2.305,0.0],[-2.304,0.0],[-2.304,0.0],[-2.306,0.0],[-0.829,0.0],[-0.831,0.0],[-0.832,0.0],[-0.834,0.0],[-0.837,0.0],[-0.835,0.0],[-0.835,0.0],[-2.289,0.0],[-2.29,0.0],[-2.298,0.0],[-2.297,0.0],[-2.293,0.0],[-2.296,0.0],[-2.294,0.0],[-2.292,0.0],[-2.294,0.0],[-0.839,0.0],[-0.841,0.0],[-0.84,0.0],[-0.841,0.0],[-0.843,0.0],[-0.845,0.0],[-0.842,0.0],[-0.846,0.0],[-0.848,0.0],[-0.849,0.0],[-0.85,0.0],[-0.852,0.0],[-0.854,0.0],[-0.856,0.0],[-0.856,0.0],[-0.855,0.0],[-0.851,0.0],[-2.288,0.0],[-2.287,0.0],[-2.286,0.0],[-2.285,0.0],[-2.282,0.0],[-2.284,0.0],[-2.283,0.0],[-2.283,0.0],[-2.281,0.0],[-2.275,0.0],[-2.277,0.0],[-2.279,0.0],[-2.278,0.0],[-2.278,0.0],[-0.859,0.0],[-0.86,0.0],[-0.861,0.0],[-0.862,0.0],[-0.863,0.0],[-0.865,0.0],[-0.874,0.0],[-0.874,0.0],[-0.872,0.0],[-0.871,0.0],[-0.875,0.0],[-0.869,0.0],[-0.87,0.0],[-0.861,0.0],[-0.867,0.0],[-0.868,0.0],[-0.866,0.0],[-2.265,0.0],[-2.273,0.0],[-2.273,0.0],[-2.271,0.0],[-2.272,0.0],[-2.272,0.0],[-2.268,0.0],[-2.269,0.0],[-2.268,0.0],[-2.264,0.0],[-2.262,0.0],[-2.261,0.0],[-2.263,0.0],[-2.259,0.0],[-2.26,0.0],[-2.235,0.0],[-2.236,0.0],[-2.258,0.0],[-2.255,0.0],[-2.257,0.0],[-2.237,0.0],[-2.256,0.0],[-2.239,0.0],[-2.239,0.0],[-2.251,0.0],[-2.243,0.0],[-2.243,0.0],[-2.247,0.0],[-2.24,0.0],[-2.254,0.0],[-2.242,0.0],[-2.249,0.0],[-2.252,0.0],[-2.246,0.0],[-2.248,0.0],[-2.245,0.0],[-2.252,0.0],[-0.879,0.0],[-0.878,0.0],[-0.881,0.0],[-0.883,0.0],[-0.883,0.0],[-0.88,0.0],[-2.227,0.0],[-2.228,0.0],[-2.23,0.0],[-2.231,0.0],[-2.233,0.0],[-2.233,0.0],[-2.232,0.0],[-0.885,0.0],[-0.886,0.0],[-0.888,0.0],[-0.889,0.0],[-0.89,0.0],[-0.891,0.0],[-0.892,0.0],[-0.892,0.0],[-0.894,0.0],[-0.894,0.0],[-0.897,0.0],[-0.896,0.0],[-0.901,0.0],[-0.899,0.0],[-0.902,0.0],[-0.899,0.0],[-0.898,0.0],[-2.223,0.0],[-2.225,0.0],[-2.226,0.0],[-2.22,0.0],[-2.221,0.0],[-2.221,0.0],[-2.222,0.0],[-2.217,0.0],[-2.219,0.0],[-2.216,0.0],[-0.904,0.0],[-0.906,0.0],[-0.905,0.0],[-0.907,0.0],[-0.92,0.0],[-0.908,0.0],[-0.918,0.0],[-0.912,0.0],[-0.909,0.0],[-0.91,0.0],[-0.913,0.0],[-0.917,0.0],[-0.918,0.0],[-0.913,0.0],[-0.913,0.0],[-0.916,0.0],[-2.214,0.0],[-2.213,0.0],[-2.213,0.0],[-2.211,0.0],[-2.211,0.0],[-2.208,0.0],[-2.21,0.0],[-2.208,0.0],[-2.207,0.0],[-2.206,0.0],[-2.204,0.0],[-2.202,0.0],[-2.202,0.0],[-2.204,0.0],[-2.201,0.0],[-2.177,0.0],[-2.178,0.0],[-2.178,0.0],[-2.199,0.0],[-2.199,0.0],[-2.197,0.0],[-2.179,0.0],[-2.195,0.0],[-2.194,0.0],[-2.181,0.0],[-2.182,0.0],[-2.185,0.0],[-2.184,0.0],[-2.197,0.0],[-2.182,0.0],[-2.19,0.0],[-2.187,0.0],[-2.192,0.0],[-2.192,0.0],[-2.186,0.0],[-2.193,0.0],[-2.189,0.0],[-2.189,0.0],[-0.922,0.0],[-0.922,0.0],[-0.921,0.0],[-0.92,0.0],[-2.173,0.0],[-2.173,0.0],[-2.175,0.0],[-2.175,0.0],[-0.929,0.0],[-0.927,0.0],[-0.924,0.0],[-0.925,0.0],[-0.926,0.0],[-0.925,0.0],[-0.926,0.0],[-2.166,0.0],[-2.172,0.0],[-2.171,0.0],[-2.167,0.0],[-2.169,0.0],[-2.168,0.0],[-2.168,0.0],[-0.931,0.0],[-0.931,0.0],[-0.932,0.0],[-0.933,0.0],[-0.934,0.0],[-0.935,0.0],[-0.937,0.0],[-0.937,0.0],[-0.938,0.0],[-0.939,0.0],[-0.94,0.0],[-0.946,0.0],[-0.944,0.0],[-0.942,0.0],[-0.942,0.0],[-2.165,0.0],[-0.946,0.0],[-0.944,0.0],[-0.942,0.0],[-2.163,0.0],[-2.161,0.0],[-2.157,0.0],[-2.158,0.0],[-2.16,0.0],[-2.156,0.0],[-2.161,0.0],[-0.947,0.0],[-0.947,0.0],[-0.949,0.0],[-0.95,0.0],[-0.964,0.0],[-0.965,0.0],[-0.962,0.0],[-0.954,0.0],[-0.953,0.0],[-0.951,0.0],[-0.952,0.0],[-0.961,0.0],[-0.96,0.0],[-0.958,0.0],[-0.956,0.0],[-0.957,0.0],[-0.956,0.0],[-0.961,0.0],[-0.958,0.0],[-2.159,0.0],[-2.155,0.0],[-2.154,0.0],[-2.15,0.0],[-2.154,0.0],[-2.151,0.0],[-2.152,0.0],[-2.156,0.0],[-2.146,0.0],[-2.149,0.0],[-2.147,0.0],[-2.148,0.0],[-2.144,0.0],[-2.143,0.0],[-2.124,0.0],[-2.141,0.0],[-2.123,0.0],[-2.14,0.0],[-2.139,0.0],[-2.125,0.0],[-2.126,0.0],[-2.127,0.0],[-2.129,0.0],[-2.14,0.0],[-2.135,0.0],[-2.132,0.0],[-2.136,0.0],[-2.136,0.0],[-2.129,0.0],[-2.133,0.0],[-2.134,0.0],[-2.13,0.0],[-2.131,0.0],[-0.971,0.0],[-0.966,0.0],[-0.969,0.0],[-0.969,0.0],[-0.968,0.0],[-2.119,0.0],[-2.121,0.0],[-2.118,0.0],[-2.122,0.0],[-0.972,0.0],[-0.973,0.0],[-0.973,0.0],[-0.975,0.0],[-0.977,0.0],[-0.976,0.0],[-0.976,0.0],[-0.975,0.0],[-0.979,0.0],[-0.985,0.0],[-0.984,0.0],[-0.982,0.0],[-0.981,0.0],[-0.982,0.0],[-0.98,0.0],[-2.117,0.0],[-2.116,0.0],[-2.114,0.0],[-2.107,0.0],[-2.113,0.0],[-2.106,0.0],[-2.108,0.0],[-2.114,0.0],[-2.109,0.0],[-2.11,0.0],[-2.109,0.0],[-2.113,0.0],[-0.985,0.0],[-0.987,0.0],[-0.988,0.0],[-1.003,0.0],[-0.989,0.0],[-0.989,0.0],[-1.002,0.0],[-1.001,0.0],[-1.0,0.0],[-1.0,0.0],[-0.993,0.0],[-0.998,0.0],[-0.991,0.0],[-0.993,0.0],[-0.996,0.0],[-0.995,0.0],[-0.997,0.0],[-0.991,0.0],[-2.105,0.0],[-2.102,0.0],[-2.103,0.0],[-2.101,0.0],[-2.099,0.0],[-2.099,0.0],[-2.097,0.0],[-2.097,0.0],[-2.077,0.0],[-2.078,0.0],[-2.08,0.0],[-2.093,0.0],[-2.094,0.0],[-2.092,0.0],[-2.093,0.0],[-2.09,0.0],[-2.086,0.0],[-2.091,0.0],[-2.089,0.0],[-2.081,0.0],[-2.083,0.0],[-2.088,0.0],[-2.085,0.0],[-2.084,0.0],[-2.086,0.0],[-2.081,0.0],[-1.004,0.0],[-1.006,0.0],[-1.009,0.0],[-1.007,0.0],[-1.003,0.0],[-2.075,0.0],[-2.076,0.0],[-1.01,0.0],[-1.011,0.0],[-1.008,0.0],[-1.012,0.0],[-1.014,0.0],[-1.013,0.0],[-1.016,0.0],[-1.016,0.0],[-1.021,0.0],[-1.018,0.0],[-1.018,0.0],[-1.019,0.0],[-2.066,0.0],[-2.069,0.0],[-2.063,0.0],[-2.064,0.0],[-2.073,0.0],[-2.072,0.0],[-2.07,0.0],[-2.072,0.0],[-2.072,0.0],[-2.069,0.0],[-1.021,0.0],[-1.021,0.0],[-1.023,0.0],[-1.024,0.0],[-1.041,0.0],[-1.042,0.0],[-1.04,0.0],[-1.025,0.0],[-1.037,0.0],[-1.038,0.0],[-1.038,0.0],[-1.039,0.0],[-1.025,0.0],[-1.027,0.0],[-1.034,0.0],[-1.029,0.0],[-1.032,0.0],[-1.031,0.0],[-1.03,0.0],[-1.029,0.0],[-1.032,0.0],[-1.03,0.0],[-2.063,0.0],[-2.062,0.0],[-2.061,0.0],[-2.065,0.0],[-2.056,0.0],[-2.057,0.0],[-2.059,0.0],[-2.058,0.0],[-2.059,0.0],[-2.054,0.0],[-2.054,0.0],[-2.053,0.0],[-2.051,0.0],[-2.052,0.0],[-2.049,0.0],[-2.046,0.0],[-2.036,0.0],[-2.039,0.0],[-2.039,0.0],[-2.037,0.0],[-2.041,0.0],[-2.041,0.0],[-2.043,0.0],[-2.044,0.0],[-2.044,0.0],[-2.047,0.0],[-2.038,0.0],[-1.043,0.0],[-1.044,0.0],[-1.047,0.0],[-1.047,0.0],[-1.046,0.0],[-2.034,0.0],[-2.032,0.0],[-2.034,0.0],[-2.033,0.0],[-1.053,0.0],[-1.051,0.0],[-1.049,0.0],[-1.049,0.0],[-1.052,0.0],[-1.05,0.0],[-1.055,0.0],[-1.056,0.0],[-1.06,0.0],[-1.06,0.0],[-1.058,0.0],[-1.057,0.0],[-2.018,0.0],[-2.03,0.0],[-2.024,0.0],[-2.026,0.0],[-2.028,0.0],[-2.027,0.0],[-2.025,0.0],[-2.02,0.0],[-2.031,0.0],[-2.021,0.0],[-2.023,0.0],[-1.062,0.0],[-1.063,0.0],[-1.063,0.0],[-1.082,0.0],[-1.081,0.0],[-1.065,0.0],[-1.065,0.0],[-1.066,0.0],[-1.08,0.0],[-1.068,0.0],[-1.069,0.0],[-1.069,0.0],[-1.071,0.0],[-1.071,0.0],[-1.072,0.0],[-1.078,0.0],[-1.077,0.0],[-1.076,0.0],[-1.074,0.0],[-1.075,0.0],[-2.022,0.0],[-2.02,0.0],[-2.016,0.0],[-2.016,0.0],[-2.013,0.0],[-2.012,0.0],[-2.011,0.0],[-2.01,0.0],[-1.075,0.0],[-2.01,0.0],[-2.008,0.0],[-2.008,0.0],[-1.996,0.0],[-2.0,0.0],[-2.005,0.0],[-2.006,0.0],[-1.998,0.0],[-1.997,0.0],[-2.002,0.0],[-1.997,0.0],[-2.001,0.0],[-2.006,0.0],[-2.003,0.0],[-1.996,0.0],[-1.087,0.0],[-1.085,0.0],[-1.084,0.0],[-1.084,0.0],[-1.078,0.0],[-1.993,0.0],[-1.992,0.0],[-1.995,0.0],[-1.089,0.0],[-1.092,0.0],[-1.091,0.0],[-1.093,0.0],[-1.098,0.0],[-1.094,0.0],[-1.097,0.0],[-1.1,0.0],[-1.096,0.0],[-1.095,0.0],[-1.101,0.0],[-1.981,0.0],[-1.989,0.0],[-1.988,0.0],[-1.99,0.0],[-1.089,0.0],[-1.986,0.0],[-1.982,0.0],[-1.985,0.0],[-1.985,0.0],[-1.984,0.0],[-1.988,0.0],[-1.102,0.0],[-1.103,0.0],[-1.09,0.0],[-1.105,0.0],[-1.12,0.0],[-1.119,0.0],[-1.106,0.0],[-1.108,0.0],[-1.108,0.0],[-1.109,0.0],[-1.11,0.0],[-1.111,0.0],[-1.112,0.0],[-1.117,0.0],[-1.116,0.0],[-1.115,0.0],[-1.115,0.0],[-1.979,0.0],[-1.982,0.0],[-1.978,0.0],[-1.977,0.0],[-1.974,0.0],[-1.974,0.0],[-1.976,0.0],[-1.973,0.0],[-1.971,0.0],[-1.97,0.0],[-1.957,0.0],[-1.958,0.0],[-1.968,0.0],[-1.965,0.0],[-1.97,0.0],[-1.967,0.0],[-1.959,0.0],[-1.96,0.0],[-1.961,0.0],[-1.964,0.0],[-1.962,0.0],[-1.96,0.0],[-1.964,0.0],[-1.122,0.0],[-1.122,0.0],[-1.956,0.0],[-1.954,0.0],[-1.954,0.0],[-1.124,0.0],[-1.126,0.0],[-1.125,0.0],[-1.126,0.0],[-1.128,0.0],[-1.131,0.0],[-1.129,0.0],[-1.129,0.0],[-1.939,0.0],[-1.948,0.0],[-1.944,0.0],[-1.95,0.0],[-1.943,0.0],[-1.95,0.0],[-1.942,0.0],[-1.946,0.0],[-1.953,0.0],[-1.952,0.0],[-1.942,0.0],[-1.945,0.0],[-1.13,0.0],[-1.133,0.0],[-1.134,0.0],[-1.161,0.0],[-1.159,0.0],[-1.135,0.0],[-1.137,0.0],[-1.137,0.0],[-1.138,0.0],[-1.143,0.0],[-1.135,0.0],[-1.141,0.0],[-1.141,0.0],[-1.145,0.0],[-1.156,0.0],[-1.155,0.0],[-1.139,0.0],[-1.146,0.0],[-1.154,0.0],[-1.94,0.0],[-1.153,0.0],[-1.149,0.0],[-1.152,0.0],[-1.15,0.0],[-1.936,0.0],[-1.937,0.0],[-1.934,0.0],[-1.152,0.0],[-1.935,0.0],[-1.933,0.0],[-1.931,0.0],[-1.932,0.0],[-1.917,0.0],[-1.929,0.0],[-1.92,0.0],[-1.923,0.0],[-1.924,0.0],[-1.926,0.0],[-1.925,0.0],[-1.928,0.0],[-1.927,0.0],[-1.147,0.0],[-1.148,0.0],[-1.92,0.0],[-1.921,0.0],[-1.14,0.0],[-1.164,0.0],[-1.162,0.0],[-1.16,0.0],[-1.914,0.0],[-1.916,0.0],[-1.916,0.0],[-1.165,0.0],[-1.166,0.0],[-1.169,0.0],[-1.168,0.0],[-1.167,0.0],[-1.173,0.0],[-1.171,0.0],[-1.17,0.0],[-1.175,0.0],[-1.166,0.0],[-1.902,0.0],[-1.176,0.0],[-1.905,0.0],[-1.908,0.0],[-1.172,0.0],[-1.91,0.0],[-1.912,0.0],[-1.906,0.0],[-1.909,0.0],[-1.91,0.0],[-1.912,0.0],[-1.912,0.0],[-1.192,0.0],[-1.192,0.0],[-1.179,0.0],[-1.179,0.0],[-1.18,0.0],[-1.188,0.0],[-1.182,0.0],[-1.189,0.0],[-1.185,0.0],[-1.184,0.0],[-1.187,0.0],[-1.183,0.0],[-1.183,0.0],[-1.187,0.0],[-1.189,0.0],[-1.899,0.0],[-1.903,0.0],[-1.902,0.0],[-1.9,0.0],[-1.897,0.0],[-1.898,0.0],[-1.893,0.0],[-1.894,0.0],[-1.89,0.0],[-1.891,0.0],[-1.892,0.0],[-1.895,0.0],[-1.876,0.0],[-1.889,0.0],[-1.888,0.0],[-1.887,0.0],[-1.885,0.0],[-1.878,0.0],[-1.877,0.0],[-1.879,0.0],[-1.88,0.0],[-1.881,0.0],[-1.883,0.0],[-1.882,0.0],[-1.882,0.0],[-1.195,0.0],[-1.196,0.0],[-1.197,0.0],[-1.199,0.0],[-1.198,0.0],[-1.873,0.0],[-1.875,0.0],[-1.877,0.0],[-1.199,0.0],[-1.202,0.0],[-1.204,0.0],[-1.201,0.0],[-1.204,0.0],[-1.207,0.0],[-1.213,0.0],[-1.208,0.0],[-1.207,0.0],[-1.211,0.0],[-1.209,0.0],[-1.211,0.0],[-1.862,0.0],[-1.872,0.0],[-1.872,0.0],[-1.864,0.0],[-1.868,0.0],[-1.866,0.0],[-1.861,0.0],[-1.866,0.0],[-1.867,0.0],[-1.87,0.0],[-1.87,0.0],[-1.214,0.0],[-1.215,0.0],[-1.212,0.0],[-1.232,0.0],[-1.233,0.0],[-1.218,0.0],[-1.219,0.0],[-1.23,0.0],[-1.219,0.0],[-1.229,0.0],[-1.228,0.0],[-1.22,0.0],[-1.227,0.0],[-1.226,0.0],[-1.225,0.0],[-1.223,0.0],[-1.224,0.0],[-1.222,0.0],[-1.859,0.0],[-1.864,0.0],[-1.854,0.0],[-1.854,0.0],[-1.857,0.0],[-1.857,0.0],[-1.86,0.0],[-1.853,0.0],[-1.852,0.0],[-1.858,0.0],[-1.851,0.0],[-1.849,0.0],[-1.848,0.0],[-1.848,0.0],[-1.834,0.0],[-1.844,0.0],[-1.836,0.0],[-1.843,0.0],[-1.837,0.0],[-1.839,0.0],[-1.838,0.0],[-1.84,0.0],[-1.842,0.0],[-1.84,0.0],[-1.836,0.0],[-1.845,0.0],[-1.846,0.0],[-1.234,0.0],[-1.235,0.0],[-1.238,0.0],[-1.236,0.0],[-1.829,0.0],[-1.832,0.0],[-1.831,0.0],[-1.83,0.0],[-1.833,0.0],[-1.834,0.0],[-1.239,0.0],[-1.239,0.0],[-1.241,0.0],[-1.243,0.0],[-1.242,0.0],[-1.245,0.0],[-1.246,0.0],[-1.247,0.0],[-1.248,0.0],[-1.823,0.0],[-1.824,0.0],[-1.827,0.0],[-1.826,0.0],[-1.82,0.0],[-1.825,0.0],[-1.818,0.0],[-1.819,0.0],[-1.816,0.0],[-1.816,0.0],[-1.817,0.0],[-1.815,0.0],[-1.813,0.0],[-1.813,0.0],[-1.249,0.0],[-1.249,0.0],[-1.251,0.0],[-1.252,0.0],[-1.252,0.0],[-1.445,0.0],[-1.375,0.0],[-1.378,0.0],[-1.438,0.0],[-1.436,0.0],[-1.434,0.0],[-1.433,0.0],[-1.432,0.0],[-1.427,0.0],[-1.43,0.0],[-1.377,0.0],[-1.379,0.0],[-1.439,0.0],[-1.424,0.0],[-1.425,0.0],[-1.422,0.0],[-1.415,0.0],[-1.416,0.0],[-1.417,0.0],[-1.421,0.0],[-1.418,0.0],[-1.382,0.0],[-1.412,0.0],[-1.439,0.0],[-1.383,0.0],[-1.383,0.0],[-1.411,0.0],[-1.41,0.0],[-1.409,0.0],[-1.408,0.0],[-1.386,0.0],[-1.389,0.0],[-1.406,0.0],[-1.391,0.0],[-1.404,0.0],[-1.387,0.0],[-1.393,0.0],[-1.393,0.0],[-1.431,0.0],[-1.394,0.0],[-1.402,0.0],[-1.397,0.0],[-1.4,0.0],[-1.395,0.0],[-1.399,0.0],[-1.403,0.0],[-1.397,0.0],[-1.399,0.0],[-1.421,0.0],[-1.811,0.0],[-1.812,0.0],[-1.81,0.0],[-1.808,0.0],[-1.809,0.0],[-1.807,0.0],[-1.256,0.0],[-1.254,0.0],[-1.254,0.0],[-1.258,0.0],[-1.442,0.0],[-1.441,0.0],[-1.445,0.0],[-1.449,0.0],[-1.447,0.0],[-1.449,0.0],[-1.452,0.0],[-1.452,0.0],[-1.374,0.0],[-1.373,0.0],[-1.359,0.0],[-1.36,0.0],[-1.362,0.0],[-1.361,0.0],[-1.371,0.0],[-1.369,0.0],[-1.369,0.0],[-1.368,0.0],[-1.365,0.0],[-1.366,0.0],[-1.366,0.0],[-1.805,0.0],[-1.804,0.0],[-1.803,0.0],[-1.259,0.0],[-1.258,0.0],[-1.261,0.0],[-1.358,0.0],[-1.454,0.0],[-1.455,0.0],[-1.355,0.0],[-1.802,0.0],[-1.798,0.0],[-1.799,0.0],[-1.8,0.0],[-1.801,0.0],[-1.797,0.0],[-1.796,0.0],[-1.263,0.0],[-1.263,0.0],[-1.265,0.0],[-1.265,0.0],[-1.267,0.0],[-1.267,0.0],[-1.268,0.0],[-1.354,0.0],[-1.354,0.0],[-1.348,0.0],[-1.352,0.0],[-1.35,0.0],[-1.35,0.0],[-1.481,0.0],[-1.478,0.0],[-1.462,0.0],[-1.465,0.0],[-1.476,0.0],[-1.475,0.0],[-1.461,0.0],[-1.461,0.0],[-1.469,0.0],[-1.458,0.0],[-1.466,0.0],[-1.47,0.0],[-1.472,0.0],[-1.471,0.0],[-1.456,0.0],[-1.466,0.0],[-1.457,0.0],[-1.269,0.0],[-1.346,0.0],[-1.346,0.0],[-1.794,0.0],[-1.792,0.0],[-1.482,0.0],[-1.48,0.0],[-1.794,0.0],[-1.485,0.0],[-1.484,0.0],[-1.483,0.0],[-1.79,0.0],[-1.788,0.0],[-1.787,0.0],[-1.785,0.0],[-1.785,0.0],[-1.494,0.0],[-1.493,0.0],[-1.491,0.0],[-1.49,0.0],[-1.492,0.0],[-1.489,0.0],[-1.271,0.0],[-1.271,0.0],[-1.272,0.0],[-1.274,0.0],[-1.277,0.0],[-1.279,0.0],[-1.344,0.0],[-1.274,0.0],[-1.275,0.0],[-1.344,0.0],[-1.338,0.0],[-1.338,0.0],[-1.336,0.0],[-1.281,0.0],[-1.281,0.0],[-1.333,0.0],[-1.34,0.0],[-1.294,0.0],[-1.341,0.0],[-1.332,0.0],[-1.297,0.0],[-1.299,0.0],[-1.331,0.0],[-1.3,0.0],[-1.301,0.0],[-1.322,0.0],[-1.321,0.0],[-1.302,0.0],[-1.324,0.0],[-1.321,0.0],[-1.318,0.0],[-1.33,0.0],[-1.326,0.0],[-1.326,0.0],[-1.318,0.0],[-1.329,0.0],[-1.783,0.0],[-1.496,0.0],[-1.282,0.0],[-1.292,0.0],[-1.303,0.0],[-1.304,0.0],[-1.295,0.0],[-1.343,0.0],[-1.296,0.0],[-1.305,0.0],[-1.782,0.0],[-1.775,0.0],[-1.777,0.0],[-1.777,0.0],[-1.773,0.0],[-1.78,0.0],[-1.779,0.0],[-1.779,0.0],[-1.497,0.0],[-1.499,0.0],[-1.511,0.0],[-1.5,0.0],[-1.501,0.0],[-1.502,0.0],[-1.509,0.0],[-1.507,0.0],[-1.504,0.0],[-1.506,0.0],[-1.505,0.0],[-1.316,0.0],[-1.291,0.0],[-1.286,0.0],[-1.285,0.0],[-1.284,0.0],[-1.288,0.0],[-1.306,0.0],[-1.307,0.0],[-1.315,0.0],[-1.29,0.0],[-1.29,0.0],[-1.512,0.0],[-1.771,0.0],[-1.77,0.0],[-1.308,0.0],[-1.313,0.0],[-1.771,0.0],[-1.284,0.0],[-1.315,0.0],[-1.329,0.0],[-1.312,0.0],[-1.31,0.0],[-1.31,0.0],[-1.514,0.0],[-1.516,0.0],[-1.525,0.0],[-1.523,0.0],[-1.527,0.0],[-1.53,0.0],[-1.519,0.0],[-1.531,0.0],[-1.528,0.0],[-1.532,0.0],[-1.521,0.0],[-1.521,0.0],[-1.769,0.0],[-1.521,0.0],[-1.764,0.0],[-1.765,0.0],[-1.756,0.0],[-1.763,0.0],[-1.754,0.0],[-1.75,0.0],[-1.76,0.0],[-1.752,0.0],[-1.754,0.0],[-1.762,0.0],[-1.748,0.0],[-1.767,0.0],[-1.747,0.0],[-1.739,0.0],[-1.746,0.0],[-1.741,0.0],[-1.753,0.0],[-1.738,0.0],[-1.743,0.0],[-1.741,0.0],[-1.744,0.0],[-1.767,0.0],[-1.534,0.0],[-1.536,0.0],[-1.735,0.0],[-1.736,0.0],[-1.287,0.0],[-1.342,0.0],[-1.518,0.0],[-1.537,0.0],[-1.559,0.0],[-1.557,0.0],[-1.538,0.0],[-1.556,0.0],[-1.547,0.0],[-1.545,0.0],[-1.543,0.0],[-1.555,0.0],[-1.542,0.0],[-1.541,0.0],[-1.54,0.0],[-1.548,0.0],[-1.759,0.0],[-1.733,0.0],[-1.732,0.0],[-1.731,0.0],[-1.733,0.0],[-1.729,0.0],[-1.728,0.0],[-1.728,0.0],[-1.725,0.0],[-1.71,0.0],[-1.712,0.0],[-1.722,0.0],[-1.721,0.0],[-1.718,0.0],[-1.719,0.0],[-1.724,0.0],[-1.713,0.0],[-1.724,0.0],[-1.714,0.0],[-1.716,0.0],[-1.715,0.0],[-1.562,0.0],[-1.554,0.0],[-1.553,0.0],[-1.707,0.0],[-1.708,0.0],[-1.717,0.0],[-1.275,0.0],[-1.311,0.0],[-1.54,0.0],[-1.562,0.0],[-1.565,0.0],[-1.549,0.0],[-1.567,0.0],[-1.568,0.0],[-1.57,0.0],[-1.566,0.0],[-1.581,0.0],[-1.58,0.0],[-1.572,0.0],[-1.572,0.0],[-1.701,0.0],[-1.551,0.0],[-1.703,0.0],[-1.709,0.0],[-1.7,0.0],[-1.705,0.0],[-1.704,0.0],[-1.714,0.0],[-1.583,0.0],[-1.578,0.0],[-1.576,0.0],[-1.575,0.0],[-1.698,0.0],[-1.591,0.0],[-1.592,0.0],[-1.593,0.0],[-1.593,0.0],[-1.697,0.0],[-1.697,0.0],[-1.595,0.0],[-1.599,0.0],[-1.6,0.0],[-1.604,0.0],[-1.603,0.0],[-1.695,0.0],[-1.685,0.0],[-1.688,0.0],[-1.688,0.0],[-1.645,0.0],[-1.624,0.0],[-1.644,0.0],[-1.624,0.0],[-1.626,0.0],[-1.641,0.0],[-1.641,0.0],[-1.687,0.0],[-1.602,0.0],[-1.69,0.0],[-1.638,0.0],[-1.631,0.0],[-1.629,0.0],[-1.63,0.0],[-1.576,0.0],[-1.638,0.0],[-1.585,0.0],[-1.628,0.0],[-1.551,0.0],[-1.562,0.0],[-1.577,0.0],[-1.598,0.0],[-1.695,0.0],[-1.606,0.0],[-1.693,0.0],[-1.648,0.0],[-1.648,0.0],[-1.649,0.0],[-1.684,0.0],[-1.683,0.0],[-1.646,0.0],[-1.621,0.0],[-1.614,0.0],[-1.682,0.0],[-1.665,0.0],[-1.663,0.0],[-1.679,0.0],[-1.67,0.0],[-1.632,0.0],[-1.611,0.0],[-1.615,0.0],[-1.678,0.0],[-1.673,0.0],[-1.671,0.0],[-1.669,0.0],[-1.633,0.0],[-1.616,0.0],[-1.677,0.0],[-1.619,0.0],[-1.674,0.0],[-1.651,0.0],[-1.55,0.0],[-1.587,0.0],[-1.585,0.0],[-1.597,0.0],[-1.681,0.0],[-1.676,0.0],[-1.658,0.0],[-1.657,0.0],[-1.668,0.0],[-1.608,0.0],[-1.635,0.0],[-1.652,0.0],[-1.655,0.0],[-1.61,0.0],[-1.661,0.0],[-1.609,0.0],[-1.618,0.0],[-1.619,0.0],[-1.607,0.0],[-1.661,0.0],[-1.617,0.0],[-1.66,0.0],[-1.636,0.0],[-1.652,0.0],[-1.659,0.0],[-1.587,0.0],[-1.587,0.0],[-1.597,0.0],[-1.61,0.0],[-1.691,0.0],[-1.692,0.0],[-1.675,0.0],[-1.654,0.0],[-1.668,0.0],[-1.634,0.0]],"r4_sfprm":{"anchor":[64.4,62.2,60.4,56.0,54.0,50.8,48.8],"majority":[64.4,64.4,65.4,67.2,67.4,67.2,67.0],"oracle":[64.4,69.6,72.8,75.8,78.4,80.6,81.8]},"r4_code":{"energy":[75.4,86.4,93.6,96.4,98.8,98.8,99.0],"energy_sum":[75.4,83.6,90.6,92.8,95.0,96.8,97.4],"anchor":[75.4,63.6,54.2,45.8,37.8,30.6,25.2],"majority":[75.4,75.4,83.2,87.4,88.6,91.2,91.2],"oracle":[75.4,86.4,93.6,96.4,98.8,98.8,99.0]},"r4_first":{"energy":[17.4,17.4,16.4,14.8,13.8,12.4,12.4],"energy_sum":[17.4,18.2,20.4,18.0,18.4,17.8,17.8],"anchor":[17.4,18.8,21.6,20.6,20.0,20.0,20.4],"majority":[17.4,17.4,19.4,19.2,20.2,20.8,20.6],"oracle":[17.4,22.2,25.8,28.8,30.0,32.8,36.0]},"r6_sfprm":{"anchor":[89.2,90.6,91.2,92.0,92.2,92.6,92.8],"majority":[89.2,89.2,90.6,91.0,90.4,90.4,90.6],"oracle":[89.2,91.2,92.0,93.0,93.4,93.6,93.8]},"r6_code":{"energy":[10.0,18.0,30.6,45.6,61.4,76.2,88.2],"energy_sum":[10.0,12.2,14.4,16.2,17.6,22.6,26.8],"anchor":[10.0,9.4,6.4,4.0,2.2,1.6,0.4],"majority":[10.0,10.0,13.4,21.8,35.6,47.2,59.4],"oracle":[10.0,18.2,31.0,46.2,62.6,78.8,89.8]},"r6_first":{"energy":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"energy_sum":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"anchor":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"majority":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"oracle":[0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"Bs":[1,2,4,8,16,32,64]}</script>
+<script>
+"use strict";
+// ================= Energy-based SFPRM =================
+// Uses the helpers of the main script ($, el, css, mulberry32, gauss, dot, nrm, add, scl, unit, proj, clamp, fmt, deg, reduceMotion, showTip, hideTip).
+const VD = JSON.parse(document.getElementById("vizdata").textContent);
+const TAU = 2 * Math.PI;
+const wrapPi = (a) => { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; };
+function softmax(ls) { const m = Math.max(...ls); const w = ls.map((v) => Math.exp(v - m)); const Z = w.reduce((a, b) => a + b, 0); return { p: w.map((v) => v / Z), lse: m + Math.log(Z) }; }
+function arrowMarkers(svg, prefix, cols) {
+  const defs = el("defs", {}, svg);
+  cols.forEach((c) => { const mk = el("marker", { id: `${prefix}-${c}`, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" }, defs); el("path", { d: "M0,0 L10,5 L0,10 z", fill: `var(--${c})` }, mk); });
+  return defs;
+}
+const supTxt = (k) => `10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`;
+
+// ---------- E1 · rotation versus descent ----------
+(function rotDemo() {
+  const svg = $("rotPlane"), S = 100, HMIN = 0.25, E0 = [1.05, 0.85];
+  const defs = el("defs", {}, svg);
+  const cp = el("clipPath", { id: "rotClip" }, defs); el("rect", { x: -160, y: -130, width: 320, height: 260 }, cp);
+  const g = el("g", { "clip-path": "url(#rotClip)" }, svg);
+  el("text", { x: 156, y: -6, "text-anchor": "end", class: "svgtext" }, svg).textContent = "stiff mode";
+  el("text", { x: 6, y: -118, class: "svgtext" }, svg).textContent = "slow mode";
+  const par = () => ({ om: +$("rOm").value / 100, kap: +$("rKap").value, eta: +$("rEta").value / 100 });
+  function lam(h1, h2, om) {                      // eigenvalues of M = [[h1, -om], [om, h2]]
+    const tr = h1 + h2, disc = ((h1 - h2) / 2) ** 2 - om * om;
+    if (disc >= 0) { const s = Math.sqrt(disc); return [[tr / 2 + s, 0], [tr / 2 - s, 0]]; }
+    const s = Math.sqrt(-disc); return [[tr / 2, s], [tr / 2, -s]];
+  }
+  const rho = (L, eta) => Math.max(...L.map(([a, b]) => Math.hypot(1 - eta * a, eta * b)));
+  const windowOf = (L) => Math.min(...L.map(([a, b]) => 2 * a / (a * a + b * b)));
+  function run(h1, h2, om, eta) {
+    let e = E0.slice(); const pts = [e], En = [0.5 * (h1 * e[0] ** 2 + h2 * e[1] ** 2)], incs = []; let it = -1; const n0 = Math.hypot(E0[0], E0[1]);
+    for (let i = 1; i <= 400; i++) {
+      e = [e[0] - eta * (h1 * e[0] - om * e[1]), e[1] - eta * (om * e[0] + h2 * e[1])]; pts.push(e);
+      const E = 0.5 * (h1 * e[0] ** 2 + h2 * e[1] ** 2); if (E > En[En.length - 1] * (1 + 1e-9)) incs.push(i); En.push(E);
+      const n = Math.hypot(e[0], e[1]); if (it < 0 && n < 1e-3 * n0) it = i; if (n > 1e3) break;
+    }
+    return { pts, En, incs, it };
+  }
+  const ev = $("rotEig"), U = 55;
+  el("line", { x1: -112, x2: 112, y1: 0, y2: 0, stroke: "var(--rule)" }, ev); el("line", { x1: 0, x2: 0, y1: -76, y2: 76, stroke: "var(--rule)" }, ev);
+  el("circle", { cx: 0, cy: 0, r: U, fill: "none", stroke: "var(--ink-2)", "stroke-width": 1.2 }, ev);
+  el("circle", { cx: U, cy: 0, r: 3, fill: "var(--ink)" }, ev); el("text", { x: U + 4, y: 13, class: "svgtext" }, ev).textContent = "1";
+  el("text", { x: -112, y: -66, class: "svgtext" }, ev).textContent = "eigenvalues of the step";
+  const evg = el("g", {}, ev);
+  const er = $("rotErr");
+  function draw() {
+    const p = par(), h1 = HMIN * p.kap, h2 = HMIN;
+    $("rOmv").textContent = p.om.toFixed(2); $("rKapv").textContent = p.kap + "×"; $("rEtav").textContent = p.eta.toFixed(2);
+    g.innerHTML = "";
+    el("line", { x1: -160, x2: 160, y1: 0, y2: 0, stroke: "var(--rule)" }, g); el("line", { x1: 0, x2: 0, y1: -130, y2: 130, stroke: "var(--rule)" }, g);
+    const Es = 0.5 * (h1 * E0[0] ** 2 + h2 * E0[1] ** 2);
+    [1, 0.5, 0.25, 0.1, 0.03, 0.008].forEach((f) => el("ellipse", { cx: 0, cy: 0, rx: S * Math.sqrt(2 * f * Es / h1), ry: S * Math.sqrt(2 * f * Es / h2), fill: "none", stroke: "var(--s3)", "stroke-width": 1, opacity: 0.6 }, g));
+    const R = run(h1, h2, p.om, p.eta);
+    el("polyline", { points: R.pts.slice(0, 250).map((q) => `${(S * q[0]).toFixed(1)},${(-S * q[1]).toFixed(1)}`).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 1.8 }, g);
+    R.pts.slice(0, 60).forEach((q, i) => el("circle", { cx: S * q[0], cy: -S * q[1], r: i === 0 ? 5 : 2.4, fill: R.incs.includes(i) ? "var(--bad)" : "var(--s2)" }, g));
+    el("circle", { cx: 0, cy: 0, r: 4, fill: "var(--ink)" }, g);
+    el("text", { x: S * E0[0] + 7, y: -S * E0[1] - 6, class: "svgmath" }, g).textContent = "e₀";
+    el("text", { x: 6, y: 16, class: "svgtext" }, g).textContent = "fixed point";
+    // eigenvalues
+    const L = lam(h1, h2, p.om), cplx = L[0][1] !== 0, w = windowOf(L), r = rho(L, p.eta);
+    evg.innerHTML = "";
+    L.forEach(([a, b]) => {
+      const zx = clamp(U * (1 - a), -110, 110), zy = clamp(-U * (-b), -74, 74);
+      const dx = clamp(U * (1 - p.eta * a), -110, 110), dy = clamp(-U * (-p.eta * b), -74, 74);
+      el("line", { x1: U, y1: 0, x2: zx, y2: zy, stroke: "var(--muted)", "stroke-dasharray": "3 3" }, evg);
+      el("circle", { cx: zx, cy: zy, r: 6, fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, evg);
+      el("circle", { cx: dx, cy: dy, r: 4.5, fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 1.5 }, evg);
+    });
+    // best fixed step by scan
+    let best = [Infinity, 0]; for (let k = 1; k < 600; k++) { const et = w * k / 600; const rr = rho(L, et); if (rr < best[0]) best = [rr, et]; }
+    const itBest = Math.ceil(Math.log(1e-3) / Math.log(best[0]));
+    const z1 = 1 - L[0][0], z2 = 1 - L[1][0];
+    $("rotRead").innerHTML =
+      `<dt>eigenvalues ζ of the unit step</dt><dd>${cplx ? `${z1.toFixed(2)} ± ${Math.abs(L[0][1]).toFixed(2)}i` : `${z1.toFixed(2)}, ${z2.toFixed(2)}`}</dd>` +
+      `<dt>spectrum</dt><dd>${cplx ? '<span class="st-bad">complex pair</span>' : '<span class="st-ok">real</span>'}</dd>` +
+      `<dt>stable for η &lt;</dt><dd>${w.toFixed(2)}</dd>` +
+      `<dt>shrink per step at this η</dt><dd style="color:var(${r < 1 ? "--good" : "--bad"})">${r.toFixed(3)}</dd>` +
+      `<dt>error ÷1000 after</dt><dd>${R.it > 0 ? R.it + " steps" : (r >= 1 ? "never (unstable)" : "> 400 steps")}</dd>` +
+      `<dt>with the best η = ${best[1].toFixed(2)}</dt><dd>${itBest} steps</dd>` +
+      `<dt>steps where ½eᵀHe rose</dt><dd>${R.incs.length}</dd>`;
+    // energy trace
+    er.innerHTML = ""; const K = 120, lo = -6, hi = 1;
+    const X = (k) => 34 + 260 * k / K, Y = (v) => 108 - 92 * (clamp(Math.log10(v), lo, hi) - lo) / (hi - lo);
+    [-6, -4, -2, 0].forEach((k) => { el("line", { x1: 34, x2: 294, y1: Y(Math.pow(10, k)), y2: Y(Math.pow(10, k)), stroke: "var(--rule)" }, er); el("text", { x: 30, y: Y(Math.pow(10, k)) + 4, "text-anchor": "end", class: "svgtext" }, er).innerHTML = supTxt(k); });
+    const ratio = R.En.slice(0, K + 1).map((v) => Math.max(1e-9, v / R.En[0]));
+    el("polyline", { points: ratio.map((v, k) => `${X(k).toFixed(1)},${Y(v).toFixed(1)}`).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 1.8 }, er);
+    R.incs.filter((k) => k <= K).forEach((k) => el("circle", { cx: X(k), cy: Y(ratio[k]), r: 2.6, fill: "var(--bad)" }, er));
+    el("text", { x: 34, y: 126, class: "svgtext" }, er).textContent = "½eᵀHe relative to the start, over 120 steps (log scale)";
+  }
+  ["rOm", "rKap", "rEta"].forEach((id) => $(id).addEventListener("input", draw));
+  draw();
+})();
+
+// ---------- E2 · one cell, the memory term and its β knob ----------
+(function cellDemo() {
+  const svg = $("cellDial"), R = 80, MU = [0, 1, 2, 3].map((k) => k * Math.PI / 2), ETA = 0.15, RHO = 30, KA = 70, ITERS = 170;
+  const P = (a, r = R) => [r * Math.sin(a), -r * Math.cos(a)];          // angle clockwise from the top
+  const betaOf = () => 0.3 * Math.pow(100, +$("cB").value / 100);
+  arrowMarkers(svg, "cd", ["s1"]);
+  el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  const dyn = el("g", {}, svg);
+  MU.forEach((m, k) => { const q = P(m), side = Math.abs(Math.sin(m)) > 0.5, t = P(m, side ? R + 36 : R + 44); el("circle", { cx: q[0], cy: q[1], r: 4, fill: "var(--ink)" }, svg); el("text", { x: t[0], y: t[1] + 5, "text-anchor": side ? (Math.sin(m) > 0 ? "start" : "end") : "middle", class: "svgtext", style: "font-weight:600;fill:var(--ink)" }, svg).textContent = "digit " + (k + 1); });
+  let th = 0, trail = [], anim = 0, betaNow = null, msg = "";
+  const E = (t, b, s, phi) => -s * Math.cos(t - phi) - softmax(MU.map((m) => b * Math.cos(t - m))).lse / b;
+  function dE(t, b, s, phi) { const { p } = softmax(MU.map((m) => b * Math.cos(t - m))); let g = s * Math.sin(t - phi); MU.forEach((m, k) => { g += p[k] * Math.sin(t - m); }); return g; }
+  const resp = (t, b) => softmax(MU.map((m) => b * Math.cos(t - m))).p;
+  const nearest = (t) => { let k = 0, bd = 9; MU.forEach((m, i) => { const d = Math.abs(wrapPi(t - m)); if (d < bd) { bd = d; k = i; } }); return k; };
+  const cv = $("cellCurve"), bars = $("cellBars");
+  const ux = (t) => 40 + 400 * (((t + Math.PI / 4) % TAU + TAU) % TAU) / TAU;  // digits sit at interior x positions
+  const inputs = () => ({ s: +$("cS").value / 100, phi: +$("cPhi").value * Math.PI / 180 });
+  function draw() {
+    const bF = betaOf(), b = betaNow ?? bF, { s, phi } = inputs();
+    $("cBv").textContent = bF.toFixed(1); $("cPhiv").textContent = $("cPhi").value + "°"; $("cSv").textContent = s.toFixed(2); $("cStartv").textContent = $("cStart").value + "°";
+    dyn.innerHTML = "";
+    const N = 240, dens = []; for (let i = 0; i < N; i++) { const a = i / N * TAU; dens.push(MU.reduce((acc, m) => acc + Math.exp(b * (Math.cos(a - m) - 1)), 0)); }
+    const dm = Math.max(...dens);
+    el("polygon", { points: dens.map((d, i) => P(i / N * TAU, R + 4 + 26 * d / dm).map((v) => v.toFixed(1)).join(",")).join(" "), fill: "var(--s3)", "fill-opacity": 0.12, stroke: "var(--s3)", "stroke-width": 1.5 }, dyn);
+    const tipA = P(phi, 16 + 60 * s); if (s > 0.01) el("line", { x1: 0, y1: 0, x2: tipA[0], y2: tipA[1], stroke: "var(--s1)", "stroke-width": 3, "marker-end": "url(#cd-s1)" }, dyn);
+    if (trail.length > 1) el("polyline", { points: trail.map((t) => P(t, R).map((v) => v.toFixed(1)).join(",")).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 2.5, opacity: 0.5 }, dyn);
+    const q = P(th); el("circle", { cx: q[0], cy: q[1], r: 8, fill: "var(--s2)", stroke: "var(--surface)", "stroke-width": 2 }, dyn);
+    // energy along the circle
+    cv.innerHTML = ""; const M = 361, ts = Array.from({ length: M }, (_, i) => -Math.PI / 4 + i / (M - 1) * TAU);
+    const Ev = ts.map((t) => E(t, b, s, phi)), lo = Math.min(...Ev), hi = Math.max(...Ev), Y = (v) => 156 - 132 * (v - lo) / Math.max(hi - lo, 1e-9);
+    el("line", { x1: 40, x2: 440, y1: 156, y2: 156, stroke: "var(--rule)" }, cv);
+    MU.forEach((m, k) => { const x = ux(m); el("line", { x1: x, x2: x, y1: 20, y2: 160, stroke: "var(--rule)" }, cv); el("text", { x, y: 176, "text-anchor": "middle", class: "svgtext" }, cv).textContent = "digit " + (k + 1); });
+    const xp = ux(phi); el("line", { x1: xp, x2: xp, y1: 20, y2: 160, stroke: "var(--s1)", "stroke-dasharray": "4 3" }, cv);
+    el("polyline", { points: ts.map((t, i) => `${(40 + 400 * i / (M - 1)).toFixed(1)},${Y(Ev[i]).toFixed(1)}`).join(" "), fill: "none", stroke: "var(--ink)", "stroke-width": 2 }, cv);
+    el("circle", { cx: ux(th), cy: Y(E(th, b, s, phi)), r: 6, fill: "var(--s2)", stroke: "var(--surface)", "stroke-width": 2 }, cv);
+    el("text", { x: 40, y: 12, class: "svgtext" }, cv).textContent = `energy along the circle at β = ${b.toFixed(2)} (lower is better)`;
+    el("text", { x: 440, y: 196, "text-anchor": "end", class: "svgtext" }, cv).textContent = "position on the circle";
+    // soft assignment bars at the current beta
+    bars.innerHTML = ""; const pr = resp(th, b), kmax = pr.indexOf(Math.max(...pr));
+    pr.forEach((v, k) => { const x = 20 + k * 50; el("rect", { x, y: 52 - 44 * v, width: 32, height: Math.max(1, 44 * v), rx: 2, fill: k === kmax ? "var(--s2)" : "var(--muted)" }, bars); el("text", { x: x + 16, y: 68, "text-anchor": "middle", class: "svgtext" }, bars).textContent = k + 1; });
+    el("text", { x: 0, y: 8, class: "svgtext" }, bars).textContent = "soft assignment";
+    // readout
+    let minima = 0; const G = Array.from({ length: 720 }, (_, i) => dE(i / 720 * TAU, b, s, phi)); for (let i = 0; i < 720; i++) if (G[i] < 0 && G[(i + 1) % 720] >= 0) minima++;
+    const c = Math.max(...resp(th, bF));
+    $("cRead").innerHTML = `<dt>β now</dt><dd>${b.toFixed(2)}</dd><dt>wells in the energy</dt><dd>${minima}</dd><dt>nearest digit</dt><dd>${nearest(th) + 1}</dd><dt>commitment (at final β)</dt><dd>${c.toFixed(2)} ${c > 0.9 ? '<span class="st-ok">committed</span>' : ""}</dd>`;
+    $("cMsg").innerHTML = msg;
+  }
+  function descend(anneal) {
+    cancelAnimationFrame(anim); th = +$("cStart").value * Math.PI / 180; trail = [th]; msg = ""; let it = 0;
+    const one = () => { const { s, phi } = inputs(), bF = betaOf(); betaNow = anneal ? bF * Math.pow(RHO, -(1 - Math.min(it / KA, 1))) : bF; th = wrapPi(th - ETA * dE(th, betaNow, s, phi)); trail.push(th); it++; };
+    const finish = () => { betaNow = null; const k = nearest(th), want = nearest(inputs().phi); msg = k === want ? `<span class="st-ok">✓ settled on digit ${k + 1}, the digit the constraints favour.</span>` : `<span class="st-bad">✗ committed to digit ${k + 1}; the constraints favour digit ${want + 1}.</span>`; draw(); };
+    if (reduceMotion) { while (it < ITERS) one(); finish(); return; }
+    const frame = () => { for (let k = 0; k < 2 && it < ITERS; k++) one(); draw(); if (it < ITERS) anim = requestAnimationFrame(frame); else finish(); };
+    frame();
+  }
+  $("cFix").addEventListener("click", () => descend(false));
+  $("cAnn").addEventListener("click", () => descend(true));
+  $("cStart").addEventListener("input", () => { cancelAnimationFrame(anim); betaNow = null; th = +$("cStart").value * Math.PI / 180; trail = []; msg = ""; draw(); });
+  ["cB", "cPhi", "cS"].forEach((id) => $(id).addEventListener("input", () => { msg = ""; draw(); }));
+  th = +$("cStart").value * Math.PI / 180; draw();
+})();
+
+// ---------- E3/E4 · a 4×4 Sudoku solved by descending an energy ----------
+const SUD = { k0: 1.0, kA: 1.5, bA: 4, kM: 1.0, bM: 12, rho: 20, K: 60, eta: 0.2, iters: 260 };
+const PEERS = Array.from({ length: 16 }, (_, t) => Array.from({ length: 16 }, (_, s) => s).filter((s) => s !== t &&
+  ((s >> 2) === (t >> 2) || (s & 3) === (t & 3) || ((s >> 3) === (t >> 3) && ((s & 3) >> 1) === ((t & 3) >> 1)))));
+const sudBeta = (i, anneal) => anneal ? SUD.bM * Math.pow(SUD.rho, -(1 - Math.min(i / SUD.K, 1))) : SUD.bM;
+const sudInit = (r) => { const z = new Float64Array(64); for (let t = 0; t < 16; t++) { let n = 0; for (let d = 0; d < 4; d++) { const v = gauss(r); z[4 * t + d] = v; n += v * v; } n = Math.sqrt(n); for (let d = 0; d < 4; d++) z[4 * t + d] /= n; } return z; };
+const cellOf = (z, t) => [z[4 * t], z[4 * t + 1], z[4 * t + 2], z[4 * t + 3]];
+// z holds 16 unit vectors in R^4, flattened; returns the energy and its Euclidean gradient
+function sudEG(z, clues, bM) {
+  let E = 0; const g = new Float64Array(64), l = new Float64Array(8);
+  for (let t = 0; t < 16; t++) if (clues[t]) {                       // evidence: ½∠(z_t, e_clue)²
+    const k = clues[t] - 1, c = clamp(z[4 * t + k], -1 + 1e-9, 1 - 1e-9), th = Math.acos(c);
+    E += SUD.k0 * 0.5 * th * th; g[4 * t + k] -= SUD.k0 * th / Math.sqrt(1 - c * c);
+  }
+  for (let t = 0; t < 16; t++) {                                     // repulsive attention over row, column and box
+    const P = PEERS[t], n = P.length; let m = -Infinity;
+    for (let j = 0; j < n; j++) { const s = P[j]; l[j] = SUD.bA * (z[4 * t] * z[4 * s] + z[4 * t + 1] * z[4 * s + 1] + z[4 * t + 2] * z[4 * s + 2] + z[4 * t + 3] * z[4 * s + 3]); if (l[j] > m) m = l[j]; }
+    let Z = 0; for (let j = 0; j < n; j++) { l[j] = Math.exp(l[j] - m); Z += l[j]; }
+    E += SUD.kA / SUD.bA * (m + Math.log(Z));
+    for (let j = 0; j < n; j++) { const s = P[j], a = SUD.kA * l[j] / Z; for (let d = 0; d < 4; d++) { g[4 * t + d] += a * z[4 * s + d]; g[4 * s + d] += a * z[4 * t + d]; } }
+  }
+  for (let t = 0; t < 16; t++) {                                     // codebook memory with prototypes e_1..e_4
+    let m = -Infinity; for (let d = 0; d < 4; d++) { l[d] = bM * z[4 * t + d]; if (l[d] > m) m = l[d]; }
+    let Z = 0; for (let d = 0; d < 4; d++) { l[d] = Math.exp(l[d] - m); Z += l[d]; }
+    E -= SUD.kM / bM * (m + Math.log(Z)); for (let d = 0; d < 4; d++) g[4 * t + d] -= SUD.kM * l[d] / Z;
+  }
+  return { E, g };
+}
+// one Riemannian gradient step z <- Exp_z(-eta grad E), token-wise
+function sudStep(z, clues, i, anneal) {
+  const { g } = sudEG(z, clues, sudBeta(i, anneal)), out = new Float64Array(64);
+  for (let t = 0; t < 16; t++) {
+    const o = 4 * t; let gz = 0; for (let d = 0; d < 4; d++) gz += g[o + d] * z[o + d];
+    const v = [0, 0, 0, 0]; let n = 0; for (let d = 0; d < 4; d++) { v[d] = -SUD.eta * (g[o + d] - gz * z[o + d]); n += v[d] * v[d]; } n = Math.sqrt(n);
+    const c = Math.cos(n), sc = n < 1e-12 ? 1 : Math.sin(n) / n; let q = 0;
+    for (let d = 0; d < 4; d++) { out[o + d] = c * z[o + d] + sc * v[d]; q += out[o + d] * out[o + d]; }
+    q = Math.sqrt(q); for (let d = 0; d < 4; d++) out[o + d] /= q;
+  }
+  return out;
+}
+const sudDecode = (z) => Array.from({ length: 16 }, (_, t) => { let k = 0; for (let d = 1; d < 4; d++) if (z[4 * t + d] > z[4 * t + k]) k = d; return k + 1; });
+const sudEnergy = (z, clues) => sudEG(z, clues, SUD.bM).E;
+function sudSolve(clues, r, anneal) { let z = sudInit(r); for (let i = 0; i < SUD.iters; i++) z = sudStep(z, clues, i, anneal); return { z, pred: sudDecode(z), E: sudEnergy(z, clues) }; }
+const sudParse = (s) => s.split("").map(Number);
+const sameBoard = (a, b) => a.every((v, i) => v === b[i]);
+function sudViolations(pred) { let v = 0; for (let t = 0; t < 16; t++) for (const s of PEERS[t]) if (s > t && pred[s] === pred[t]) v++; return v; }
+function majorityPick(runs) { const cnt = new Map(); runs.forEach((r) => { const k = r.pred.join(""); cnt.set(k, (cnt.get(k) || 0) + 1); }); let bk = null, bc = -1; runs.forEach((r) => { const k = r.pred.join(""); if (cnt.get(k) > bc) { bc = cnt.get(k); bk = k; } }); return runs.find((r) => r.pred.join("") === bk); }
+const lowestPick = (runs) => runs.reduce((a, b) => (b.E < a.E ? b : a));
+
+let sudPuzzle = 0;
+const sudAnneal = () => $("schA").checked;
+(function sudDemo() {
+  const svg = $("sud"), plot = $("sudPlot"), C = 78, O = 9;
+  let st = null, anim = 0, seed = 7;
+  function grid(z, clues, sol, b, done) {
+    svg.innerHTML = "";
+    for (let t = 0; t < 16; t++) {
+      const r = t >> 2, c = t & 3, x = O + c * C, y = O + r * C;
+      el("rect", { x, y, width: C, height: C, fill: clues[t] ? "var(--rule)" : "var(--surface)", stroke: "var(--rule)" }, svg);
+      const zt = cellOf(z, t), pr = softmax(zt.map((v) => b * v)).p, k = pr.indexOf(Math.max(...pr));
+      const commit = Math.max(...softmax(zt.map((v) => SUD.bM * v)).p), committed = commit > 0.9;
+      const col = clues[t] ? "var(--ink)" : (done ? (k + 1 === sol[t] ? "var(--good)" : "var(--bad)") : "var(--ink)");
+      el("text", { x: x + C / 2, y: y + 40, "text-anchor": "middle", style: `font:600 30px var(--f-ui);fill:${col}`, opacity: clues[t] || committed ? 1 : 0.28 }, svg).textContent = k + 1;
+      pr.forEach((v, d) => el("rect", { x: x + 13 + d * 14, y: y + 70 - 18 * v, width: 10, height: Math.max(1, 18 * v), rx: 1.5, fill: d === k ? "var(--s2)" : "var(--muted)", opacity: clues[t] ? 0.5 : 1 }, svg));
+    }
+    el("rect", { x: O, y: O, width: 4 * C, height: 4 * C, fill: "none", stroke: "var(--ink)", "stroke-width": 2.5 }, svg);
+    el("line", { x1: O + 2 * C, x2: O + 2 * C, y1: O, y2: O + 4 * C, stroke: "var(--ink)", "stroke-width": 2.5 }, svg);
+    el("line", { y1: O + 2 * C, y2: O + 2 * C, x1: O, x2: O + 4 * C, stroke: "var(--ink)", "stroke-width": 2.5 }, svg);
+  }
+  function drawPlot(trace, it) {
+    plot.innerHTML = "";
+    const X = (i) => 40 + 280 * i / SUD.iters;
+    el("rect", { x: X(0), y: 8, width: X(SUD.K) - X(0), height: 86, fill: "var(--rule)", opacity: 0.5 }, plot);
+    el("text", { x: X(2), y: 20, class: "svgtext" }, plot).textContent = "β rising";
+    if (trace.length > 1) {
+      const lo = Math.min(...trace), hi = Math.max(...trace), Y = (v) => 90 - 76 * (v - lo) / Math.max(hi - lo, 1e-9);
+      el("polyline", { points: trace.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, plot);
+      el("text", { x: 36, y: Y(hi) + 4, "text-anchor": "end", class: "svgtext" }, plot).textContent = hi.toFixed(1);
+      el("text", { x: 36, y: Y(lo) + 4, "text-anchor": "end", class: "svgtext" }, plot).textContent = lo.toFixed(1);
+    }
+    el("line", { x1: 40, x2: 320, y1: 94, y2: 94, stroke: "var(--rule)" }, plot);
+    el("text", { x: 40, y: 112, class: "svgtext" }, plot).textContent = `energy E over ${SUD.iters} iterations (iteration ${it})`;
+  }
+  function readout() {
+    if (!st) return;
+    const pred = sudDecode(st.z), done = st.i >= SUD.iters, b = sudBeta(st.i, st.anneal);
+    let committed = 0; for (let t = 0; t < 16; t++) if (Math.max(...softmax(cellOf(st.z, t).map((v) => SUD.bM * v)).p) > 0.9) committed++;
+    $("sudRead").innerHTML = `<dt>puzzle</dt><dd>${sudPuzzle + 1} of ${VD.puzzles.length}</dd><dt>iteration</dt><dd>${st.i}</dd><dt>β now</dt><dd>${b.toFixed(2)}</dd><dt>energy E</dt><dd>${st.trace.length ? st.trace[st.trace.length - 1].toFixed(2) : "–"}</dd><dt>committed cells</dt><dd>${committed} / 16</dd><dt>repeated digits in a unit</dt><dd>${sudViolations(pred)}</dd>`;
+    $("sudMsg").innerHTML = done ? (sameBoard(pred, st.sol) ? '<span class="st-ok">✓ halted on the solution.</span>' : '<span class="st-bad">✗ halted on a wrong board: a local minimum. Try another start, or the restarts below.</span>') : "";
+    grid(st.z, st.clues, st.sol, b, done); drawPlot(st.trace, st.i);
+  }
+  function load() {
+    cancelAnimationFrame(anim);
+    const [c, s] = VD.puzzles[sudPuzzle], clues = sudParse(c), sol = sudParse(s);
+    const z0 = new Float64Array(64); clues.forEach((v, t) => { for (let d = 0; d < 4; d++) z0[4 * t + d] = v ? (d === v - 1 ? 1 : 0) : 0.5; });
+    st = { clues, sol, z: z0, i: 0, trace: [], anneal: sudAnneal() };
+    grid(st.z, clues, sol, SUD.bM, false); drawPlot([], 0);
+    $("sudRead").innerHTML = `<dt>puzzle</dt><dd>${sudPuzzle + 1} of ${VD.puzzles.length}</dd><dt>clues</dt><dd>${clues.filter(Boolean).length}</dd>`;
+    $("sudMsg").textContent = "Press “Solve from a random start”.";
+  }
+  function solve() {
+    cancelAnimationFrame(anim);
+    const [c, s] = VD.puzzles[sudPuzzle], r = mulberry32(seed++);
+    st = { clues: sudParse(c), sol: sudParse(s), z: null, i: 0, trace: [], anneal: sudAnneal() };
+    st.z = sudInit(r); st.trace.push(sudEnergy(st.z, st.clues));
+    const one = () => { st.z = sudStep(st.z, st.clues, st.i, st.anneal); st.i++; st.trace.push(sudEnergy(st.z, st.clues)); };
+    if (reduceMotion) { while (st.i < SUD.iters) one(); readout(); return; }
+    const frame = () => { for (let k = 0; k < 3 && st.i < SUD.iters; k++) one(); readout(); if (st.i < SUD.iters) anim = requestAnimationFrame(frame); };
+    frame();
+  }
+  $("sudRun").addEventListener("click", solve);
+  $("sudNew").addEventListener("click", () => { sudPuzzle = (sudPuzzle + 1) % VD.puzzles.length; load(); document.dispatchEvent(new Event("sudpuzzle")); });
+  ["schA", "schF"].forEach((id) => $(id).addEventListener("change", () => { if (st && st.i > 0) solve(); }));
+  load();
+})();
+
+(function sudRestarts() {
+  const svg = $("sudE"); let seed = 1000, runs = null;
+  function draw() {
+    svg.innerHTML = "";
+    if (!runs) { el("text", { x: 230, y: 85, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "Press “Run B restarts on this puzzle”."; return; }
+    const Es = runs.map((r) => r.E), lo = Math.min(...Es), hi = Math.max(...Es), pad = 0.08 * Math.max(hi - lo, 0.5);
+    const X = (e) => 30 + 400 * (e - (lo - pad)) / ((hi + pad) - (lo - pad));
+    el("line", { x1: 30, x2: 430, y1: 120, y2: 120, stroke: "var(--rule)" }, svg);
+    [lo, hi].forEach((v) => el("text", { x: X(v), y: 138, "text-anchor": "middle", class: "svgtext" }, svg).textContent = v.toFixed(1));
+    el("text", { x: 230, y: 160, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "final energy E of each restart (lower is better)";
+    const sorted = runs.map((r, i) => [r, i]).sort((a, b) => a[0].E - b[0].E), occ = [];
+    const best = lowestPick(runs);
+    sorted.forEach(([r]) => {
+      const x = X(r.E); let lvl = 0; while (occ.some(([ox, ol]) => ol === lvl && Math.abs(ox - x) < 13)) lvl++; occ.push([x, lvl]);
+      const y = 106 - 15 * lvl;
+      const c = el("circle", { cx: x, cy: y, r: 6, fill: r.ok ? "var(--good)" : "var(--bad)", stroke: "var(--surface)", "stroke-width": 1.5 }, svg);
+      c.addEventListener("mousemove", (e) => showTip(e, `E = ${r.E.toFixed(2)} · ${r.ok ? "solution" : `wrong board, ${sudViolations(r.pred)} repeated digits`}`)); c.addEventListener("mouseleave", hideTip);
+      if (r === best) { el("circle", { cx: x, cy: y, r: 11, fill: "none", stroke: "var(--ink)", "stroke-width": 2 }, svg); el("text", { x: x + 14, y: y - 10, class: "svgtext" }, svg).textContent = "lowest energy"; }
+    });
+    const nOk = runs.filter((r) => r.ok).length, maj = majorityPick(runs);
+    $("sudERead").innerHTML = `<dt>restarts that found the solution</dt><dd>${nOk} / ${runs.length}</dd><dt>lowest energy picks</dt><dd>${best.ok ? '<span class="st-ok">✓ solution</span>' : '<span class="st-bad">✗ wrong board</span>'}</dd><dt>majority vote picks</dt><dd>${maj.ok ? '<span class="st-ok">✓ solution</span>' : '<span class="st-bad">✗ wrong board</span>'}</dd>`;
+  }
+  function go() {
+    const B = +$("sB").value, [c, s] = VD.puzzles[sudPuzzle], clues = sudParse(c), sol = sudParse(s), r = mulberry32(seed++), an = sudAnneal();
+    runs = Array.from({ length: B }, () => { const o = sudSolve(clues, r, an); o.ok = sameBoard(o.pred, sol); return o; });
+    draw();
+  }
+  $("sB").addEventListener("input", () => { $("sBv").textContent = $("sB").value; });
+  $("sudRestart").addEventListener("click", go);
+  document.addEventListener("sudpuzzle", () => { runs = null; $("sudERead").innerHTML = ""; draw(); });
+  $("sBv").textContent = $("sB").value; draw();
+})();
+
+(function sudBatchDemo() {
+  const svg = $("sudBatch"), Bs = [1, 2, 4, 8, 16], NP = 24, NR = 16; let seedBase = 5000;
+  function draw(res) {
+    svg.innerHTML = "";
+    const X = (i) => 60 + 330 * i / (Bs.length - 1), Y = (v) => 222 - 196 * v;
+    [0, 0.25, 0.5, 0.75, 1].forEach((v) => { el("line", { x1: 60, x2: 390, y1: Y(v), y2: Y(v), stroke: "var(--rule)" }, svg); el("text", { x: 54, y: Y(v) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = Math.round(v * 100) + "%"; });
+    Bs.forEach((B, i) => el("text", { x: X(i), y: 242, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "B = " + B);
+    el("text", { x: 60, y: 14, class: "svgtext" }, svg).textContent = "puzzles solved by the chosen restart";
+    if (!res) return;
+    const series = [[res.F.energy, "s1", null, "fixed β, lowest energy"], [res.A.majority, "s2", "6 4", "majority"], [res.A.energy, "s2", null, "lowest energy"], [res.A.oracle, "ink-2", "2 3", "oracle"]];
+    series.forEach(([v, col, dash, name]) => {
+      el("polyline", { points: v.map((y, i) => `${X(i)},${Y(y)}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": 2, "stroke-dasharray": dash || "none" }, svg);
+      v.forEach((y, i) => { el("circle", { cx: X(i), cy: Y(y), r: 3.5, fill: `var(--${col})` }, svg); const h = el("circle", { cx: X(i), cy: Y(y), r: 10, fill: "transparent" }, svg); h.addEventListener("mousemove", (e) => showTip(e, `${name}, B = ${Bs[i]}: ${(y * 100).toFixed(0)}%`)); h.addEventListener("mouseleave", hideTip); });
+    });
+    $("sudBatchRead").innerHTML = `<dt>one restart, annealed β</dt><dd>${(res.A.single * 100).toFixed(0)}%</dd><dt>one restart, fixed β</dt><dd>${(res.F.single * 100).toFixed(0)}%</dd><dt>B = 16, lowest energy, annealed</dt><dd>${(res.A.energy[4] * 100).toFixed(0)}%</dd><dt>B = 16, oracle, annealed</dt><dd>${(res.A.oracle[4] * 100).toFixed(0)}%</dd><dt>B = 16, lowest energy, fixed β</dt><dd>${(res.F.energy[4] * 100).toFixed(0)}%</dd>`;
+  }
+  function compute() {
+    const btn = $("sudBatchBtn"); btn.disabled = true;
+    const acc = { A: { energy: Bs.map(() => 0), majority: Bs.map(() => 0), oracle: Bs.map(() => 0), single: 0 }, F: { energy: Bs.map(() => 0), majority: Bs.map(() => 0), oracle: Bs.map(() => 0), single: 0 } };
+    let p = 0; const base = seedBase; seedBase += 1000;
+    const work = () => {
+      const [c, s] = VD.puzzles[p], clues = sudParse(c), sol = sudParse(s);
+      [["A", true], ["F", false]].forEach(([key, an]) => {
+        const r = mulberry32(base + p); const runs = Array.from({ length: NR }, () => { const o = sudSolve(clues, r, an); o.ok = sameBoard(o.pred, sol); return o; });
+        acc[key].single += runs.filter((o) => o.ok).length / NR / NP;
+        Bs.forEach((B, i) => { const sub = runs.slice(0, B); acc[key].energy[i] += lowestPick(sub).ok / NP; acc[key].majority[i] += majorityPick(sub).ok / NP; acc[key].oracle[i] += sub.some((o) => o.ok) / NP; });
+      });
+      p++; btn.textContent = `Computing… ${p} / ${NP}`;
+      if (p < NP) setTimeout(work, 0); else { draw(acc); btn.textContent = "Recompute with new random starts"; btn.disabled = false; }
+    };
+    draw(null); setTimeout(work, 30);
+  }
+  $("sudBatchBtn").addEventListener("click", compute);
+  compute();
+})();
+
+// ---------- E5 · measured spectra and restart curves of the trained models ----------
+(function realEigDemo() {
+  const svg = $("realEig"), S = 80, XL = 2.05, YL = 1.8;
+  el("line", { x1: -168, x2: 168, y1: 0, y2: 0, stroke: "var(--rule)" }, svg); el("line", { x1: 0, x2: 0, y1: -148, y2: 148, stroke: "var(--rule)" }, svg);
+  el("circle", { cx: 0, cy: 0, r: S, fill: "none", stroke: "var(--ink-2)", "stroke-width": 1.5 }, svg);
+  el("circle", { cx: S, cy: 0, r: 3, fill: "var(--ink)" }, svg); el("text", { x: S + 5, y: 14, class: "svgtext" }, svg).textContent = "1";
+  el("text", { x: 164, y: -6, "text-anchor": "end", class: "svgtext" }, svg).textContent = "Re"; el("text", { x: 6, y: -138, class: "svgtext" }, svg).textContent = "Im";
+  const G = el("g", {}, svg);
+  const models = [["SFPRM", VD.eig_sfprm, "s1"], ["Energy model", VD.eig_energy, "s2"]];
+  function stats(E, eta) { let rho = 0, cpx = 0, win = Infinity, off = 0; for (const [a, b] of E) { const da = 1 + eta * (a - 1), db = eta * b; rho = Math.max(rho, Math.hypot(da, db)); if (Math.abs(da) > XL || Math.abs(db) > YL) off++; if (Math.abs(b) > 1e-6) cpx++; const dz2 = (a - 1) ** 2 + b * b; if (a < 1 && dz2 > 1e-12) win = Math.min(win, 2 * (1 - a) / dz2); } return { rho, cpx: cpx / E.length, win, off }; }
+  const bestEta = models.map(([, E]) => { const w = stats(E, 1).win; let best = [Infinity, 0]; for (let k = 1; k < 200; k++) { const et = w * k / 200, r = stats(E, et).rho; if (r < best[0]) best = [r, et]; } return best; });
+  const iters = (r) => r < 1 ? Math.ceil(Math.log(1e-3) / Math.log(r)) : Infinity;
+  function draw() {
+    const eta = +$("rE").value / 100; $("rEv").textContent = eta.toFixed(2);
+    G.innerHTML = "";
+    models.forEach(([, E, col]) => { for (const [a, b] of E) { const da = 1 + eta * (a - 1), db = eta * b; if (Math.abs(da) <= XL && Math.abs(db) <= YL) el("circle", { cx: (S * da).toFixed(1), cy: (-S * db).toFixed(1), r: 1.8, fill: `var(--${col})`, opacity: 0.55 }, G); } });
+    let html = "";
+    models.forEach(([name, E], m) => {
+      const st = stats(E, eta), it = iters(st.rho), [bR, bE] = bestEta[m];
+      html += `<dt style="grid-column:1/-1;color:var(--ink);font-weight:600;margin-top:4px">${name}</dt>` +
+        `<dt>complex eigenvalues</dt><dd>${(st.cpx * 100).toFixed(1)}%</dd>` +
+        `<dt>stable for η &lt;</dt><dd>${st.win.toFixed(2)}</dd>` +
+        `<dt>slowest mode ÷1000 at this η</dt><dd style="color:var(${st.rho < 1 ? "--good" : "--bad"})">${Number.isFinite(it) ? it + " steps" : "diverges"}</dd>` +
+        `<dt>at its best η = ${bE.toFixed(2)}</dt><dd>${iters(bR)} steps</dd>` +
+        (st.off ? `<dt>off the chart</dt><dd>${st.off}</dd>` : "");
+    });
+    $("realEigRead").innerHTML = html;
+  }
+  $("rE").addEventListener("input", draw);
+  $("rE1").addEventListener("click", () => { $("rE").value = 100; draw(); });
+  $("rE01").addEventListener("click", () => { $("rE").value = 10; draw(); });
+  draw();
+})();
+
+(function realBDemo() {
+  const svg = $("realB"), Bs = VD.Bs;
+  const series = [
+    ["sfprm", "anchor", "s1", "1.5", "3 3", "SFPRM, anchor angle"],
+    ["sfprm", "majority", "s1", "2", "7 4", "SFPRM, majority vote"],
+    ["sfprm", "oracle", "s1", "1.5", "1.5 3", "SFPRM, oracle"],
+    ["first", "energy", "muted", "2", null, "first energy model, lowest energy"],
+    ["code", "majority", "s2", "2", "7 4", "energy model, majority vote"],
+    ["code", "energy", "s2", "3", null, "energy model, lowest energy"],
+    ["code", "oracle", "ink", "1.5", "1.5 3", "energy model, oracle"],
+  ];
+  $("realBLegend").innerHTML = series.map(([, , col, , dash, name]) => `<span><span class="sw${dash ? " dash" : ""}" style="${dash ? `color:var(--${col})` : `background:var(--${col})`}"></span>${name}</span>`).join("");
+  function draw() {
+    const size = $("r4").checked ? "4" : "6", D = { sfprm: VD[`r${size}_sfprm`], code: VD[`r${size}_code`], first: VD[`r${size}_first`] };
+    svg.innerHTML = "";
+    const X = (i) => 56 + 380 * i / (Bs.length - 1), Y = (v) => 232 - 2.06 * v;
+    [0, 25, 50, 75, 100].forEach((v) => { el("line", { x1: 56, x2: 436, y1: Y(v), y2: Y(v), stroke: "var(--rule)" }, svg); el("text", { x: 50, y: Y(v) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = v + "%"; });
+    Bs.forEach((B, i) => el("text", { x: X(i), y: 252, "text-anchor": "middle", class: "svgtext" }, svg).textContent = B);
+    el("text", { x: 246, y: 268, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "restarts B";
+    el("text", { x: 56, y: 14, class: "svgtext" }, svg).textContent = `out-of-distribution board accuracy, ${size}×${size}`;
+    series.forEach(([m, rule, col, w, dash, name]) => {
+      const v = D[m] && D[m][rule]; if (!v) return;
+      el("polyline", { points: v.map((y, i) => `${X(i)},${Y(y)}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": w, "stroke-dasharray": dash || "none" }, svg);
+      v.forEach((y, i) => { const h = el("circle", { cx: X(i), cy: Y(y), r: 8, fill: "transparent" }, svg); h.addEventListener("mousemove", (e) => showTip(e, `${name}, B = ${Bs[i]}: ${y.toFixed(1)}%`)); h.addEventListener("mouseleave", hideTip); });
+    });
+    const last = Bs.length - 1, sBest = Math.max(D.sfprm.anchor[last], D.sfprm.majority[last]);
+    $("realBRead").innerHTML = `<dt>energy model, one restart</dt><dd>${D.code.energy[0].toFixed(1)}%</dd><dt>energy model, lowest energy of 64</dt><dd>${D.code.energy[last].toFixed(1)}%</dd><dt>energy model, oracle of 64</dt><dd>${D.code.oracle[last].toFixed(1)}%</dd><dt>SFPRM, one restart</dt><dd>${D.sfprm.majority[0].toFixed(1)}%</dd><dt>SFPRM, best rule at 64</dt><dd>${sBest.toFixed(1)}%</dd>`;
+  }
+  ["r4", "r6"].forEach((id) => $(id).addEventListener("change", draw)); draw();
+})();
+</script>
+</body>
+</html>

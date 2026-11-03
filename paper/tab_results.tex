@@ -1,0 +1,26 @@
+\begin{tabular}{@{}lccccccccc@{}}
+\toprule
+ & \multicolumn{5}{c}{$4\times4$} & \multicolumn{4}{c}{$6\times6$} \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-10}
+ & SFPRM & Energy & Codebook & $+$rank & Mem.\ MLP & SFPRM & Energy & $+$rank & Mem.\ MLP \\
+\midrule
+Parameters ($\times10^3$) & 101 & 79 & 79 & 79 & 67 & 101 & 80 & 80 & 68 \\
+Steps to $90\%$ train acc. & 200 & 1250 & 650 & 750 & 200 & 400 & $>4000$ & $>4000$ & 500 \\
+Board acc.\ ID & 97.8 & 82.4 & 98.0 & 94.6 & 95.8 & 99.8 & 0.0 & 61.2 & 99.2 \\
+Board acc.\ OOD & 65.6 & 17.2 & 74.4 & 62.8 & 55.0 & 89.2 & 0.0 & 11.0 & 69.8 \\
+\midrule
+Halted ($\le128$ it.) & 73.4 & 81.8 & 98.0 & 97.4 & 75.4 & 90.6 & 30.4 & 25.0 & 77.6 \\
+Iterations (med./p90) & 19/45 & 68/114 & 43/76 & 49/83 & 25/48 & 19/37 & 102/122 & 103/124 & 22/45 \\
+Complex $\zeta$ (\%) & 96.4 & 0.0 & 0.0 & 0.0 & 94.9 & 96.4 & 0.0 & 0.0 & 94.8 \\
+$\lambda_{\max}(\operatorname{Hess}E)$ & -- & 12.2 & 12.5 & 12.7 & -- & -- & 17.9 & 12.9 & -- \\
+Window (Cor.~\ref{cor:window}) & 1.40 & 0.16 & 0.16 & 0.15 & 1.24 & 1.33 & 0.12 & 0.16 & 1.24 \\
+\midrule
+$B{=}64$: lowest energy & -- & 12.4 & 99.0 & 100.0 & -- & -- & 0.0 & 88.2 & -- \\
+$B{=}64$: anchor angle & 48.8 & 20.4 & 25.2 & 14.8 & 48.4 & 92.8 & 0.0 & 0.4 & 63.4 \\
+$B{=}64$: majority & 67.0 & 20.6 & 91.2 & 84.8 & 56.4 & 90.6 & 0.0 & 59.4 & 71.4 \\
+$B{=}64$: oracle & 81.8 & 36.0 & 99.0 & 100.0 & 67.0 & 93.8 & 0.0 & 89.8 & 82.2 \\
+\midrule
+Committed boards & -- & -- & 98.4 & 95.8 & -- & -- & -- & 4.6 & -- \\
+Acc.\ committed/uncomm. & -- & -- & 75.6/0.0 & 65.3/4.8 & -- & -- & -- & 78.3/7.8 & -- \\
+\bottomrule
+\end{tabular}

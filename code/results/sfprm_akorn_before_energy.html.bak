@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SFPRM–AKOrN Correspondence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;600&family=STIX+Two+Text:ital@0;1&display=swap">
+<style>
+/* Layout: one reading column (~68ch) with figures that widen to 960px; each section = prose + live figure + readout. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --ink: #161a22; --ink-2: #4b5263; --muted: #7b8292; --rule: #dde1e8;
+  --accent: #3346a8;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --good: #0ca30c; --bad: #d03b3b;
+  --heat-lo: #f3f6fb; --heat-hi: #0d366b;
+  --f-text: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --f-ui: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --surface: #1a1e26; --ink: #eceef2; --ink-2: #b9bfcc; --muted: #8a91a0; --rule: #2c323d;
+    --accent: #9aa8ff; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --heat-lo: #1a1e26; --heat-hi: #9ec5f4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --surface: #1a1e26; --ink: #eceef2; --ink-2: #b9bfcc; --muted: #8a91a0; --rule: #2c323d;
+  --accent: #9aa8ff; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --heat-lo: #1a1e26; --heat-hi: #9ec5f4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--f-text); padding-inline: 16px; padding-block: 0 64px; }
+main { max-width: 960px; margin: 0 auto; }
+.prose { max-width: 68ch; }
+header { padding-block: 48px 8px; border-bottom: 1px solid var(--rule); margin-bottom: 8px; }
+.eyebrow { font: 600 12px/1.2 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 10px 0 14px; text-wrap: balance; }
+h2 { font-weight: 600; font-size: 26px; line-height: 1.2; margin: 56px 0 10px; text-wrap: balance; }
+h3 { font: 600 15px/1.3 var(--f-ui); letter-spacing: .02em; margin: 28px 0 6px; color: var(--ink-2); }
+p { margin: 0 0 14px; }
+.lede { font-size: 19px; color: var(--ink-2); }
+.m { font-family: var(--f-math); font-style: italic; white-space: nowrap; }
+.m .u { font-style: normal; }
+.eq { font-family: var(--f-math); font-size: 19px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 16px; margin: 8px 0 16px; overflow-x: auto; }
+.eq .tag { font: 600 12px/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; font-style: normal; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.pair > * { min-width: 0; }
+figure { margin: 18px 0 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; }
+figcaption { font: 14px/1.45 var(--f-ui); color: var(--ink-2); margin-top: 10px; max-width: 80ch; }
+.fig-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .fig-grid { grid-template-columns: 1fr; } }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+.controls { display: grid; gap: 12px; font: 14px/1.3 var(--f-ui); }
+.ctl label { display: flex; justify-content: space-between; color: var(--ink-2); margin-bottom: 4px; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+input[type=checkbox] { accent-color: var(--accent); }
+.readout { font: 14px/1.5 var(--f-ui); border-top: 1px solid var(--rule); padding-top: 10px; display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-variant-numeric: tabular-nums; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; text-align: right; }
+.note { font: 13px/1.45 var(--f-ui); color: var(--muted); }
+.warn { font: 13px/1.45 var(--f-ui); color: var(--bad); min-height: 1.45em; }
+button { font: 600 14px/1 var(--f-ui); color: var(--surface); background: var(--accent); border: 0; border-radius: 5px; padding: 9px 14px; cursor: pointer; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 13px/1.3 var(--f-ui); color: var(--ink-2); margin-top: 8px; }
+.sw { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.sw.dash { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 8px) !important; height: 2px; }
+.pipeline { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; font: 14px/1.35 var(--f-ui); margin: 14px 0; }
+.stage { flex: 1 1 150px; min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; position: relative; }
+.stage b { display: block; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+.stage .akorn { color: var(--ink-2); }
+.stage .m { white-space: normal; }
+.stage.c1 { border-top: 3px solid var(--s1); } .stage.c2 { border-top: 3px solid var(--s2); } .stage.c3 { border-top: 3px solid var(--s3); } .stage.c4 { border-top: 3px solid var(--ink); }
+.tablewrap { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font: 14px/1.45 var(--f-ui); min-width: 560px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+td.k { color: var(--ink-2); white-space: nowrap; }
+td .badge { font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap; }
+.torus-wrap { position: relative; }
+canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+.status { font: 13px/1.5 var(--f-ui); display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 4px 10px; font-variant-numeric: tabular-nums; }
+.st-ok { color: var(--good); } .st-bad { color: var(--bad); } .st-run { color: var(--muted); }
+.tip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); color: var(--ink); font: 13px/1.35 var(--f-ui); padding: 6px 8px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.svgtext { font-family: var(--f-ui); font-size: 12px; fill: var(--ink-2); }
+.svgmath { font-family: var(--f-math); font-style: italic; font-size: 15px; fill: var(--ink); }
+footer { margin-top: 56px; border-top: 1px solid var(--rule); padding-top: 14px; font: 13px/1.5 var(--f-ui); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Fixed-point reasoning on the sphere</div>
+  <h1>SFPRM is an AKOrN with zero natural frequency</h1>
+  <p class="lede prose">Every operation in an SFPRM iteration (geodesic injection, nGPT sub-layers, geodesic damping) moves a unit vector along a great circle toward a tangent direction. That is exactly the Kuramoto update used by AKOrN. This page starts with the basic concepts, then shows the identity, how one iteration splits into AKOrN steps, and a proposed extension built on small oscillators with random restarts.</p>
+</header>
+
+<section id="basics">
+  <h2>Basics, interactively</h2>
+  <p class="prose">Four ideas carry the rest of the page: splitting a vector into radial and tangential parts, oscillators that synchronize, an oscillator that locks to a drive, and damping as a way to tame rotating modes. Each figure matches a subsection of Section 2 in the LaTeX note.</p>
+
+  <h3>1 · Radial and tangential parts, and why normalization only sees the tangent</h3>
+  <p class="prose">Any update <span class="m">v</span> at a point <span class="m">z</span> splits into <span class="m">⟨v,z⟩z</span> (radial) and <span class="m">P<sub>z</sub>v</span> (tangential). After normalizing, only the direction of <span class="m">z + v</span> survives, so the radial part just rescales the tangential step (Lemma A). The normalization step and the exponential map move along the same great circle, by <span class="m">arctan‖P<sub>z</sub>v‖</span> and <span class="m">‖P<sub>z</sub>v‖</span> respectively.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bProj" viewBox="-160 -170 440 300" role="img" aria-label="A vector at z split into radial and tangential parts, and its normalization"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="vDir">Direction of v <output id="vDirv"></output></label><input id="vDir" type="range" min="0" max="359" value="20"></div>
+        <div class="ctl"><label for="vLen">Length of v <output id="vLenv"></output></label><input id="vLen" type="range" min="0" max="250" value="110"></div>
+        <dl class="readout" id="bProjRead"></dl>
+        <div class="warn" id="bProjWarn"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--ink-2)"></span>update v</span>
+      <span><span class="sw" style="background:var(--s3)"></span>radial part ⟨v,z⟩z</span>
+      <span><span class="sw" style="background:var(--s2)"></span>tangential part P<sub>z</sub>v</span>
+      <span><span class="sw" style="background:var(--s1)"></span>Exp<sub>z</sub>(P<sub>z</sub>v)</span>
+    </div>
+    <figcaption>The orange ring is Π(z + v). The orange dot on the tangent line is z + P<sub>z</sub>v / (1 + ⟨v,z⟩); it lies on the same ray, which is Lemma A. When 1 + ⟨v,z⟩ ≤ 0 the update lands in the far hemisphere and no tangent step reproduces it.</figcaption>
+  </figure>
+
+  <h3>2 · The Kuramoto model: coupling against frequency spread</h3>
+  <p class="prose">Forty phase oscillators with natural frequencies drawn from a normal distribution of width <span class="m">σ</span>, all coupled with strength <span class="m">K</span>: <span class="m">θ̇<sub>i</sub> = ω<sub>i</sub> + (K/n) Σ<sub>j</sub> sin(θ<sub>j</sub> − θ<sub>i</sub>)</span>. Below a critical coupling (about <span class="m">1.6σ</span> for this distribution) the phases stay spread out. Above it, a synchronized cluster forms and the order parameter <span class="m">r</span> rises toward 1.</p>
+  <figure>
+    <div class="fig-grid">
+      <div><canvas id="bKura" width="560" height="560" aria-label="Kuramoto oscillators on a circle"></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="kK">Coupling K <output id="kKv"></output></label><input id="kK" type="range" min="0" max="300" value="160"></div>
+        <div class="ctl"><label for="kS">Frequency spread σ <output id="kSv"></output></label><input id="kS" type="range" min="0" max="150" value="60"></div>
+        <div class="btns"><button id="kReset" type="button" class="ghost">Random phases</button></div>
+        <svg id="bKuraR" viewBox="0 0 300 120" role="img" aria-label="Order parameter over time"></svg>
+        <dl class="readout" id="bKuraRead"></dl>
+      </div>
+    </div>
+    <figcaption>Dots are oscillators on the unit circle; the orange arrow is the order parameter r·e<sup>iψ</sup>, the mean of all unit vectors. In AKOrN each dot becomes a unit vector in N dimensions, the coupling becomes a learned matrix J, and frequencies become rotation matrices Ω.</figcaption>
+  </figure>
+
+  <h3>3 · Locking to a drive (the Adler condition)</h3>
+  <p class="prose">A single oscillator with natural frequency <span class="m">ω</span> pulled by a fixed drive <span class="m">h</span>: <span class="m">θ̇ = ω − ‖h‖ sin(θ − φ<sub>h</sub>)</span>. If the drive beats the frequency, the oscillator locks at a constant lag behind <span class="m">h</span>, which is a fixed point. Otherwise it keeps slipping round. This is the stimulus term of AKOrN and the injection of SFPRM, and it is the condition the oscillatory extension of SFPRM has to satisfy to halt.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bAdler" viewBox="-150 -140 300 280" role="img" aria-label="Single oscillator locking to or slipping past a drive"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="aW">Natural frequency ω <output id="aWv"></output></label><input id="aW" type="range" min="0" max="200" value="80"></div>
+        <div class="ctl"><label for="aH">Drive strength ‖h‖ <output id="aHv"></output></label><input id="aH" type="range" min="0" max="200" value="110"></div>
+        <dl class="readout" id="bAdlerRead"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>drive h</span>
+      <span><span class="sw" style="background:var(--s2)"></span>oscillator</span>
+    </div>
+    <figcaption>Near the boundary ‖h‖ ≈ ω the oscillator takes longer and longer to settle (relaxation rate √(‖h‖² − ω²)), which is why iterations-to-halt grow with difficulty.</figcaption>
+  </figure>
+
+  <h3>4 · Damping a fixed-point iteration</h3>
+  <p class="prose">Near a fixed point, the error follows the Jacobian: each eigenvalue <span class="m">ζ</span> multiplies its mode every step. Damping with step <span class="m">η</span> replaces <span class="m">ζ</span> by <span class="m">1 + η(ζ − 1)</span>, a point on the segment from 1 to <span class="m">ζ</span>. The mode decays if that point is inside the unit circle. Rotating modes (large imaginary part) need small η; modes with <span class="m">Re ζ ≥ 1</span> cannot be rescued.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bDamp" viewBox="-170 -150 340 300" role="img" aria-label="Complex plane with eigenvalue, damped eigenvalue and the unit circle"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="dRe">Re ζ <output id="dRev"></output></label><input id="dRe" type="range" min="-150" max="150" value="-13"></div>
+        <div class="ctl"><label for="dIm">Im ζ <output id="dImv"></output></label><input id="dIm" type="range" min="-150" max="150" value="103"></div>
+        <div class="ctl"><label for="dEta">Damping η <output id="dEtav"></output></label><input id="dEta" type="range" min="0" max="100" value="100"></div>
+        <dl class="readout" id="bDampRead"></dl>
+        <svg id="bDampErr" viewBox="0 0 300 130" role="img" aria-label="Error magnitude over iterations, damped versus undamped"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s2)"></span>eigenvalue ζ (undamped, ring)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>damped 1 + η(ζ − 1)</span>
+      <span><span class="sw" style="background:var(--good)"></span>stable window for η</span>
+    </div>
+    <figcaption>The default ζ ≈ −0.13 + 1.03i is the dominant mode that the GFPR paper measured at FPRM's halt on a Sudoku puzzle: an almost pure rotation, stable only for η &lt; 0.97. SFPRM's patience rule shrinks η until the damped point enters the circle.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The two update rules</h2>
+  <div class="pair">
+    <div class="eq"><span class="tag">AKOrN step (oscillators on S<sup>N−1</sup>)</span>
+      x<sub>i</sub> ← Π( x<sub>i</sub> + γ [ Ω<sub>i</sub>x<sub>i</sub> + P<sub>x<sub>i</sub></sub>( c<sub>i</sub> + Σ<sub>j</sub> J<sub>ij</sub>x<sub>j</sub> ) ] )
+    </div>
+    <div class="eq"><span class="tag">SFPRM iteration (tokens on S<sup>d−1</sup>)</span>
+      z̃ = f<sub>θ</sub>( Slerp<sub>λ</sub>(z, x) ),&nbsp;&nbsp; z ← Slerp<sub>η</sub>(z, z̃)
+    </div>
+  </div>
+  <p class="prose">Here <span class="m">Π(y) = y/‖y‖</span>, <span class="m">P<sub>z</sub>v = v − ⟨v,z⟩z</span> projects onto the tangent space, <span class="m">Ω</span> is antisymmetric (the natural frequency), <span class="m">J</span> the coupling and <span class="m">c</span> the stimulus. Two lemmas connect them:</p>
+  <div class="pair">
+    <div class="eq"><span class="tag">Lemma A · renormalized residual step</span>
+      Π(z + w) = Π( z + P<sub>z</sub>w / (1 + ⟨w,z⟩) )
+    </div>
+    <div class="eq"><span class="tag">Lemma B · Slerp</span>
+      Slerp<sub>η</sub>(u,v) = Exp<sub>u</sub>(η Log<sub>u</sub>v) = Π( u + <span style="white-space:nowrap">tan(ηθ)/sin θ</span> · P<sub>u</sub>v )
+    </div>
+  </div>
+  <p class="prose">Applied to the damping step, Lemma B gives the exact statement: one SFPRM iteration is <span class="m">z ← Π(z + γ P<sub>z</sub>F<sub>θ</sub>(z;x))</span> with <span class="m">γ = tan(ηθ)/sin θ</span>. That is an AKOrN step with <span class="m">Ω = 0</span>, one oscillator per token (<span class="m">N = d</span>), and the whole recurrent map as its drive.</p>
+</section>
+
+<section>
+  <h2>One step, two forms</h2>
+  <p class="prose">Everything happens in the plane spanned by the state <span class="m">z</span> and the proposal <span class="m">z̃</span>, so a circle shows the whole construction. Slerp rotates <span class="m">z</span> by <span class="m">ηθ</span>. The AKOrN form walks along the tangent line by <span class="m">γ P<sub>z</sub>z̃</span> and renormalizes. Both land on the same point. Only the step size differs between update rules; nGPT-style lerp-then-normalize lands elsewhere on the same arc, with its own <span class="m">γ</span>.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="circ" viewBox="-150 -150 440 290" role="img" aria-label="Unit circle showing Slerp and the AKOrN tangent step landing at the same point"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="th">Angle to proposal θ <output id="thv"></output></label><input id="th" type="range" min="2" max="178" value="70"></div>
+        <div class="ctl"><label for="eta">Damping η <output id="etav"></output></label><input id="eta" type="range" min="0" max="100" value="60"></div>
+        <label style="display:flex;gap:8px;align-items:center;color:var(--ink-2)"><input id="lerp" type="checkbox" checked> Show nGPT-style lerp, then normalize</label>
+        <dl class="readout" id="circRead"></dl>
+        <div class="warn" id="circWarn"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>Slerp<sub>η</sub>(z, z̃)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>AKOrN step Π(z + γ P<sub>z</sub>z̃)</span>
+      <span><span class="sw dash" style="color:var(--s3)"></span>lerp, then normalize</span>
+    </div>
+    <figcaption>The two markers on the circle coincide for every θ and η with ηθ &lt; 90°. Beyond that, no positive γ reaches the Slerp point: an AKOrN-form step always rotates by less than 90°. The difference readout is computed with the full formulas, not from the drawing.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Inside one iteration: operator-split AKOrN</h2>
+  <p class="prose">Lemma A applies to every nGPT sub-layer and Lemma B to the injection, so each stage of the recurrent map is its own AKOrN step, with its own drive.</p>
+  <div class="pipeline" aria-label="SFPRM iteration as a chain of AKOrN steps">
+    <div class="stage c1"><b>Injection</b><span class="m">Slerp<sub>λ</sub>(z, x)</span><div class="akorn">AKOrN stimulus step, <span class="m">c = x</span>. Also a Riemannian gradient step on ½∠(z,x)².</div></div>
+    <div class="stage c2"><b>Attention</b><span class="m">Norm(h + α<sub>A</sub>⊙(Norm(Attn h) − h))</span><div class="akorn">AKOrN coupling step, <span class="m">J<sub>ts</sub> = Σ<sub>k</sub>a<sup>k</sup><sub>ts</sub>W<sub>O</sub>W<sub>V</sub></span>.</div></div>
+    <div class="stage c3"><b>MLP</b><span class="m">Norm(h + α<sub>M</sub>⊙(Norm(MLP h) − h))</span><div class="akorn">AKOrN step with a nonlinear self-drive.</div></div>
+    <div class="stage c4"><b>Damping</b><span class="m">Slerp<sub>η</sub>(z, z̃)</span><div class="akorn">AKOrN step whose drive is the whole proposal <span class="m">F<sub>θ</sub>(z;x)</span>.</div></div>
+  </div>
+  <p class="prose">AKOrN sums stimulus and coupling into one Euler step. SFPRM applies them one after another. When the step sizes are small (<span class="m">λ, α = O(ε)</span>), the sequence collapses to a single AKOrN step with drive <span class="m">c + Jz + m(z)</span>, with an error of order <span class="m">ε²</span>. The figure below runs a toy SFPRM (3 tokens on S², one random nGPT layer) and draws both paths in the tangent plane at <span class="m">z</span>. In this gnomonic view every great circle is a straight line, so each AKOrN step from <span class="m">z</span> is a straight arrow and the single collapsed step is the vector sum of the three drives.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="gno" viewBox="0 0 460 320" role="img" aria-label="Split SFPRM path versus single collapsed AKOrN step in the tangent plane"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="eps">Step scale ε <output id="epsv"></output></label><input id="eps" type="range" min="0" max="100" value="70"></div>
+        <div class="ctl"><label for="eta2">Damping η <output id="eta2v"></output></label><input id="eta2" type="range" min="10" max="100" value="100"></div>
+        <dl class="readout" id="gnoRead"></dl>
+        <svg id="errplot" viewBox="0 0 300 190" role="img" aria-label="Log-log plot of split versus collapsed error against epsilon"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>injection (stimulus)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>attention (coupling)</span>
+      <span><span class="sw" style="background:var(--s3)"></span>MLP (self-drive)</span>
+      <span><span class="sw" style="background:var(--ink)"></span>damping → next state</span>
+      <span><span class="sw dash" style="color:var(--ink-2)"></span>single AKOrN step, drives summed</span>
+    </div>
+    <figcaption>Solid: the actual SFPRM stages for token 1. Dashed: the three drives evaluated at <span class="m">z</span> and added head to tail, then scaled by η. The view is rescaled by 1/ε so the picture keeps its size. As ε shrinks the two endpoints meet; the log-log inset shows the gap falling with slope 2.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Dictionary</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Ingredient</th><th>AKOrN</th><th>SFPRM</th><th>Relation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Update</td><td>Π(x + γ[Ωx + P<sub>x</sub>(c + Jx)])</td><td>Slerp<sub>η</sub>(z, F<sub>θ</sub>(z;x))</td><td><span class="badge">exact</span> with Ω = 0, γ = tan(ηθ)/sin θ</td></tr>
+      <tr><td class="k">Oscillator size</td><td>N = 2 or 4, many per position</td><td>N = d, one per token</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Natural frequency</td><td>Ω ≠ 0 (learned global ω)</td><td>Ω = 0</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Stimulus</td><td>c, linear potential −⟨c,x⟩</td><td>Slerp<sub>λ</sub>(z,x), potential ½∠(z,x)²</td><td><span class="badge">exact</span> stimulus step</td></tr>
+      <tr><td class="k">Coupling</td><td>Σ<sub>j</sub>J<sub>ij</sub>x<sub>j</sub> (conv or attention)</td><td>nGPT attention sub-layer</td><td><span class="badge">exact</span> coupling step</td></tr>
+      <tr><td class="k">Combination</td><td>summed in one Euler step</td><td>sequential stages</td><td><span class="badge">O(ε²)</span> Lie–Trotter</td></tr>
+      <tr><td class="k">Fixed points</td><td>P<sub>z</sub>(c + Jz) = 0</td><td>F<sub>θ</sub>(z;x) = z</td><td><span class="badge">exact</span> up to antipodes</td></tr>
+      <tr><td class="k">Linearization</td><td>I + γ(J<sub>T</sub> − I)</td><td>(1 − η)I + ηJ</td><td><span class="badge">exact</span> same damping window</td></tr>
+      <tr><td class="k">Energy</td><td>Lyapunov for symmetric J, Ω = 0</td><td>none (F<sub>θ</sub> is not a gradient field)</td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Halting</td><td>fixed T, energy voting</td><td>chordal residual &lt; τ<sub>c</sub></td><td><span class="badge">differs</span></td></tr>
+      <tr><td class="k">Anchor angle</td><td>phase lag to stimulus</td><td>∠(z<sub>t</sub>, x<sub>t</sub>), predicts correctness</td><td><span class="badge">same quantity</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="prose note">A constant Ω adds nothing new: oscillatory SFPRM with block F equals vanilla SFPRM with block F′(z) = Exp<sub>z</sub>(Ωz + Log<sub>z</sub>F(z)), for every η. What cannot be folded into the block is a change of state space or anything that varies across iterations, which is what the proposal below uses.</p>
+</section>
+
+<section>
+  <h2>Proposed method: small oscillators with random restarts</h2>
+  <p class="prose">Split each token into <span class="m">M = d/N</span> small oscillators on <span class="m">S<sup>N−1</sup></span>, keep the nGPT block unchanged, and add EqR-style random initialization, path noise and restarts. The halt doubles as a certificate, since 99.7–100% of halted Sudoku puzzles are solved in the SFPRM experiments.</p>
+  <div class="eq"><span class="tag">Update, per oscillator group</span>
+    z ← Exp<sub>z</sub>( η<sub>i</sub> Log<sub>z</sub> Π(z̃) + β<sub>i</sub> ξ ),&nbsp;&nbsp; ξ ~ N(0, P<sub>z</sub>),&nbsp;&nbsp; β<sub>i</sub> = β<sub>0</sub>η<sub>i</sub>/η<sub>0</sub>,&nbsp;&nbsp; z<sub>0</sub> ~ Uniform(S<sup>N−1</sup>)
+  </div>
+  <p class="prose">With β₀ = 0 and N = d this is exactly SFPRM. Tying the noise to the damping means the patience rule anneals both together. Run B restarts, accept the first that halts, and fall back to the lowest residual or anchor angle.</p>
+
+  <h3>Why small oscillators: random starts are not random on a big sphere</h3>
+  <p class="prose">On S<sup>511</sup> a random state sits at 90° ± 2.5° from any fixed input vector, so every restart starts at the same anchor angle, which is the quantity injection acts on. Per group of size N the starting angle is spread out.</p>
+  <figure>
+    <div class="fig-grid">
+      <svg id="hist" viewBox="0 0 460 318" role="img" aria-label="Histograms of the angle between a random initial state and the input"></svg>
+      <div class="controls">
+        <div class="ctl"><label for="nsel">Oscillator dimension N <output id="nselv"></output></label><input id="nsel" type="range" min="0" max="7" value="0"></div>
+        <dl class="readout" id="histRead"></dl>
+        <p class="note">6,000 random unit vectors per panel. The top panel is fixed at N = d = 512.</p>
+      </div>
+    </div>
+    <figcaption>Prediction to test on the trained model: the spread between restart end states (the SFPRM uniqueness figure) grows as N shrinks, and accuracy gains more from extra restarts.</figcaption>
+  </figure>
+
+  <h3>The mechanism on a toy: two oscillators, four attractors</h3>
+  <p class="prose">Two N = 2 oscillators live on a torus. A toy potential has one narrow, deep well (the solution) and three broad, shallower wells (wrong attractors). Each restart runs the SFPRM solver: a gradient-step proposal, geodesic damping with the patience rule, tangent noise tied to η, and chordal halting. This is a toy, not a trained model; it shows the mechanics of breadth and noise, not their size on Sudoku.</p>
+  <figure>
+    <div class="fig-grid">
+      <div class="torus-wrap"><canvas id="torus" width="600" height="600" aria-label="Torus energy landscape with restart trajectories"></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="bsel">Restarts B <output id="bselv"></output></label><input id="bsel" type="range" min="1" max="16" value="8"></div>
+        <div class="ctl"><label for="beta">Path noise β₀ <output id="betav"></output></label><input id="beta" type="range" min="0" max="30" value="5"></div>
+        <div class="btns"><button id="rerun" type="button">New restarts</button><button id="pause" type="button" class="ghost">Pause</button></div>
+        <div class="status" id="tstatus"></div>
+        <p class="note" id="tsel"></p>
+      </div>
+    </div>
+    <div class="legend">
+      <span>Darker = lower energy</span>
+      <span><span class="sw" style="background:var(--good)"></span>✓ halted in the solution well</span>
+      <span><span class="sw" style="background:var(--bad)"></span>✗ halted in a wrong well</span>
+      <span><span class="sw" style="background:var(--muted)"></span>running</span>
+    </div>
+  </figure>
+  <figure>
+    <div class="fig-grid">
+      <svg id="bplot" viewBox="0 0 460 260" role="img" aria-label="Success rate against number of restarts, with and without path noise"></svg>
+      <div class="controls">
+        <p class="note" style="margin:0">Each point is 150 toy trials. A trial selects the lowest-energy restart among those that halted. The noisy curve uses the β₀ set above.</p><p class="note" style="margin:0">In this toy, restarts do the work: one restart finds the narrow solution well about 15% of the time, sixteen restarts about 90%. Path noise does not help here, because the barriers around the wrong wells are too high to cross. EqR saw a similar small noise effect on Sudoku and a large one on Maze, so whether noise helps is an empirical question for the trained model.</p>
+        <button id="batch" type="button">Recompute with current β₀</button>
+        <dl class="readout" id="bread"></dl>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s1)"></span>random init only (β₀ = 0)</span>
+      <span><span class="sw" style="background:var(--s2)"></span>random init + path noise</span>
+    </div>
+  </figure>
+</section>
+
+<footer>
+  AKOrN: Miyato, Löwe, Geiger, Welling, ICLR 2025 · nGPT: Loshchilov et al., ICLR 2025 · FPRM: Movahedi et al., arXiv:2606.18206 · EqR: Huang, Geng, Kolter, arXiv:2605.21488 · SFPRM: under review. Proofs and numerical checks are in the accompanying LaTeX note.
+</footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+"use strict";
+// ---------- helpers ----------
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r) { let u = 0; while (u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); }
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+const nrm = (a) => Math.sqrt(dot(a, a));
+const add = (a, b) => a.map((v, i) => v + b[i]);
+const sub = (a, b) => a.map((v, i) => v - b[i]);
+const scl = (a, s) => a.map((v) => v * s);
+const unit = (a) => scl(a, 1 / nrm(a));
+const proj = (z, v) => sub(v, scl(z, dot(v, z)));
+const matvec = (M, v) => M.map((row) => dot(row, v));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+function slerp(u, v, eta) { const th = Math.acos(clamp(dot(u, v), -1, 1)); if (th < 1e-12) return u.slice(); const s = Math.sin(th); return add(scl(u, Math.sin((1 - eta) * th) / s), scl(v, Math.sin(eta * th) / s)); }
+const fmt = (x, d = 3) => Number.isFinite(x) ? x.toFixed(d) : "∞";
+const sci = (x) => x === 0 ? "0" : x.toExponential(1).replace("e", "×10^").replace("^-", "^−");
+const deg = (r) => r * 180 / Math.PI;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tip = $("tip");
+function showTip(evt, html) { tip.innerHTML = html; tip.hidden = false; tip.style.left = (evt.clientX + 12) + "px"; tip.style.top = (evt.clientY + 12) + "px"; }
+function hideTip() { tip.hidden = true; }
+
+// ---------- 1. circle demo ----------
+(function circleDemo() {
+  const svg = $("circ"), R = 100;
+  const P = (phi, r = R) => [r * Math.sin(phi), -r * Math.cos(phi)];   // angle measured clockwise from z (top)
+  const g = {};
+  g.circle = el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  g.tan = el("line", { x1: -140, y1: -R, x2: 285, y2: -R, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 4" }, svg);
+  el("text", { x: -138, y: -R - 6, class: "svgtext" }, svg).textContent = "tangent line at z";
+  g.thArc = el("path", { fill: "none", stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+  g.zvec = el("line", { x1: 0, y1: 0, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  g.ztvec = el("line", { x1: 0, y1: 0, stroke: "var(--ink-2)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, svg);
+  g.chord = el("line", { stroke: "var(--s3)", "stroke-width": 1.5, "stroke-dasharray": "5 3" }, svg);
+  g.lerpRay = el("line", { x1: 0, y1: 0, stroke: "var(--s3)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
+  g.lerpPt = el("circle", { r: 3.5, fill: "var(--s3)" }, svg);
+  g.lerpOn = el("circle", { r: 6, fill: "none", stroke: "var(--s3)", "stroke-width": 2 }, svg);
+  g.slerpArc = el("path", { fill: "none", stroke: "var(--s1)", "stroke-width": 4, "stroke-linecap": "round" }, svg);
+  g.pz = el("line", { stroke: "var(--s2)", "stroke-width": 1.5 }, svg);
+  g.gpz = el("line", { stroke: "var(--s2)", "stroke-width": 3, "stroke-linecap": "round" }, svg);
+  g.ray = el("line", { x1: 0, y1: 0, stroke: "var(--s2)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, svg);
+  g.tp = el("circle", { r: 4, fill: "var(--s2)" }, svg);
+  g.land = el("circle", { r: 7, fill: "var(--surface)", stroke: "var(--s1)", "stroke-width": 2.5 }, svg);
+  g.land2 = el("circle", { r: 3, fill: "var(--s2)" }, svg);
+  el("circle", { cx: 0, cy: 0, r: 2.5, fill: "var(--ink)" }, svg);
+  g.zl = el("text", { class: "svgmath" }, svg); g.zl.textContent = "z";
+  g.ztl = el("text", { class: "svgmath" }, svg); g.ztl.textContent = "z̃";
+  g.thl = el("text", { class: "svgmath" }, svg); g.thl.textContent = "θ";
+  g.tpl = el("text", { class: "svgtext" }, svg);
+  g.landl = el("text", { class: "svgtext" }, svg);
+  const arc = (a0, a1, r) => { const p0 = P(a0, r), p1 = P(a1, r); const large = (a1 - a0) > Math.PI ? 1 : 0; return `M${p0[0]},${p0[1]} A${r},${r} 0 ${large} 1 ${p1[0]},${p1[1]}`; };
+  function update() {
+    const th = +$("th").value * Math.PI / 180, eta = +$("eta").value / 100, showL = $("lerp").checked;
+    $("thv").textContent = Math.round(deg(th)) + "°"; $("etav").textContent = eta.toFixed(2);
+    const z = [0, 1], zt = [Math.sin(th), Math.cos(th)];
+    const S = (v) => [R * v[0], -R * v[1]];
+    const pz = S(z), pzt = S(zt);
+    g.zvec.setAttribute("x2", pz[0]); g.zvec.setAttribute("y2", pz[1]);
+    g.ztvec.setAttribute("x2", pzt[0]); g.ztvec.setAttribute("y2", pzt[1]);
+    g.zl.setAttribute("x", -14); g.zl.setAttribute("y", -R - 8);
+    g.ztl.setAttribute("x", pzt[0] + 8); g.ztl.setAttribute("y", pzt[1] + 14);
+    g.thArc.setAttribute("d", arc(0, th, 34));
+    const mid = P(th / 2, 46); g.thl.setAttribute("x", mid[0] - 4); g.thl.setAttribute("y", mid[1] + 5);
+    // Slerp
+    const zs = slerp(z, zt, eta);
+    g.slerpArc.setAttribute("d", eta * th > 1e-4 ? arc(0, eta * th, R) : "");
+    const ps = S(zs); g.land.setAttribute("cx", ps[0]); g.land.setAttribute("cy", ps[1]);
+    // AKOrN tangent construction
+    const pv = proj(z, zt); // = (sin th, 0)
+    g.pz.setAttribute("x1", pz[0]); g.pz.setAttribute("y1", pz[1]); g.pz.setAttribute("x2", pz[0] + R * pv[0]); g.pz.setAttribute("y2", pz[1]);
+    const ok = eta * th < Math.PI / 2 - 1e-3;
+    const gam = ok ? Math.tan(eta * th) / Math.sin(th) : Infinity;
+    const tx = ok ? R * gam * pv[0] : Infinity;
+    const txc = Math.min(tx, 280);
+    g.gpz.setAttribute("x1", pz[0]); g.gpz.setAttribute("y1", pz[1]); g.gpz.setAttribute("x2", txc); g.gpz.setAttribute("y2", -R);
+    g.tp.setAttribute("cx", txc); g.tp.setAttribute("cy", -R); g.tp.style.display = tx <= 280 ? "" : "none";
+    g.ray.setAttribute("x2", txc); g.ray.setAttribute("y2", -R); g.ray.style.display = ok ? "" : "none";
+    g.tpl.setAttribute("x", Math.min(txc, 200) + 6); g.tpl.setAttribute("y", -R - 10);
+    g.tpl.textContent = tx <= 280 ? "z + γ P_z z̃" : (ok ? "z + γ P_z z̃ (off chart)" : "");
+    let akorn = null;
+    if (ok) { akorn = unit(add(z, scl(pv, gam))); const pa = S(akorn); g.land2.setAttribute("cx", pa[0]); g.land2.setAttribute("cy", pa[1]); g.land2.style.display = ""; } else g.land2.style.display = "none";
+    const lp = P(eta * th, R + 18); g.landl.setAttribute("x", lp[0] + (lp[0] > 0 ? 4 : -60)); g.landl.setAttribute("y", lp[1]); g.landl.textContent = "next state";
+    // lerp
+    const lin = add(scl(z, 1 - eta), scl(zt, eta)); const ln = nrm(lin);
+    [g.chord, g.lerpRay, g.lerpPt, g.lerpOn].forEach((e) => e.style.display = showL && ln > 1e-6 ? "" : "none");
+    let lerpAng = NaN, gl = NaN;
+    if (ln > 1e-6) {
+      const pl = S(lin), pon = S(scl(lin, 1 / ln));
+      g.chord.setAttribute("x1", pz[0]); g.chord.setAttribute("y1", pz[1]); g.chord.setAttribute("x2", pzt[0]); g.chord.setAttribute("y2", pzt[1]);
+      g.lerpPt.setAttribute("cx", pl[0]); g.lerpPt.setAttribute("cy", pl[1]);
+      g.lerpRay.setAttribute("x2", pon[0]); g.lerpRay.setAttribute("y2", pon[1]);
+      g.lerpOn.setAttribute("cx", pon[0]); g.lerpOn.setAttribute("cy", pon[1]);
+      lerpAng = Math.atan2(eta * Math.sin(th), 1 - eta + eta * Math.cos(th));
+      const a = 1 - eta + eta * Math.cos(th); gl = a > 0 ? eta / a : Infinity;
+    }
+    const diff = akorn ? Math.max(Math.abs(akorn[0] - zs[0]), Math.abs(akorn[1] - zs[1])) : NaN;
+    $("circRead").innerHTML =
+      `<dt>Slerp rotation ηθ</dt><dd>${deg(eta * th).toFixed(1)}°</dd>` +
+      `<dt>γ = tan(ηθ)/sin θ</dt><dd>${ok ? fmt(gam) : "none"}</dd>` +
+      `<dt>|Slerp − AKOrN form|</dt><dd>${ok ? sci(diff) : "n/a"}</dd>` +
+      (showL ? `<dt>lerp rotation</dt><dd>${deg(lerpAng).toFixed(1)}°</dd><dt>lerp γ = η/(1−η+η cos θ)</dt><dd>${fmt(gl)}</dd>` : "");
+    $("circWarn").textContent = ok ? "" : "ηθ ≥ 90°: Slerp rotates further than any AKOrN-form step can.";
+  }
+  ["th", "eta", "lerp"].forEach((id) => $(id).addEventListener("input", update));
+  update();
+})();
+
+// ---------- 2. operator splitting toy (3 tokens on S^2) ----------
+(function splitDemo() {
+  const r = mulberry32(11), d = 3, T = 3, H = 2;
+  const randM = (a, b, s) => Array.from({ length: a }, () => Array.from({ length: b }, () => gauss(r) * s));
+  const x = Array.from({ length: T }, () => unit([gauss(r), gauss(r), gauss(r)]));
+  const z = Array.from({ length: T }, () => unit([gauss(r), gauss(r), gauss(r)]));
+  const Wq = [], Wk = [], Wv = [], Wo = [];
+  for (let h = 0; h < H; h++) { Wq.push(randM(d, d, 0.8)); Wk.push(randM(d, d, 0.8)); Wv.push(randM(d, d, 0.8)); Wo.push(randM(d, d, 0.8)); }
+  const W1 = randM(6, d, 0.9), W2 = randM(d, 6, 0.6);
+  function attn(hs) {
+    const out = hs.map(() => [0, 0, 0]);
+    for (let k = 0; k < H; k++) {
+      const q = hs.map((h) => unit(matvec(Wq[k], h))), kk = hs.map((h) => unit(matvec(Wk[k], h))), v = hs.map((h) => matvec(Wo[k], matvec(Wv[k], h)));
+      for (let t = 0; t < T; t++) {
+        const s = kk.map((kv) => 3 * dot(q[t], kv)); const m = Math.max(...s); const e = s.map((u) => Math.exp(u - m)); const Z = e.reduce((a, b) => a + b, 0);
+        for (let j = 0; j < T; j++) out[t] = add(out[t], scl(v[j], e[j] / Z));
+      }
+    }
+    return out;
+  }
+  const mlp = (h) => matvec(W2, matvec(W1, h).map(Math.tanh));
+  const sublayer = (h, F, a) => unit(add(h, scl(sub(unit(F), h), a)));
+  function split(eps, eta) {
+    let h = z.map((zt, t) => slerp(zt, x[t], eps)); const p1 = h[0];
+    const A = attn(h); h = h.map((ht, t) => sublayer(ht, A[t], eps)); const p2 = h[0];
+    h = h.map((ht) => sublayer(ht, mlp(ht), eps)); const p3 = h[0];
+    return { p1, p2, p3, zn: slerp(z[0], p3, eta) };
+  }
+  function collapsed(eps, eta) {
+    const z0 = z[0], th = Math.acos(clamp(dot(z0, x[0]), -1, 1));
+    const c = scl(proj(z0, x[0]), th / Math.sin(th));
+    const a = proj(z0, unit(attn(z)[0]));
+    const m = proj(z0, unit(mlp(z0)));
+    const V = add(add(c, a), m);
+    return { c, a, m, V, zn: unit(add(z0, scl(V, eta * eps))) };
+  }
+  const z0 = z[0]; const e1 = unit(proj(z0, x[0])); const e2 = [z0[1] * e1[2] - z0[2] * e1[1], z0[2] * e1[0] - z0[0] * e1[2], z0[0] * e1[1] - z0[1] * e1[0]];
+  const gno = (y) => { const s = dot(y, z0); return [dot(y, e1) / s - 0, dot(y, e2) / s]; };
+  const tan2 = (v) => [dot(v, e1), dot(v, e2)];
+  const epsOf = (v) => Math.pow(10, -2.5 + 2.4 * v / 100);
+  const svg = $("gno");
+  const defs = el("defs", {}, svg);
+  ["s1", "s2", "s3", "ink", "ink-2"].forEach((c) => { const mk = el("marker", { id: "ah-" + c, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs); el("path", { d: "M0,0 L10,5 L0,10 z", fill: `var(--${c})` }, mk); });
+  const g = el("g", {}, svg);
+  function draw() {
+    const eps = epsOf(+$("eps").value), eta = +$("eta2").value / 100;
+    $("epsv").textContent = eps < 0.1 ? eps.toFixed(3) : eps.toFixed(2); $("eta2v").textContent = eta.toFixed(2);
+    const S = split(eps, eta), C = collapsed(eps, eta);
+    const pts = { O: [0, 0], P1: scl(gno(S.p1), 1 / eps), P2: scl(gno(S.p2), 1 / eps), P3: scl(gno(S.p3), 1 / eps), Zn: scl(gno(S.zn), 1 / eps),
+      C1: tan2(C.c), C2: tan2(add(C.c, C.a)), C3: tan2(C.V), Zc: scl(gno(C.zn), 1 / eps) };
+    const all = Object.values(pts); let xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const pad = 0.12 * Math.max(x1 - x0, y1 - y0, 0.1); x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    const s = Math.min(420 / (x1 - x0), 280 / (y1 - y0));
+    const ox = 20 + (420 - s * (x1 - x0)) / 2 - s * x0, oy = 20 + (280 - s * (y1 - y0)) / 2 + s * y1;
+    const M = (p) => [ox + s * p[0], oy - s * p[1]];
+    g.innerHTML = "";
+    const arrow = (a, b, col, dash, w) => { const A = M(a), B = M(b); if (Math.hypot(B[0] - A[0], B[1] - A[1]) < 2) return; el("line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: `var(--${col})`, "stroke-width": w || 2, "stroke-dasharray": dash ? "6 4" : "none", "marker-end": `url(#ah-${col})` }, g); };
+    // axes cross at z
+    const Oz = M([0, 0]);
+    el("line", { x1: 10, y1: Oz[1], x2: 450, y2: Oz[1], stroke: "var(--rule)" }, g); el("line", { x1: Oz[0], y1: 10, x2: Oz[0], y2: 310, stroke: "var(--rule)" }, g);
+    arrow(pts.O, pts.C1, "s1", true, 1.5); arrow(pts.C1, pts.C2, "s2", true, 1.5); arrow(pts.C2, pts.C3, "s3", true, 1.5);
+    arrow(pts.O, pts.P1, "s1", false, 2.5); arrow(pts.P1, pts.P2, "s2", false, 2.5); arrow(pts.P2, pts.P3, "s3", false, 2.5);
+    arrow(pts.O, pts.Zn, "ink", false, 2.5);
+    const zc = M(pts.Zc); el("circle", { cx: zc[0], cy: zc[1], r: 8, fill: "none", stroke: "var(--ink-2)", "stroke-width": 1.5, "stroke-dasharray": "3 2" }, g);
+    const zn = M(pts.Zn); el("circle", { cx: zn[0], cy: zn[1], r: 4, fill: "var(--ink)" }, g);
+    el("circle", { cx: Oz[0], cy: Oz[1], r: 4, fill: "var(--ink)" }, g);
+    const lab = (p, t, dx, dy, cls) => { const q = M(p); el("text", { x: q[0] + dx, y: q[1] + dy, class: cls || "svgtext" }, g).textContent = t; };
+    lab(pts.O, "z", -14, -8, "svgmath"); lab(pts.P3, "z̃", 8, -6, "svgmath"); lab(pts.Zn, "next state", 10, 16); lab(pts.C3, "Σ drives", 8, 4);
+    const err = nrm(sub(S.zn, C.zn));
+    $("gnoRead").innerHTML = `<dt>|split − single step|</dt><dd>${sci(err)}</dd><dt>error / ε²</dt><dd>${fmt(err / (eps * eps), 3)}</dd><dt>λ = α_A = α_M</dt><dd>${eps < 0.1 ? eps.toFixed(3) : eps.toFixed(2)}</dd>`;
+    drawErr(eta, eps);
+  }
+  const ep = $("errplot");
+  function drawErr(eta, epsNow) {
+    ep.innerHTML = "";
+    const xs = [], ys = [];
+    for (let i = 0; i <= 24; i++) { const e = Math.pow(10, -2.5 + 2.4 * i / 24); xs.push(e); ys.push(nrm(sub(split(e, eta).zn, collapsed(e, eta).zn))); }
+    const lx0 = -2.5, lx1 = -0.1, ly = ys.map(Math.log10), ly0 = Math.floor(Math.min(...ly)), ly1 = Math.ceil(Math.max(...ly));
+    const X = (e) => 44 + 240 * (Math.log10(e) - lx0) / (lx1 - lx0), Y = (v) => 160 - 140 * (Math.log10(v) - ly0) / (ly1 - ly0);
+    for (let k = ly0; k <= ly1; k += 2) { el("line", { x1: 44, x2: 284, y1: Y(Math.pow(10, k)), y2: Y(Math.pow(10, k)), stroke: "var(--rule)" }, ep); const tl = el("text", { x: 40, y: Y(Math.pow(10, k)) + 4, "text-anchor": "end", class: "svgtext" }, ep); tl.innerHTML = `10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; }
+    [-2, -1].forEach((k) => { el("text", { x: X(Math.pow(10, k)), y: 178, "text-anchor": "middle", class: "svgtext" }, ep).innerHTML = `ε = 10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; });
+    // slope-2 guide through the middle point
+    const i0 = 12, c = ys[i0] / (xs[i0] * xs[i0]);
+    el("line", { x1: X(xs[0]), y1: Y(c * xs[0] * xs[0]), x2: X(xs[24]), y2: Y(c * xs[24] * xs[24]), stroke: "var(--muted)", "stroke-dasharray": "4 4" }, ep);
+    el("text", { x: X(xs[3]), y: Y(c * xs[3] * xs[3]) - 8, class: "svgtext" }, ep).textContent = "slope 2";
+    el("polyline", { points: xs.map((e, i) => `${X(e)},${Y(ys[i])}`).join(" "), fill: "none", stroke: "var(--s1)", "stroke-width": 2 }, ep);
+    const yn = nrm(sub(split(epsNow, eta).zn, collapsed(epsNow, eta).zn));
+    el("circle", { cx: X(epsNow), cy: Y(yn), r: 5, fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }, ep);
+    el("text", { x: 44, y: 12, class: "svgtext" }, ep).textContent = "|split − single step| vs ε (log-log)";
+  }
+  ["eps", "eta2"].forEach((id) => $(id).addEventListener("input", draw));
+  draw();
+})();
+
+// ---------- 3. concentration of measure ----------
+(function histDemo() {
+  const Ns = [2, 3, 4, 8, 16, 32, 64, 128], NB = 36, K = 6000;
+  function sample(N, seed) { const r = mulberry32(seed); const out = new Float64Array(K); for (let i = 0; i < K; i++) { let s = 0, v0 = 0; for (let j = 0; j < N; j++) { const g = gauss(r); s += g * g; if (j === 0) v0 = g; } out[i] = Math.acos(clamp(v0 / Math.sqrt(s), -1, 1)) * 180 / Math.PI; } return out; }
+  const cache = {}; const get = (N) => cache[N] || (cache[N] = sample(N, 1000 + N));
+  const big = get(512);
+  const stats = (a) => { let m = 0; for (const v of a) m += v; m /= a.length; let s = 0; for (const v of a) s += (v - m) * (v - m); return [m, Math.sqrt(s / a.length)]; };
+  const svg = $("hist");
+  function panel(a, y0, h, title) {
+    const counts = new Array(NB).fill(0); for (const v of a) counts[Math.min(NB - 1, Math.floor(v / 5))]++;
+    const frac = counts.map((c) => c / a.length), ymax = 0.5;
+    const X = (deg) => 44 + 400 * deg / 180, Y = (f) => y0 + h - h * Math.min(f, ymax) / ymax;
+    [0, 0.25, 0.5].forEach((f) => { el("line", { x1: 44, x2: 444, y1: Y(f), y2: Y(f), stroke: "var(--rule)" }, svg); el("text", { x: 40, y: Y(f) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = Math.round(f * 100) + "%"; });
+    frac.forEach((f, i) => { if (f <= 0) return; const x = X(i * 5) + 1, w = 400 / NB - 2, yt = Y(f), hh = y0 + h - yt; el("rect", { x, y: yt, width: w, height: Math.max(hh, 1), rx: Math.min(2, w / 2), fill: "var(--s1)" }, svg).addEventListener("mousemove", (e) => showTip(e, `${i * 5}–${i * 5 + 5}°: ${(f * 100).toFixed(1)}% of starts`)); });
+    svg.lastChild && null;
+    if (frac.some((f) => f > ymax)) el("text", { x: X(90) + 8, y: y0 + 10, class: "svgtext" }, svg).textContent = "peak " + Math.round(Math.max(...frac) * 100) + "% (clipped)";
+    el("text", { x: 44, y: y0 - 6, class: "svgtext", style: "font-weight:600;fill:var(--ink)" }, svg).textContent = title;
+  }
+  function draw() {
+    const N = Ns[+$("nsel").value]; $("nselv").textContent = N;
+    svg.innerHTML = "";
+    panel(big, 18, 100, "One sphere per token, N = d = 512");
+    panel(get(N), 160, 100, `Small oscillators, N = ${N}`);
+    [0, 45, 90, 135, 180].forEach((dg) => el("text", { x: 44 + 400 * dg / 180, y: 288, "text-anchor": "middle", class: "svgtext" }, svg).textContent = dg + "°");
+    el("text", { x: 244, y: 310, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "angle between random start and input";
+    svg.querySelectorAll("rect").forEach((rc) => rc.addEventListener("mouseleave", hideTip));
+    const [m1, s1] = stats(big), [m2, s2] = stats(get(N));
+    $("histRead").innerHTML = `<dt>spread, N = 512</dt><dd>${s1.toFixed(1)}°</dd><dt>spread, N = ${N}</dt><dd>${s2.toFixed(1)}°</dd><dt>ratio</dt><dd>${(s2 / s1).toFixed(1)}×</dd>`;
+  }
+  $("nsel").addEventListener("input", draw); draw();
+})();
+
+// ---------- 4. torus toy: restarts + path noise ----------
+const WELLS = [[1.9, -1.2, 1.0, 6.0], [-1.5, 1.4, 0.75, 2.0], [-2.0, -1.8, 0.7, 2.5], [0.6, 2.0, 0.65, 3.0]];
+const wrapA = (a) => { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; };
+function energy(t1, t2) { let e = 0; for (const [m1, m2, a, k] of WELLS) e -= a * Math.exp(k * (Math.cos(t1 - m1) + Math.cos(t2 - m2) - 2)); return e; }
+function gradE(t1, t2) { let g1 = 0, g2 = 0; for (const [m1, m2, a, k] of WELLS) { const f = a * Math.exp(k * (Math.cos(t1 - m1) + Math.cos(t2 - m2) - 2)); g1 += f * k * Math.sin(t1 - m1); g2 += f * k * Math.sin(t2 - m2); } return [g1, g2]; }
+const SOLVER = { g: 0.15, tau: 1e-5, P: 10, dec: 0.9, Tmax: 1500 };
+function newRun(r) { return { t1: (r() * 2 - 1) * Math.PI, t2: (r() * 2 - 1) * Math.PI, eta: 1, best: Infinity, pat: SOLVER.P, halted: false, stalled: false, it: 0, trail: [] }; }
+function stepRun(p, beta0, r) {
+  if (p.halted || p.stalled) return;
+  const [g1, g2] = gradE(p.t1, p.t2); const d1 = -SOLVER.g * g1, d2 = -SOLVER.g * g2;   // proposal z̃ = z − g∇E (AKOrN Euler step)
+  const res = Math.max(1 - Math.cos(d1), 1 - Math.cos(d2));                              // chordal residual
+  if (res < SOLVER.tau) { p.halted = true; return; }
+  if (res < p.best) { p.best = res; p.pat = SOLVER.P; } else p.pat--;
+  if (p.pat <= 0) { p.eta *= SOLVER.dec; p.pat = SOLVER.P; }
+  const b = beta0 * p.eta;
+  p.t1 = wrapA(p.t1 + p.eta * d1 + b * gauss(r)); p.t2 = wrapA(p.t2 + p.eta * d2 + b * gauss(r));   // Exp_z(η Log z̃ + βξ) on each circle
+  p.it++; if (p.it >= SOLVER.Tmax || p.eta < 1e-4) p.stalled = true;
+}
+const inSolution = (p) => Math.hypot(wrapA(p.t1 - WELLS[0][0]), wrapA(p.t2 - WELLS[0][1])) < 0.6;
+function select(runs) { let best = -1, be = Infinity; runs.forEach((p, i) => { if (p.halted) { const e = energy(p.t1, p.t2); if (e < be) { be = e; best = i; } } }); if (best < 0) runs.forEach((p, i) => { const e = energy(p.t1, p.t2); if (e < be) { be = e; best = i; } }); return best; }
+
+(function torusDemo() {
+  const cv = $("torus"), ctx = cv.getContext("2d"), W = cv.width;
+  let heat = null, runs = [], paused = false, seed = 1, rng = mulberry32(1);
+  const toPx = (t1, t2) => [(t1 + Math.PI) / (2 * Math.PI) * W, (1 - (t2 + Math.PI) / (2 * Math.PI)) * W];
+  function hex(c) { c = c.replace("#", ""); if (c.length === 3) c = c.split("").map((x) => x + x).join(""); return [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16)); }
+  function buildHeat() {
+    const lo = hex(css("--heat-lo") || "#f3f6fb"), hi = hex(css("--heat-hi") || "#0d366b");
+    const n = 150, E = new Float64Array(n * n); let mn = Infinity, mx = -Infinity;
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const t1 = -Math.PI + 2 * Math.PI * (i + .5) / n, t2 = Math.PI - 2 * Math.PI * (j + .5) / n; const e = energy(t1, t2); E[j * n + i] = e; mn = Math.min(mn, e); mx = Math.max(mx, e); }
+    const off = document.createElement("canvas"); off.width = off.height = n; const oc = off.getContext("2d"); const img = oc.createImageData(n, n);
+    for (let k = 0; k < n * n; k++) { const t = Math.pow((mx - E[k]) / (mx - mn), 0.6); for (let c = 0; c < 3; c++) img.data[4 * k + c] = lo[c] + (hi[c] - lo[c]) * t; img.data[4 * k + 3] = 255; }
+    oc.putImageData(img, 0, 0); heat = off;
+  }
+  function reset() { rng = mulberry32(seed++); const B = +$("bsel").value; runs = Array.from({ length: B }, () => newRun(rng)); runs.forEach((p) => p.trail.push([p.t1, p.t2])); }
+  function render() {
+    ctx.imageSmoothingEnabled = true; ctx.drawImage(heat, 0, 0, W, W);
+    ctx.font = "600 22px " + (css("--f-ui") || "sans-serif");
+    WELLS.forEach(([m1, m2], i) => { const [x, y] = toPx(m1, m2); ctx.fillStyle = css("--surface"); ctx.globalAlpha = 0.85; const label = i === 0 ? "solution" : "wrong"; const w = ctx.measureText(label).width; ctx.fillRect(x + 10, y - 30, w + 10, 28); ctx.globalAlpha = 1; ctx.fillStyle = css("--ink"); ctx.fillText(label, x + 15, y - 9); });
+    const sel = runs.every((p) => p.halted || p.stalled) ? select(runs) : -1;
+    runs.forEach((p, i) => {
+      const col = p.halted ? (inSolution(p) ? css("--good") : css("--bad")) : css("--muted");
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.85; ctx.beginPath();
+      p.trail.forEach(([a, b], k) => { const [x, y] = toPx(a, b); if (k === 0) ctx.moveTo(x, y); else { const [pa, pb] = p.trail[k - 1]; if (Math.abs(a - pa) > Math.PI || Math.abs(b - pb) > Math.PI) ctx.moveTo(x, y); else ctx.lineTo(x, y); } });
+      ctx.stroke(); ctx.globalAlpha = 1;
+      const [x, y] = toPx(p.t1, p.t2); ctx.fillStyle = col; ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, 8, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+      if (i === sel) { ctx.strokeStyle = css("--ink"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, 16, 0, 2 * Math.PI); ctx.stroke(); }
+    });
+    const st = runs.map((p, i) => { const tag = p.halted ? (inSolution(p) ? `<span class="st-ok">✓ halted t=${p.it}</span>` : `<span class="st-bad">✗ halted t=${p.it}</span>`) : (p.stalled ? `<span class="st-bad">✗ no halt</span>` : `<span class="st-run">running ${p.it}</span>`); return `<div>#${i + 1} ${tag}</div>`; }).join("");
+    $("tstatus").innerHTML = st;
+    if (sel >= 0) { const ok = runs[sel].halted && inSolution(runs[sel]); const nOk = runs.filter((p) => p.halted && inSolution(p)).length; $("tsel").innerHTML = `Selected restart #${sel + 1} (lowest energy among halted): ${ok ? '<span class="st-ok">✓ solution</span>' : '<span class="st-bad">✗ wrong attractor</span>'}. ${nOk} of ${runs.length} restarts reached the solution well.`; }
+    else $("tsel").textContent = "Selection runs once every restart has halted or stalled.";
+  }
+  function tick() {
+    if (!paused) {
+      const beta0 = +$("beta").value / 100;
+      for (let k = 0; k < 6; k++) runs.forEach((p) => { if (!p.halted && !p.stalled) { stepRun(p, beta0, rng); if (p.it % 2 === 0) p.trail.push([p.t1, p.t2]); } });
+      render();
+    }
+    if (runs.some((p) => !p.halted && !p.stalled)) requestAnimationFrame(tick); else render();
+  }
+  function start() { reset(); if (reduceMotion) { const beta0 = +$("beta").value / 100; while (runs.some((p) => !p.halted && !p.stalled)) runs.forEach((p) => { stepRun(p, beta0, rng); if (p.it % 3 === 0) p.trail.push([p.t1, p.t2]); }); render(); } else { render(); requestAnimationFrame(tick); } }
+  buildHeat();
+  $("bsel").addEventListener("input", () => { $("bselv").textContent = $("bsel").value; start(); });
+  $("beta").addEventListener("input", () => { $("betav").textContent = (+$("beta").value / 100).toFixed(2); });
+  $("rerun").addEventListener("click", start);
+  $("pause").addEventListener("click", () => { paused = !paused; $("pause").textContent = paused ? "Resume" : "Pause"; if (!paused) requestAnimationFrame(tick); });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { buildHeat(); render(); });
+  new MutationObserver(() => { buildHeat(); render(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  $("bselv").textContent = $("bsel").value; $("betav").textContent = (+$("beta").value / 100).toFixed(2);
+  start();
+})();
+
+(function batchDemo() {
+  const Bs = [1, 2, 4, 8, 16], TRIALS = 150;
+  function experiment(beta0, seedBase) {
+    const wins = Bs.map(() => 0); let single = 0;
+    for (let tr = 0; tr < TRIALS; tr++) {
+      const r = mulberry32(seedBase + tr); const runs = Array.from({ length: 16 }, () => newRun(r));
+      for (const p of runs) while (!p.halted && !p.stalled) stepRun(p, beta0, r);
+      single += runs.filter((p) => p.halted && inSolution(p)).length / 16;
+      Bs.forEach((B, bi) => { const sub = runs.slice(0, B); const s = select(sub); if (s >= 0 && sub[s].halted && inSolution(sub[s])) wins[bi]++; });
+    }
+    return { rates: wins.map((w) => w / TRIALS), single: single / TRIALS };
+  }
+  const svg = $("bplot");
+  function draw(A, Bn, betaN) {
+    svg.innerHTML = "";
+    const X = (i) => 60 + 330 * i / (Bs.length - 1), Y = (v) => 220 - 190 * v;
+    [0, 0.25, 0.5, 0.75, 1].forEach((v) => { el("line", { x1: 60, x2: 390, y1: Y(v), y2: Y(v), stroke: "var(--rule)" }, svg); el("text", { x: 54, y: Y(v) + 4, "text-anchor": "end", class: "svgtext" }, svg).textContent = Math.round(v * 100) + "%"; });
+    Bs.forEach((B, i) => el("text", { x: X(i), y: 240, "text-anchor": "middle", class: "svgtext" }, svg).textContent = "B = " + B);
+    el("text", { x: 60, y: 14, class: "svgtext" }, svg).textContent = "trials whose selected restart is the solution";
+    [[A.rates, "s1", "no noise"], [Bn.rates, "s2", `β₀ = ${betaN.toFixed(2)}`]].forEach(([rates, col, name]) => {
+      el("polyline", { points: rates.map((v, i) => `${X(i)},${Y(v)}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": 2 }, svg);
+      rates.forEach((v, i) => { const c = el("circle", { cx: X(i), cy: Y(v), r: 4.5, fill: `var(--${col})`, stroke: "var(--surface)", "stroke-width": 2 }, svg); const hit = el("circle", { cx: X(i), cy: Y(v), r: 12, fill: "transparent" }, svg); hit.addEventListener("mousemove", (e) => showTip(e, `${name}, B = ${Bs[i]}: ${(v * 100).toFixed(0)}%`)); hit.addEventListener("mouseleave", hideTip); });
+      const last = rates[rates.length - 1]; el("text", { x: 398, y: Y(last) + 4, class: "svgtext" }, svg).textContent = name;
+    });
+    $("bread").innerHTML = `<dt>single restart, no noise</dt><dd>${(A.single * 100).toFixed(0)}%</dd><dt>single restart, β₀ = ${betaN.toFixed(2)}</dt><dd>${(Bn.single * 100).toFixed(0)}%</dd><dt>B = 16, no noise</dt><dd>${(A.rates[4] * 100).toFixed(0)}%</dd><dt>B = 16, β₀ = ${betaN.toFixed(2)}</dt><dd>${(Bn.rates[4] * 100).toFixed(0)}%</dd>`;
+  }
+  let base = null;
+  function run() { const b = +$("beta").value / 100; $("batch").textContent = "Computing…"; $("batch").disabled = true; setTimeout(() => { if (!base) base = experiment(0, 50000); const nz = experiment(b, 90000); draw(base, nz, b); $("batch").textContent = "Recompute with current β₀"; $("batch").disabled = false; }, 30); }
+  $("batch").addEventListener("click", run);
+  run();
+})();
+
+// ================= Basics =================
+(function basicsProj() {
+  const svg = $("bProj"), R = 100;
+  el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  el("line", { x1: -155, y1: -R, x2: 275, y2: -R, stroke: "var(--muted)", "stroke-dasharray": "2 4" }, svg);
+  el("text", { x: -152, y: -R - 6, class: "svgtext" }, svg).textContent = "tangent line at z";
+  el("line", { x1: 0, y1: 0, x2: 0, y2: -R, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  el("circle", { cx: 0, cy: 0, r: 2.5, fill: "var(--ink)" }, svg);
+  el("text", { x: -16, y: -R + 16, class: "svgmath" }, svg).textContent = "z";
+  const ray = el("line", { x1: 0, y1: 0, stroke: "var(--s2)", "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+  const rad = el("line", { stroke: "var(--s3)", "stroke-width": 2.5 }, svg);
+  const tan = el("line", { stroke: "var(--s2)", "stroke-width": 2.5 }, svg);
+  const vv = el("line", { stroke: "var(--ink-2)", "stroke-width": 2 }, svg);
+  const vtip = el("circle", { r: 3, fill: "var(--ink-2)" }, svg);
+  const tp = el("circle", { r: 4, fill: "var(--s2)" }, svg);
+  const land = el("circle", { r: 7, fill: "none", stroke: "var(--s2)", "stroke-width": 2.5 }, svg);
+  const expPt = el("circle", { r: 5, fill: "var(--s1)" }, svg);
+  const vl = el("text", { class: "svgmath" }, svg); vl.textContent = "v";
+  function upd() {
+    const phi = +$("vDir").value * Math.PI / 180, L = +$("vLen").value / 100;
+    $("vDirv").textContent = $("vDir").value + "°"; $("vLenv").textContent = L.toFixed(2);
+    const v = [L * Math.cos(phi), L * Math.sin(phi)];      // math coords, z = (0,1)
+    const S = (p) => [R * p[0], -R * p[1]];
+    const z = [0, 1], zv = add(z, v), r = v[1], t = v[0];
+    const pz = S(z), pzv = S(zv);
+    vv.setAttribute("x1", pz[0]); vv.setAttribute("y1", pz[1]); vv.setAttribute("x2", pzv[0]); vv.setAttribute("y2", pzv[1]);
+    vtip.setAttribute("cx", pzv[0]); vtip.setAttribute("cy", pzv[1]);
+    vl.setAttribute("x", pzv[0] + 6); vl.setAttribute("y", pzv[1] - 4);
+    const pr = S([0, 1 + r]); rad.setAttribute("x1", pz[0]); rad.setAttribute("y1", pz[1]); rad.setAttribute("x2", pr[0]); rad.setAttribute("y2", pr[1]);
+    const pt = S([t, 1]); tan.setAttribute("x1", pz[0]); tan.setAttribute("y1", pz[1]); tan.setAttribute("x2", pt[0]); tan.setAttribute("y2", pt[1]);
+    const a = 1 + r, ok = a > 1e-6, n = nrm(zv);
+    if (n > 1e-9) { const pl = S(scl(zv, 1 / n)); land.setAttribute("cx", pl[0]); land.setAttribute("cy", pl[1]); land.style.display = ""; } else land.style.display = "none";
+    if (ok) { const x = t / a; const pp = S([x, 1]); tp.setAttribute("cx", Math.max(-155, Math.min(275, pp[0]))); tp.setAttribute("cy", pp[1]); tp.style.display = Math.abs(R * x) < 275 ? "" : "none"; }
+    else tp.style.display = "none";
+    const far = ok ? S([t / a, 1]) : pzv; ray.setAttribute("x2", ok ? Math.max(-155, Math.min(275, far[0])) : pzv[0]); ray.setAttribute("y2", ok ? far[1] : pzv[1]);
+    const ang = Math.abs(t);           // Exp_z(P_z v) rotates by |t|
+    const pe = S([Math.sign(t) * Math.sin(ang), Math.cos(ang)]); expPt.setAttribute("cx", pe[0]); expPt.setAttribute("cy", pe[1]); expPt.style.display = Math.abs(t) > 1e-6 ? "" : "none";
+    const rot = Math.atan2(Math.abs(t), a);
+    $("bProjRead").innerHTML = `<dt>radial ⟨v,z⟩</dt><dd>${r.toFixed(2)}</dd><dt>tangential ‖P<sub>z</sub>v‖</dt><dd>${Math.abs(t).toFixed(2)}</dd>` +
+      `<dt>rotation of Π(z+v)</dt><dd>${deg(rot).toFixed(1)}°</dd><dt>effective step 1/(1+⟨v,z⟩)</dt><dd>${ok ? (1 / a).toFixed(2) : "none"}</dd>` +
+      `<dt>Exp vs Π(z+P<sub>z</sub>v)</dt><dd>${deg(Math.abs(t)).toFixed(0)}° vs ${deg(Math.atan(Math.abs(t))).toFixed(0)}°</dd>`;
+    $("bProjWarn").textContent = ok ? "" : "1 + ⟨v,z⟩ ≤ 0: z + v points into the far hemisphere.";
+  }
+  ["vDir", "vLen"].forEach((id) => $(id).addEventListener("input", upd)); upd();
+})();
+
+(function basicsKuramoto() {
+  const cv = $("bKura"), ctx = cv.getContext("2d"), W = cv.width, n = 40;
+  let th = [], z0 = [], rHist = [], rng = mulberry32(3);
+  function reset() { th = Array.from({ length: n }, () => rng() * 2 * Math.PI); z0 = Array.from({ length: n }, () => gauss(rng)); rHist = []; }
+  const order = () => { let c = 0, s = 0; for (const t of th) { c += Math.cos(t); s += Math.sin(t); } return [Math.hypot(c, s) / n, Math.atan2(s, c)]; };
+  function step(dt) {
+    const K = +$("kK").value / 100, sig = +$("kS").value / 100, [r, psi] = order();
+    th = th.map((t, i) => t + dt * (sig * z0[i] + K * r * Math.sin(psi - t)));   // mean-field form of the all-to-all model
+  }
+  function draw() {
+    const K = +$("kK").value / 100, sig = +$("kS").value / 100;
+    $("kKv").textContent = K.toFixed(2); $("kSv").textContent = sig.toFixed(2);
+    ctx.clearRect(0, 0, W, W); const c = W / 2, R = W * 0.38;
+    ctx.strokeStyle = css("--rule"); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(c, c, R, 0, 2 * Math.PI); ctx.stroke();
+    th.forEach((t) => { ctx.fillStyle = css("--ink-2"); ctx.beginPath(); ctx.arc(c + R * Math.cos(t), c - R * Math.sin(t), 9, 0, 2 * Math.PI); ctx.fill(); });
+    const [r, psi] = order(); ctx.strokeStyle = css("--s2"); ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(c + R * r * Math.cos(psi), c - R * r * Math.sin(psi)); ctx.stroke();
+    ctx.fillStyle = css("--s2"); ctx.beginPath(); ctx.arc(c + R * r * Math.cos(psi), c - R * r * Math.sin(psi), 8, 0, 2 * Math.PI); ctx.fill();
+    rHist.push(r); if (rHist.length > 300) rHist.shift();
+    const s = $("bKuraR"); s.innerHTML = "";
+    [0, 0.5, 1].forEach((v) => { el("line", { x1: 30, x2: 296, y1: 100 - 85 * v, y2: 100 - 85 * v, stroke: "var(--rule)" }, s); el("text", { x: 26, y: 104 - 85 * v, "text-anchor": "end", class: "svgtext" }, s).textContent = v; });
+    el("polyline", { points: rHist.map((v, i) => `${30 + 266 * i / 299},${100 - 85 * v}`).join(" "), fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, s);
+    el("text", { x: 30, y: 116, class: "svgtext" }, s).textContent = "order parameter r over time";
+    const Kc = sig * Math.sqrt(8 / Math.PI);
+    $("bKuraRead").innerHTML = `<dt>order parameter r</dt><dd>${r.toFixed(2)}</dd><dt>critical coupling K<sub>c</sub> ≈ 1.6σ</dt><dd>${Kc.toFixed(2)}</dd><dt>regime</dt><dd>${K > Kc ? "synchronizing" : "incoherent"}</dd>`;
+  }
+  function loop() { for (let k = 0; k < 3; k++) step(0.05); draw(); requestAnimationFrame(loop); }
+  reset();
+  ["kK", "kS"].forEach((id) => $(id).addEventListener("input", () => { if (reduceMotion) { for (let k = 0; k < 600; k++) step(0.05); } draw(); }));
+  $("kReset").addEventListener("click", () => { reset(); if (reduceMotion) for (let k = 0; k < 600; k++) step(0.05); draw(); });
+  if (reduceMotion) { for (let k = 0; k < 600; k++) step(0.05); draw(); } else loop();
+})();
+
+(function basicsAdler() {
+  const svg = $("bAdler"), R = 100;
+  el("circle", { cx: 0, cy: 0, r: R, fill: "none", stroke: "var(--rule)", "stroke-width": 1.5 }, svg);
+  const hv = el("line", { x1: 0, y1: 0, x2: 0, y2: -R, stroke: "var(--s1)", "stroke-width": 3 }, svg);
+  el("text", { x: 6, y: -R - 8, class: "svgmath" }, svg).textContent = "h";
+  const trail = el("path", { fill: "none", stroke: "var(--s2)", "stroke-width": 2, opacity: 0.45 }, svg);
+  const lagArc = el("path", { fill: "none", stroke: "var(--muted)", "stroke-dasharray": "3 3" }, svg);
+  const dot = el("circle", { r: 9, fill: "var(--s2)", stroke: "var(--surface)", "stroke-width": 2 }, svg);
+  let th = 2.5, hist = [];
+  const P = (a, r = R) => [r * Math.sin(a), -r * Math.cos(a)];    // angle clockwise from h (top)
+  function stepA(dt) { const w = +$("aW").value / 100, h = +$("aH").value / 100; th = th + dt * (w - h * Math.sin(th)); th = Math.atan2(Math.sin(th), Math.cos(th)); }
+  function draw() {
+    const w = +$("aW").value / 100, h = +$("aH").value / 100; $("aWv").textContent = w.toFixed(2); $("aHv").textContent = h.toFixed(2);
+    hv.setAttribute("y2", -R * Math.min(1.25, 0.35 + h / 2));
+    const p = P(th); dot.setAttribute("cx", p[0]); dot.setAttribute("cy", p[1]);
+    hist.push(p); if (hist.length > 60) hist.shift();
+    trail.setAttribute("d", hist.map((q, i) => (i ? "L" : "M") + q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" "));
+    const locked = h >= w;
+    if (locked && w > 0) { const lag = Math.asin(w / h); const a = P(0, 60), b = P(lag, 60); lagArc.setAttribute("d", `M${a[0]},${a[1]} A60,60 0 0 1 ${b[0]},${b[1]}`); } else lagArc.setAttribute("d", "");
+    const lagTxt = locked ? (w > 0 ? deg(Math.asin(w / h)).toFixed(0) + "°" : "0°") : "none";
+    $("bAdlerRead").innerHTML = `<dt>state</dt><dd style="color:var(${locked ? "--good" : "--bad"})">${locked ? "✓ locked (fixed point)" : "✗ drifting"}</dd>` +
+      `<dt>lag behind h</dt><dd>${lagTxt}</dd>` +
+      (locked ? `<dt>relaxation rate √(‖h‖²−ω²)</dt><dd>${Math.sqrt(h * h - w * w).toFixed(2)}</dd>` : `<dt>slip period 2π/√(ω²−‖h‖²)</dt><dd>${(2 * Math.PI / Math.sqrt(w * w - h * h)).toFixed(1)}</dd>`);
+  }
+  function loop() { for (let k = 0; k < 2; k++) stepA(0.04); draw(); requestAnimationFrame(loop); }
+  ["aW", "aH"].forEach((id) => $(id).addEventListener("input", () => { hist = []; if (reduceMotion) { for (let k = 0; k < 2000; k++) stepA(0.04); } draw(); }));
+  if (reduceMotion) { for (let k = 0; k < 2000; k++) stepA(0.04); draw(); } else loop();
+})();
+
+(function basicsDamping() {
+  const svg = $("bDamp"), S = 80;
+  const M = (re, im) => [S * re, -S * im];
+  el("line", { x1: -165, x2: 165, y1: 0, y2: 0, stroke: "var(--rule)" }, svg); el("line", { x1: 0, x2: 0, y1: -145, y2: 145, stroke: "var(--rule)" }, svg);
+  el("text", { x: 160, y: -6, "text-anchor": "end", class: "svgtext" }, svg).textContent = "Re"; el("text", { x: 6, y: -136, class: "svgtext" }, svg).textContent = "Im";
+  el("circle", { cx: 0, cy: 0, r: S, fill: "var(--surface)", stroke: "var(--ink-2)", "stroke-width": 1.5 }, svg);
+  el("text", { x: -S * 0.95, y: S + 22, class: "svgtext" }, svg).textContent = "unit circle";
+  const one = M(1, 0); el("circle", { cx: one[0], cy: one[1], r: 4, fill: "var(--ink)" }, svg); el("text", { x: one[0] + 6, y: one[1] + 16, class: "svgtext" }, svg).textContent = "1";
+  const seg = el("line", { x1: one[0], y1: one[1], stroke: "var(--muted)", "stroke-dasharray": "4 3" }, svg);
+  const win = el("line", { x1: one[0], y1: one[1], stroke: "var(--good)", "stroke-width": 5, "stroke-linecap": "round", opacity: 0.6 }, svg);
+  const dp = el("circle", { r: 6, fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }, svg);
+  const zp = el("circle", { r: 9, fill: "none", stroke: "var(--s2)", "stroke-width": 3 }, svg);
+  const zl = el("text", { class: "svgmath" }, svg); zl.textContent = "ζ";
+  function upd() {
+    const re = +$("dRe").value / 100, im = +$("dIm").value / 100, eta = +$("dEta").value / 100;
+    $("dRev").textContent = re.toFixed(2); $("dImv").textContent = im.toFixed(2); $("dEtav").textContent = eta.toFixed(2);
+    const z = M(re, im); zp.setAttribute("cx", z[0]); zp.setAttribute("cy", z[1]); zl.setAttribute("x", z[0] + 9); zl.setAttribute("y", z[1] - 6);
+    seg.setAttribute("x2", z[0]); seg.setAttribute("y2", z[1]);
+    const dre = 1 + eta * (re - 1), dim = eta * im, d = M(dre, dim); dp.setAttribute("cx", d[0]); dp.setAttribute("cy", d[1]);
+    const dz2 = (re - 1) ** 2 + im * im, emax = re < 1 && dz2 > 0 ? 2 * (1 - re) / dz2 : 0, eopt = re < 1 && dz2 > 0 ? (1 - re) / dz2 : 0;
+    const e1 = Math.min(1, emax), w = M(1 + e1 * (re - 1), e1 * im); win.setAttribute("x2", w[0]); win.setAttribute("y2", w[1]); win.style.display = emax > 0 ? "" : "none";
+    const mz = Math.hypot(re, im), md = Math.hypot(dre, dim);
+    const cOpt = re < 1 ? Math.sqrt(Math.max(0, 1 - (1 - re) ** 2 / dz2)) : NaN;
+    $("bDampRead").innerHTML = `<dt>|ζ| (undamped)</dt><dd>${mz.toFixed(3)}</dd><dt>|1 + η(ζ − 1)|</dt><dd style="color:var(${md < 1 ? "--good" : "--bad"})">${md.toFixed(3)} ${md < 1 ? "✓ decays" : "✗ grows"}</dd>` +
+      `<dt>stable for η &lt;</dt><dd>${re < 1 ? emax.toFixed(3) : "no η works"}</dd><dt>best η*, factor per step</dt><dd>${re < 1 ? eopt.toFixed(3) + ", " + cOpt.toFixed(3) : "n/a"}</dd>`;
+    const s = $("bDampErr"); s.innerHTML = ""; const K = 40, lo = -4, hi = 2;
+    const Y = (v) => 110 - 95 * (Math.max(lo, Math.min(hi, Math.log10(v))) - lo) / (hi - lo), X = (k) => 34 + 260 * k / K;
+    [-4, -2, 0, 2].forEach((k) => { el("line", { x1: 34, x2: 294, y1: Y(Math.pow(10, k)), y2: Y(Math.pow(10, k)), stroke: "var(--rule)" }, s); el("text", { x: 30, y: Y(Math.pow(10, k)) + 4, "text-anchor": "end", class: "svgtext" }, s).innerHTML = `10<tspan dy="-5" font-size="9">${String(k).replace("-", "−")}</tspan>`; });
+    [[mz, "s2"], [md, "s1"]].forEach(([m, col]) => el("polyline", { points: Array.from({ length: K + 1 }, (_, k) => `${X(k)},${Y(Math.max(1e-6, Math.pow(m, k)))}`).join(" "), fill: "none", stroke: `var(--${col})`, "stroke-width": 2 }, s));
+    el("text", { x: 34, y: 126, class: "svgtext" }, s).textContent = "error size over 40 iterations (log scale)";
+  }
+  ["dRe", "dIm", "dEta"].forEach((id) => $(id).addEventListener("input", upd)); upd();
+})();
+
+</script>
+</body>
+</html>
